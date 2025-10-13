@@ -1,0 +1,608 @@
+// src/components/Layout/DashboardMenu.tsx
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../../contexts/AuthContext';
+import { 
+  BarChart3, 
+  Zap, 
+  Briefcase, 
+  FileText, 
+  Shield, 
+  Key, 
+  CreditCard, 
+  Settings,
+  HelpCircle,
+  LogOut
+} from 'lucide-react';
+
+interface DashboardMenuProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onOpen: () => void;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+}
+
+const DashboardMenu: React.FC<DashboardMenuProps> = ({ 
+  isOpen, 
+  onClose, 
+  onOpen,
+  isCollapsed,
+  onToggleCollapse 
+}) => {
+  const [activePath, setActivePath] = useState('');
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  useEffect(() => {
+    setActivePath(location.pathname);
+  }, [location.pathname]);
+
+  const menuItems = [
+    {
+      category: 'Trading',
+      items: [
+        { 
+          name: 'Dashboard', 
+          href: '/dashboard', 
+          icon: BarChart3,
+          description: 'Trading overview & analytics'
+        },
+        { 
+          name: 'Live Trading', 
+          href: '/dashboard/trading', 
+          icon: Zap,
+          description: 'Real-time execution'
+        },
+        { 
+          name: 'Portfolio', 
+          href: '/dashboard/portfolio', 
+          icon: Briefcase,
+          description: 'Asset management'
+        },
+      ]
+    },
+    {
+      category: 'Analytics',
+      items: [
+        { 
+          name: 'Reports', 
+          href: '/dashboard/reports', 
+          icon: FileText,
+          description: 'Detailed analysis'
+        },
+        { 
+          name: 'Risk Metrics', 
+          href: '/dashboard/risk', 
+          icon: Shield,
+          description: 'Risk management'
+        },
+      ]
+    },
+    {
+      category: 'Account',
+      items: [
+        { 
+          name: 'API Keys', 
+          href: '/dashboard/api-key', 
+          icon: Key,
+          description: 'Exchange connections'
+        },
+        { 
+          name: 'Billing', 
+          href: '/dashboard/billing', 
+          icon: CreditCard,
+          description: 'Subscription & plans'
+        },
+        { 
+          name: 'Settings', 
+          href: '/dashboard/settings', 
+          icon: Settings,
+          description: 'Platform configuration'
+        },
+      ]
+    }
+  ];
+
+  const quickStats = [
+    { label: 'Daily P&L', value: '+2.4%', color: 'text-green-400' },
+    { label: 'Active Bots', value: '3/5', color: 'text-yellow-400' },
+    { label: 'Win Rate', value: '87.3%', color: 'text-blue-400' },
+  ];
+
+  const handleConnectWallet = () => {
+    navigate("/dashboard/api-key");
+  };
+
+  const handleNavigation = (href: string) => {
+    navigate(href);
+    onClose();
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  const getUserInitial = () => {
+    return user?.full_name?.charAt(0).toUpperCase() || 'U';
+  };
+
+  const getUserName = () => {
+    return user?.full_name || 'User';
+  };
+
+  return (
+    <>
+      {/* Overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Menu Panel */}
+      <motion.div
+        initial={{ x: '-100%' }}
+        animate={{ x: isOpen ? 0 : '-100%' }}
+        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+        className={`fixed top-0 left-0 h-full bg-gray-900 border-r border-gray-800/50 z-50 flex flex-col ${
+          isCollapsed ? 'w-20' : 'w-80'
+        } transition-all duration-300 ease-in-out`}
+      >
+        {/* Header */}
+        <div className={`p-6 border-b border-gray-800/50 ${isCollapsed ? 'px-4' : ''}`}>
+          <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} mb-6`}>
+            <Link 
+              to="/dashboard" 
+              className={`flex items-center group ${isCollapsed ? 'justify-center' : 'space-x-3'}`}
+            >
+              <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/25">
+                <span className="text-gray-900 font-bold text-lg">T</span>
+              </div>
+              {!isCollapsed && (
+                <div className="flex flex-col">
+                  <span className="text-white font-bold text-xl">TOKABI</span>
+                  <span className="text-yellow-400 text-xs font-medium">DASHBOARD</span>
+                </div>
+              )}
+            </Link>
+            
+            {!isCollapsed && (
+              <button
+                onClick={onClose}
+                className="p-2 rounded-lg bg-gray-800/50 border border-gray-700/50 text-gray-400 hover:text-white transition-colors duration-200 lg:hidden"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {/* Quick Stats */}
+          {!isCollapsed && (
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              {quickStats.map((stat, index) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="text-center p-2 bg-gray-800/30 rounded-lg border border-gray-700/30 hover:border-gray-600/50 transition-colors duration-200"
+                >
+                  <div className={`text-sm font-bold ${stat.color}`}>{stat.value}</div>
+                  <div className="text-xs text-gray-400">{stat.label}</div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {/* Connect Wallet Button */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleConnectWallet}
+            className={`w-full py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-xl hover:from-green-400 hover:to-green-500 transition-all duration-300 shadow-lg shadow-green-500/25 flex items-center justify-center ${
+              isCollapsed ? 'px-2' : 'space-x-2'
+            }`}
+          >
+            {isCollapsed ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <span>Connect Wallet</span>
+              </>
+            )}
+          </motion.button>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          <div className={`p-4 space-y-6 ${isCollapsed ? 'px-2' : ''}`}>
+            {menuItems.map((category, categoryIndex) => (
+              <motion.div
+                key={category.category}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: categoryIndex * 0.1 }}
+              >
+                {!isCollapsed && (
+                  <h3 className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-3 px-2">
+                    {category.category}
+                  </h3>
+                )}
+                <div className="space-y-1">
+                  {category.items.map((item) => {
+                    const isActive = activePath === item.href;
+                    const Icon = item.icon;
+                    return (
+                      <motion.button
+                        key={item.name}
+                        whileHover={{ x: isCollapsed ? 0 : 4 }}
+                        onClick={() => handleNavigation(item.href)}
+                        className={`w-full text-left rounded-xl transition-all duration-200 group border ${
+                          isCollapsed ? 'p-3 justify-center' : 'p-3'
+                        } ${
+                          isActive
+                            ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400 shadow-lg shadow-yellow-500/10'
+                            : 'text-gray-300 hover:bg-gray-800/50 hover:text-white border-transparent hover:border-gray-700/50'
+                        }`}
+                      >
+                        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
+                          <Icon className={`transition-transform duration-200 group-hover:scale-110 ${
+                            isCollapsed ? 'w-5 h-5' : 'w-5 h-5'
+                          }`} />
+                          {!isCollapsed && (
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-sm">{item.name}</div>
+                              <div className={`text-xs transition-colors duration-200 ${
+                                isActive ? 'text-yellow-300/70' : 'text-gray-400 group-hover:text-gray-300'
+                              }`}>
+                                {item.description}
+                              </div>
+                            </div>
+                          )}
+                          {!isCollapsed && isActive && (
+                            <motion.div
+                              layoutId="activeMenuIndicator"
+                              className="w-2 h-2 bg-yellow-400 rounded-full shadow-lg shadow-yellow-400/50"
+                            />
+                          )}
+                        </div>
+                        {isCollapsed && isActive && (
+                          <motion.div
+                            layoutId="activeMenuIndicatorCollapsed"
+                            className="w-1 h-1 bg-yellow-400 rounded-full mx-auto mt-2 shadow-lg shadow-yellow-400/50"
+                          />
+                        )}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className={`p-4 border-t border-gray-800/50 ${isCollapsed ? 'px-2' : ''}`}>
+          <div className="space-y-3">
+            {/* User Profile */}
+            <div className={`flex items-center rounded-lg bg-gray-800/30 border border-gray-700/30 ${
+              isCollapsed ? 'p-2 justify-center' : 'p-3 space-x-3'
+            }`}>
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm font-bold">{getUserInitial()}</span>
+              </div>
+              {!isCollapsed && (
+                <div className="flex-1 min-w-0">
+                  <div className="text-white text-sm font-semibold truncate">{getUserName()}</div>
+                  <div className="text-gray-400 text-xs truncate">Pro Plan</div>
+                </div>
+              )}
+              {!isCollapsed && (
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              )}
+            </div>
+
+            {/* Support & Logout */}
+            <div className={`grid gap-2 ${isCollapsed ? 'grid-cols-1' : 'grid-cols-2'}`}>
+              <button 
+                onClick={() => {
+                  window.open('https://support.tokabi.com', '_blank');
+                  onClose();
+                }}
+                className={`text-gray-400 hover:text-yellow-400 transition-colors duration-200 text-sm font-medium rounded-lg border border-gray-700/30 hover:border-yellow-500/30 hover:bg-yellow-500/5 ${
+                  isCollapsed ? 'p-2 flex justify-center' : 'p-2'
+                }`}
+                title={isCollapsed ? "Support" : undefined}
+              >
+                {isCollapsed ? (
+                  <HelpCircle className="w-4 h-4" />
+                ) : (
+                  'Support'
+                )}
+              </button>
+              <button 
+                onClick={handleLogout}
+                className={`text-gray-400 hover:text-red-400 transition-colors duration-200 text-sm font-medium rounded-lg border border-gray-700/30 hover:border-red-500/30 hover:bg-red-500/5 ${
+                  isCollapsed ? 'p-2 flex justify-center' : 'p-2'
+                }`}
+                title={isCollapsed ? "Logout" : undefined}
+              >
+                {isCollapsed ? (
+                  <LogOut className="w-4 h-4" />
+                ) : (
+                  'Logout'
+                )}
+              </button>
+            </div>
+
+            {/* Collapse Toggle Button - Desktop Only */}
+            <div className="hidden lg:block pt-2 border-t border-gray-800/30">
+              <button
+                onClick={onToggleCollapse}
+                className="w-full p-2 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200 flex items-center justify-center"
+                title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              >
+                <svg 
+                  className={`w-4 h-4 transform transition-transform duration-300 ${
+                    isCollapsed ? 'rotate-180' : ''
+                  }`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Enhanced Desktop Sidebar */}
+      <div className={`hidden lg:flex lg:flex-shrink-0 lg:flex-col lg:fixed lg:inset-y-0 lg:z-30 transition-all duration-300 ease-in-out ${
+        isCollapsed ? 'lg:w-20' : 'lg:w-80'
+      }`}>
+        <div className="flex-1 flex flex-col min-h-0 bg-gray-900 border-r border-gray-800/50 backdrop-blur-sm">
+          {/* Same content as mobile menu but always visible */}
+          {/* Header */}
+          <div className={`p-6 border-b border-gray-800/50 ${isCollapsed ? 'px-4' : ''}`}>
+            <Link 
+              to="/dashboard" 
+              className={`flex items-center group ${isCollapsed ? 'justify-center' : 'space-x-3'}`}
+            >
+              <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/25">
+                <span className="text-gray-900 font-bold text-lg">T</span>
+              </div>
+              {!isCollapsed && (
+                <div className="flex flex-col">
+                  <span className="text-white font-bold text-xl">TOKABI</span>
+                  <span className="text-yellow-400 text-xs font-medium">DASHBOARD</span>
+                </div>
+              )}
+            </Link>
+
+            {/* Quick Stats */}
+            {!isCollapsed && (
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                {quickStats.map((stat, index) => (
+                  <div
+                    key={stat.label}
+                    className="text-center p-2 bg-gray-800/30 rounded-lg border border-gray-700/30 hover:border-gray-600/50 transition-colors duration-200"
+                  >
+                    <div className={`text-sm font-bold ${stat.color}`}>{stat.value}</div>
+                    <div className="text-xs text-gray-400">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Connect Wallet Button */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleConnectWallet}
+              className={`w-full py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-xl hover:from-green-400 hover:to-green-500 transition-all duration-300 shadow-lg shadow-green-500/25 flex items-center justify-center ${
+                isCollapsed ? 'px-2' : 'space-x-2'
+              }`}
+            >
+              {isCollapsed ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <span>Connect Wallet</span>
+                </>
+              )}
+            </motion.button>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <div className={`p-4 space-y-6 ${isCollapsed ? 'px-2' : ''}`}>
+              {menuItems.map((category) => (
+                <div key={category.category}>
+                  {!isCollapsed && (
+                    <h3 className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-3 px-2">
+                      {category.category}
+                    </h3>
+                  )}
+                  <div className="space-y-1">
+                    {category.items.map((item) => {
+                      const isActive = activePath === item.href;
+                      const Icon = item.icon;
+                      return (
+                        <motion.button
+                          key={item.name}
+                          whileHover={{ x: isCollapsed ? 0 : 4 }}
+                          onClick={() => handleNavigation(item.href)}
+                          className={`w-full text-left rounded-xl transition-all duration-200 group border ${
+                            isCollapsed ? 'p-3 justify-center' : 'p-3'
+                          } ${
+                            isActive
+                              ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400 shadow-lg shadow-yellow-500/10'
+                              : 'text-gray-300 hover:bg-gray-800/50 hover:text-white border-transparent hover:border-gray-700/50'
+                          }`}
+                        >
+                          <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
+                            <Icon className={`transition-transform duration-200 group-hover:scale-110 ${
+                              isCollapsed ? 'w-5 h-5' : 'w-5 h-5'
+                            }`} />
+                            {!isCollapsed && (
+                              <div className="flex-1 min-w-0">
+                                <div className="font-semibold text-sm">{item.name}</div>
+                                <div className={`text-xs transition-colors duration-200 ${
+                                  isActive ? 'text-yellow-300/70' : 'text-gray-400 group-hover:text-gray-300'
+                                }`}>
+                                  {item.description}
+                                </div>
+                              </div>
+                            )}
+                            {!isCollapsed && isActive && (
+                              <motion.div
+                                layoutId="activeMenuIndicator"
+                                className="w-2 h-2 bg-yellow-400 rounded-full shadow-lg shadow-yellow-400/50"
+                              />
+                            )}
+                          </div>
+                          {isCollapsed && isActive && (
+                            <motion.div
+                              layoutId="activeMenuIndicatorCollapsed"
+                              className="w-1 h-1 bg-yellow-400 rounded-full mx-auto mt-2 shadow-lg shadow-yellow-400/50"
+                            />
+                          )}
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className={`p-4 border-t border-gray-800/50 ${isCollapsed ? 'px-2' : ''}`}>
+            <div className="space-y-3">
+              {/* User Profile */}
+              <div className={`flex items-center rounded-lg bg-gray-800/30 border border-gray-700/30 ${
+                isCollapsed ? 'p-2 justify-center' : 'p-3 space-x-3'
+              }`}>
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">{getUserInitial()}</span>
+                </div>
+                {!isCollapsed && (
+                  <div className="flex-1 min-w-0">
+                    <div className="text-white text-sm font-semibold truncate">{getUserName()}</div>
+                    <div className="text-gray-400 text-xs truncate">Pro Plan</div>
+                  </div>
+                )}
+                {!isCollapsed && (
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                )}
+              </div>
+
+              {/* Support & Logout */}
+              <div className={`grid gap-2 ${isCollapsed ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                <button 
+                  onClick={() => window.open('https://support.tokabi.com', '_blank')}
+                  className={`text-gray-400 hover:text-yellow-400 transition-colors duration-200 text-sm font-medium rounded-lg border border-gray-700/30 hover:border-yellow-500/30 hover:bg-yellow-500/5 ${
+                    isCollapsed ? 'p-2 flex justify-center' : 'p-2'
+                  }`}
+                  title={isCollapsed ? "Support" : undefined}
+                >
+                  {isCollapsed ? (
+                    <HelpCircle className="w-4 h-4" />
+                  ) : (
+                    'Support'
+                  )}
+                </button>
+                <button 
+                  onClick={handleLogout}
+                  className={`text-gray-400 hover:text-red-400 transition-colors duration-200 text-sm font-medium rounded-lg border border-gray-700/30 hover:border-red-500/30 hover:bg-red-500/5 ${
+                    isCollapsed ? 'p-2 flex justify-center' : 'p-2'
+                  }`}
+                  title={isCollapsed ? "Logout" : undefined}
+                >
+                  {isCollapsed ? (
+                    <LogOut className="w-4 h-4" />
+                  ) : (
+                    'Logout'
+                  )}
+                </button>
+              </div>
+
+              {/* Collapse Toggle Button */}
+              <div className="pt-2 border-t border-gray-800/30">
+                <button
+                  onClick={onToggleCollapse}
+                  className="w-full p-2 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200 flex items-center justify-center"
+                  title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                >
+                  <svg 
+                    className={`w-4 h-4 transform transition-transform duration-300 ${
+                      isCollapsed ? 'rotate-180' : ''
+                    }`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile menu button for dashboard header - Only show when menu is closed */}
+      <AnimatePresence>
+        {!isOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="lg:hidden fixed top-4 left-4 z-30"
+          >
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onOpen}
+              className="p-2 rounded-xl bg-gray-800/80 backdrop-blur-sm border border-gray-700/50 text-gray-300 hover:text-white transition-all duration-200 shadow-lg"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+};
+
+export default DashboardMenu;

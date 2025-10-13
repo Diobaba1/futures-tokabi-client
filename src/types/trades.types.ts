@@ -1,0 +1,30 @@
+// src/types/trade.types.ts
+export interface TradeResponse {
+  id: string;
+  user_id: string;
+  signal_id?: string;
+  symbol: string;
+  side: string;
+  position_type: string;
+  entry_price: number;
+  position_size_usd: number;
+  leverage: number;
+  quantity: number;
+  take_profit_price: number;
+  stop_loss_price: number;
+  trailing_stop_enabled: boolean;
+  exit_price?: number;
+  exit_reason?: string;
+  unrealized_pnl_usd: number;
+  realized_pnl_usd?: number;
+  realized_pnl_percent?: number;
+  fees_usd: number;
+  entry_order_id?: string;
+  exit_order_id?: string;
+  status: string;
+  created_at: string;
+  opened_at?: string;
+  closed_at?: string;
+  error_message?: string;
+  retry_count: number;
+}
