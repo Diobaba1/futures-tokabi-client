@@ -53,3 +53,64 @@
 .border-white\/10 { border-color: rgba(255, 255, 255, 0.1); }
 .bg-white\/5 { background-color: rgba(255, 255, 255, 0.05); }
 .bg-white\/10 { background-color: rgba(255, 255, 255, 0.1); }
+
+
+/* Add to your CSS file */
+.websocket-status {
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.status.connected {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status.connecting {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status.disconnected {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+
+.reconnect-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.reconnect-btn:hover {
+  background-color: #0056b3;
+}
+
+.real-time-indicator {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-weight: bold;
+}
