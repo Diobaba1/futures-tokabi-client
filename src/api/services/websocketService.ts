@@ -65,27 +65,21 @@ export class WebSocketService {
     };
   }
 
+  // src/api/services/websocketService.ts - Only the buildWebSocketUrl method
   private buildWebSocketUrl(path: string, token?: string): string {
     try {
-      // For localhost development, use the environment variable
-      const baseApi = process.env.REACT_APP_API_BASE_URL || "https://server.tokabi.org/api";
-      
-      // Convert HTTP to WebSocket protocol
+      const baseApi =
+        process.env.REACT_APP_API_BASE_URL || "https://server.tokabi.org/api";
+
       const wsBase = baseApi
         .replace(/^http/, "ws")
         .replace(/^https/, "wss")
-        .replace(/\/+$/, ""); // remove trailing slashes
+        .replace(/\/api\/?$/, ""); // Remove /api from the end
 
-      // Your backend WebSocket route is mounted at /api/stream
-      // The full path should be: /stream/ws/portfolio/{user_id}
-      let normalizedPath = path;
-      
-      // Ensure the path starts with /stream
-      if (!normalizedPath.startsWith("/stream")) {
-        normalizedPath = `/stream${normalizedPath.startsWith("/") ? normalizedPath : `/${normalizedPath}`}`;
-      }
-
-      let url = `${wsBase}${normalizedPath}`;
+      // The path already includes /ws/portfolio/{user_id}
+      // Backend expects: /api/stream/ws/portfolio/{user_id}
+      let normalizedPath = path.startsWith("/") ? path : `/${path}`;
+      let url = `${wsBase}/api/stream${normalizedPath}`;
 
       if (token) {
         const separator = url.includes("?") ? "&" : "?";

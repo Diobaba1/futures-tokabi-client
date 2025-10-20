@@ -6,6 +6,7 @@ import React, {
   ReactNode,
   useEffect,
   useRef,
+  useCallback,
 } from "react";
 import { authService } from "../../api/services";
 import {
@@ -48,43 +49,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [websocketStatus, setWebsocketStatus] = useState<string>("idle");
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const isConnectingRef = useRef(false);
+  const hasInitialized = useRef(false);
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (token) {
-        try {
-          await refreshUser();
-        } catch (error) {
-          console.error("Failed to refresh user on init:", error);
-          await clearAuth();
-        }
-      } else {
-        setIsLoading(false);
-      }
-    };
-
-    initializeAuth();
-
-    // Cleanup on unmount
-    return () => {
-      if (unsubscribeRef.current) {
-        unsubscribeRef.current();
-      }
-      websocketService.disconnect();
-    };
-  }, []);
-
-  const connectWebSocket = (userId: string, token: string) => {
+  const connectWebSocket = useCallback((userId: string, token: string) => {
     try {
-      // Prevent duplicate connection attempts
       if (isConnectingRef.current || websocketService.isConnected()) {
         return;
       }
 
       isConnectingRef.current = true;
 
-      // Clean up previous connection and listeners
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
         unsubscribeRef.current = null;
@@ -92,15 +66,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       websocketService.disconnect();
 
-      // Use the correct WebSocket path that matches your backend
       const wsPath = `/ws/portfolio/${userId}`;
       
-      // Subscribe to connection status changes
       unsubscribeRef.current = websocketService.onConnectionChange((status) => {
         console.log("WebSocket connection status changed:", status);
         setWebsocketStatus(status);
         
-        // Reset connecting flag when connection is established or failed
         if (status === "connected" || status === "error" || status === "disconnected") {
           isConnectingRef.current = false;
         }
@@ -118,7 +89,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       });
 
-      // Connect to WebSocket with a small delay to ensure auth is fully processed
       setTimeout(() => {
         websocketService.connect(wsPath, token);
       }, 100);
@@ -128,9 +98,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setWebsocketStatus("error");
       isConnectingRef.current = false;
     }
-  };
+  }, []);
 
-  const reconnectWebSocket = () => {
+  const reconnectWebSocket = useCallback(() => {
     if (user?.id) {
       const token = localStorage.getItem("accessToken");
       if (token) {
@@ -138,9 +108,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         connectWebSocket(user.id, token);
       }
     }
-  };
+  }, [user?.id, connectWebSocket]);
 
-  const clearAuth = async () => {
+  const clearAuth = useCallback(async () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     setUser(null);
@@ -149,56 +119,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setWebsocketStatus("idle");
     isConnectingRef.current = false;
     
-    // Clean up WebSocket connection
     if (unsubscribeRef.current) {
       unsubscribeRef.current();
       unsubscribeRef.current = null;
     }
     websocketService.disconnect();
-  };
+  }, []);
 
-  const login = async (data: LoginRequest) => {
-    setIsLoading(true);
-    try {
-      const response = await authService.login(data);
-      localStorage.setItem("accessToken", response.access_token);
-      localStorage.setItem("refreshToken", response.refresh_token);
-      await refreshUser();
-    } catch (error) {
-      await clearAuth();
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const register = async (data: RegisterRequest): Promise<void> => {
-    setIsLoading(true);
-    try {
-      const response = await authService.register(data);
-      localStorage.setItem("accessToken", response.access_token);
-      localStorage.setItem("refreshToken", response.refresh_token);
-      await refreshUser();
-    } catch (error) {
-      await clearAuth();
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const logout = async () => {
-    setIsLoading(true);
-    try {
-      await authService.logout();
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      await clearAuth();
-    }
-  };
-
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     try {
       const token = localStorage.getItem("accessToken");
       if (!token) {
@@ -209,8 +137,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(fetchedUser);
       setIsAuthenticated(true);
       
-      // Connect WebSocket with user ID and token
-      if (fetchedUser.id) {
+      if (fetchedUser.id && !websocketService.isConnected()) {
         console.log("🔄 Setting up WebSocket for user:", fetchedUser.id);
         connectWebSocket(fetchedUser.id, token);
       }
@@ -218,8 +145,75 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error("Failed to refresh user:", error);
       await clearAuth();
       throw error;
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [connectWebSocket, clearAuth]);
+
+  useEffect(() => {
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
+    const initializeAuth = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        try {
+          await refreshUser();
+        } catch (error) {
+          console.error("Failed to refresh user on init:", error);
+          await clearAuth();
+        }
+      } else {
+        setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
+
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+      }
+      websocketService.disconnect();
+    };
+  }, [refreshUser, clearAuth]);
+
+  const login = useCallback(async (data: LoginRequest) => {
+    setIsLoading(true);
+    try {
+      const response = await authService.login(data);
+      localStorage.setItem("accessToken", response.access_token);
+      localStorage.setItem("refreshToken", response.refresh_token);
+      await refreshUser();
+    } catch (error) {
+      await clearAuth();
+      throw error;
+    }
+  }, [refreshUser, clearAuth]);
+
+  const register = useCallback(async (data: RegisterRequest): Promise<void> => {
+    setIsLoading(true);
+    try {
+      const response = await authService.register(data);
+      localStorage.setItem("accessToken", response.access_token);
+      localStorage.setItem("refreshToken", response.refresh_token);
+      await refreshUser();
+    } catch (error) {
+      await clearAuth();
+      throw error;
+    }
+  }, [refreshUser, clearAuth]);
+
+  const logout = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      await clearAuth();
+    }
+  }, [clearAuth]);
 
   const value: AuthContextType = {
     user,
