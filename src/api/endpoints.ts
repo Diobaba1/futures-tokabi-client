@@ -37,7 +37,7 @@ export const API_ENDPOINTS = {
     PORTFOLIO: "/analytics/portfolio",
     PERFORMANCE: "/analytics/performance",
     HISTORY: "/analytics/history",
-    SYSTEM: "/system"
+    SYSTEM: "/analytics/system"
   },
 
   // Signals (open endpoints)

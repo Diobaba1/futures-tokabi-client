@@ -1,44 +1,66 @@
-// src/services/signalService.ts
-import axiosInstance from "../axiosConfig";
+import axiosInstance from '../axiosConfig';
 import {
-  GetSignalsParams,
   SignalResponse,
   SignalDetailResponse,
-  SignalStatsResponse,
-  AvailableSymbolsResponse,
-} from "../../types/signals.types";
-import { API_ENDPOINTS } from "../endpoints";
+  SignalStats,
+  SignalFilters,
+  SignalsResponse
+} from '../../types/signals.types';
 
-export const signalService = {
-  /**
-   * Get paginated list of trading signals with filtering options
-   */
-  getSignals: async (params: GetSignalsParams = {}): Promise<{ trades: SignalResponse[]; pagination: any }> => {
-    const response = await axiosInstance.get(API_ENDPOINTS.SIGNALS.LIST, { params });
-    return response.data;
-  },
+class SignalsService {
+  private basePath = '/signals';
 
-  /**
-   * Get detailed information for a specific signal
-   */
-  getSignalDetail: async (signalId: string): Promise<SignalDetailResponse> => {
-    const response = await axiosInstance.get(`${API_ENDPOINTS.SIGNALS.DETAIL.replace('{signal_id}', signalId)}`);
-    return response.data;
-  },
+  async getSignals(filters: SignalFilters = {}): Promise<SignalsResponse> {
+    const {
+      symbol,
+      decision,
+      limit = 50,
+      offset = 0,
+      start_date,
+      end_date
+    } = filters;
 
-  /**
-   * Get list of all available symbols that have signals
-   */
-  getAvailableSymbols: async (): Promise<AvailableSymbolsResponse> => {
-    const response = await axiosInstance.get(API_ENDPOINTS.SIGNALS.SYMBOLS);
-    return response.data;
-  },
+    const params: Record<string, any> = {
+      limit,
+      offset
+    };
 
-  /**
-   * Get signal statistics for the specified timeframe
-   */
-  getSignalStats: async (timeframe: string = '24h'): Promise<SignalStatsResponse> => {
-    const response = await axiosInstance.get(`${API_ENDPOINTS.SIGNALS.STATS}?timeframe=${timeframe}`);
+    if (symbol) params.symbol = symbol;
+    if (decision) params.decision = decision;
+    if (start_date) params.start_date = start_date;
+    if (end_date) params.end_date = end_date;
+
+    const response = await axiosInstance.get<SignalResponse[]>(this.basePath + '/', { params });
+    
+    // Note: The backend doesn't return total in response, so we'd need to handle pagination differently
+    // For now, we'll assume if we get less than limit, there are no more signals
+    const hasMore = response.data.length === limit;
+    
+    return {
+      signals: response.data,
+      total: offset + response.data.length, // This is approximate
+      hasMore
+    };
+  }
+
+  async getSignal(signalId: string): Promise<SignalDetailResponse> {
+    const response = await axiosInstance.get<SignalDetailResponse>(
+      `${this.basePath}/${signalId}`
+    );
     return response.data;
-  },
-};
+  }
+
+  async getAvailableSymbols(): Promise<string[]> {
+    const response = await axiosInstance.get<string[]>(this.basePath + '/symbols/');
+    return response.data;
+  }
+
+  async getSignalStats(timeframe: '1h' | '24h' | '7d' | '30d' | 'all' = '24h'): Promise<SignalStats> {
+    const response = await axiosInstance.get<SignalStats>(this.basePath + '/stats/summary', {
+      params: { timeframe }
+    });
+    return response.data;
+  }
+}
+
+export const signalsService = new SignalsService();

@@ -1,750 +1,508 @@
-// src/pages/pageComponents/SignalsPage.tsx
-import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { useAuth } from "../../components/contexts/AuthContext";
-import { signalService } from "../../api/services/signalsService";
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   SignalResponse,
   SignalDetailResponse,
-  GetSignalsParams,
-  SignalStatsResponse,
-  AvailableSymbolsResponse,
-} from "../../types/signals.types";
-import {
-  Filter,
-  Search,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  RefreshCw,
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  BarChart3,
-  Eye,
-  Download,
-  Share2,
-  Zap,
-  Shield,
-  Target,
-  Clock,
-  AlertTriangle,
-  CheckCircle2,
-  PieChart,
-} from "lucide-react";
+  SignalStats,
+  SignalFilters
+} from '../../types/signals.types';
+import { signalsService } from '../../api/services/signalsService';
 
-interface SignalStatsDisplay extends SignalStatsResponse {
-  win_rate?: number;
-  avg_holding_period?: number;
-}
-
-const SignalsPage: React.FC = () => {
-  const { user } = useAuth();
-  const [signals, setSignals] = useState<SignalResponse[]>([]);
-  const [stats, setStats] = useState<SignalStatsDisplay | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedSignal, setSelectedSignal] =
-    useState<SignalDetailResponse | null>(null);
-  const [showDetailModal, setShowDetailModal] = useState(false);
-
-  // Filter states
-  const [filters, setFilters] = useState<GetSignalsParams>({
-    limit: 20,
-    offset: 0,
-    symbol: "",
-    decision: undefined,
-    start_date: "",
-    end_date: "",
-  });
+const SignalPage: React.FC = () => {
+  const [allSignals, setAllSignals] = useState<SignalResponse[]>([]);
+  const [selectedSignal, setSelectedSignal] = useState<SignalDetailResponse | null>(null);
   const [availableSymbols, setAvailableSymbols] = useState<string[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [filters, setFilters] = useState<SignalFilters>({
+    symbol: undefined,
+    decision: undefined,
+    limit: 50
+  });
 
-  const loadSignals = useCallback(
-    async (showRefreshSpinner = false) => {
-      if (!user) return;
-      try {
-        if (showRefreshSpinner) {
-          setIsRefreshing(true);
-        } else {
-          setIsLoading(true);
-        }
-        setError(null);
+  // Client-side filtered signals
+  const filteredSignals = useMemo(() => {
+    let filtered = allSignals;
 
-        const response = (await signalService.getSignals(filters)) || {
-          trades: [],
-          pagination: {},
-        };
-        const signalList: SignalResponse[] = response.trades;
-        setSignals(signalList);
-        setTotalCount(signalList.length);
-      } catch (err: any) {
-        setError("Failed to load trading signals");
-        console.error("Error loading signals:", err);
-      } finally {
-        setIsLoading(false);
-        setIsRefreshing(false);
-      }
-    },
-    [filters, user]
-  );
-
-  const loadStats = useCallback(async () => {
-    try {
-      const statsData: SignalStatsResponse = await signalService.getSignalStats(
-        "24h"
+    // Filter by symbol
+    if (filters.symbol) {
+      filtered = filtered.filter(signal => 
+        signal.symbol.toLowerCase().includes(filters.symbol!.toLowerCase())
       );
-      setStats({
-        ...statsData,
-        win_rate: 72.5, // Mock data - replace with actual calculation
-        avg_holding_period: 4.2, // Mock data - replace with actual calculation
-      });
-    } catch (err: any) {
-      console.error("Error loading stats:", err);
     }
-  }, []);
 
-  const loadSymbols = useCallback(async () => {
-    try {
-      const response: AvailableSymbolsResponse =
-        (await signalService.getAvailableSymbols()) || { symbols: [] };
-      setAvailableSymbols(response.symbols);
-    } catch (err: any) {
-      console.error("Error loading symbols:", err);
+    // Filter by decision (excluding 'hold')
+    if (filters.decision) {
+      filtered = filtered.filter(signal => signal.final_decision === filters.decision);
     }
-  }, []);
+
+    // Apply limit
+    if (filters.limit) {
+      filtered = filtered.slice(0, filters.limit);
+    }
+
+    return filtered;
+  }, [allSignals, filters]);
+
+  // Client-side stats calculation
+  const clientStats = useMemo(() => {
+    const now = new Date();
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    
+    const recentSignals = allSignals.filter(signal => 
+      new Date(signal.created_at) >= twentyFourHoursAgo
+    );
+
+    const longSignals = recentSignals.filter(s => s.final_decision === 'long').length;
+    const shortSignals = recentSignals.filter(s => s.final_decision === 'short').length;
+    
+    const totalActiveSignals = longSignals + shortSignals;
+    const avgConsensus = recentSignals.length > 0 
+      ? recentSignals.reduce((sum, signal) => sum + signal.consensus_strength, 0) / recentSignals.length
+      : 0;
+
+    // Most active symbols (excluding hold signals)
+    const symbolCounts = recentSignals
+      .filter(s => s.final_decision !== 'hold')
+      .reduce((acc, signal) => {
+        acc[signal.symbol] = (acc[signal.symbol] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+    const mostActiveSymbols = Object.entries(symbolCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 5)
+      .map(([symbol, count]) => ({ symbol, signal_count: count }));
+
+    return {
+      timeframe: "24h",
+      total_signals: totalActiveSignals,
+      decisions: {
+        long: longSignals,
+        short: shortSignals,
+        hold: 0
+      },
+      avg_consensus_strength: Math.round(avgConsensus * 100) / 100,
+      most_active_symbols: mostActiveSymbols
+    };
+  }, [allSignals]);
 
   useEffect(() => {
-    if (user) {
-      loadSymbols();
-      loadStats();
-      loadSignals();
-    }
-  }, [user, loadSignals, loadSymbols, loadStats]);
+    loadInitialData();
+  }, []);
 
-  const handleFilterChange = (
-    key: keyof GetSignalsParams,
-    value: string | number | undefined
-  ) => {
-    setFilters((prev) => ({ ...prev, [key]: value, offset: 0 }));
-  };
-
-  const handleViewDetail = async (signalId: string) => {
+  const loadInitialData = async () => {
+    setLoading(true);
     try {
-      const detail: SignalDetailResponse = await signalService.getSignalDetail(
-        signalId
-      );
-      setSelectedSignal(detail);
-      setShowDetailModal(true);
-    } catch (err: any) {
-      setError("Failed to load signal details");
+      // Load all signals without backend filtering
+      const signalsResponse = await signalsService.getSignals({ limit: 100 });
+      const allSignalsData = signalsResponse.signals;
+      
+      // Filter out hold signals on client side
+      const activeSignals = allSignalsData.filter(signal => signal.final_decision !== 'hold');
+      
+      setAllSignals(activeSignals);
+      
+      // Get available symbols from filtered signals
+      const symbols = Array.from(new Set(activeSignals.map(signal => signal.symbol))).sort();
+      setAvailableSymbols(symbols);
+      
+    } catch (error) {
+      console.error('Failed to load initial data:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const closeModal = () => {
-    setShowDetailModal(false);
-    setSelectedSignal(null);
+  const handleFilterChange = (newFilters: Partial<SignalFilters>) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
   };
 
-  const handleRefresh = async () => {
-    await Promise.all([loadSignals(true), loadStats(), loadSymbols()]);
-  };
-
-  const clearFilters = () => {
-    setFilters({
-      limit: 20,
-      offset: 0,
-      symbol: "",
-      decision: undefined,
-      start_date: "",
-      end_date: "",
-    });
-    setSearchTerm("");
-  };
-
-  const getDecisionIcon = (decision: string) => {
-    switch (decision) {
-      case "long":
-        return <TrendingUp className="w-4 h-4 text-green-400" />;
-      case "short":
-        return <TrendingDown className="w-4 h-4 text-red-400" />;
-      case "hold":
-        return <Minus className="w-4 h-4 text-gray-400" />;
-      default:
-        return null;
+  const handleSignalSelect = async (signalId: string) => {
+    try {
+      const signalDetail = await signalsService.getSignal(signalId);
+      setSelectedSignal(signalDetail);
+    } catch (error) {
+      console.error('Failed to load signal details:', error);
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString();
   };
 
   const getDecisionColor = (decision: string) => {
     switch (decision) {
-      case "long":
-        return "text-green-400 bg-green-500/10 border-green-500/20";
-      case "short":
-        return "text-red-400 bg-red-500/10 border-red-500/20";
-      case "hold":
-        return "text-gray-400 bg-gray-500/10 border-gray-500/20";
-      default:
-        return "text-gray-500 bg-gray-500/10";
+      case 'long': 
+        return 'text-emerald-400 bg-emerald-900/50 border border-emerald-600/50';
+      case 'short': 
+        return 'text-rose-400 bg-rose-900/50 border border-rose-600/50';
+      default: 
+        return 'text-gray-400 bg-gray-900/50 border border-gray-600/50';
     }
   };
 
+  const getPriceChangeColor = (value: number | null) => {
+    if (!value) return 'text-gray-300';
+    return value >= 0 ? 'text-emerald-400' : 'text-rose-400';
+  };
+
   const getConsensusStrengthColor = (strength: number) => {
-    if (strength >= 80) return "text-green-400";
-    if (strength >= 60) return "text-yellow-400";
-    if (strength >= 40) return "text-orange-400";
-    return "text-red-400";
+    if (strength >= 80) return 'text-emerald-400';
+    if (strength >= 60) return 'text-amber-400';
+    return 'text-rose-400';
   };
 
-  const getConsensusStrengthBg = (strength: number) => {
-    if (strength >= 80) return "bg-green-500/10";
-    if (strength >= 60) return "bg-yellow-500/10";
-    if (strength >= 40) return "bg-orange-500/10";
-    return "bg-red-500/10";
-  };
-
-  const filteredSignals = useMemo(() => {
-    if (!searchTerm) return signals;
-    return signals.filter(
-      (signal) =>
-        signal.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        signal.final_decision.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [signals, searchTerm]);
-
-  const hasActiveFilters =
-    filters.symbol ||
-    filters.decision ||
-    filters.start_date ||
-    filters.end_date;
-
-  if (isLoading && signals.length === 0) {
+  if (loading && allSignals.length === 0) {
     return (
-      <div className="min-h-96 bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl border border-gray-700/50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-300 text-lg font-medium mb-2">
-            Loading Trading Signals
-          </p>
-          <p className="text-gray-500 text-sm">Analyzing market data...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error && signals.length === 0) {
-    return (
-      <div className="min-h-96 bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl border border-gray-700/50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6">
-          <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertTriangle className="w-10 h-10 text-red-400" />
-          </div>
-          <h3 className="text-2xl font-bold text-white mb-3">
-            Connection Issue
-          </h3>
-          <p className="text-gray-300 mb-6 leading-relaxed">{error}</p>
-          <button
-            onClick={handleRefresh}
-            disabled={isLoading}
-            className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-amber-600 text-gray-900 font-bold rounded-2xl hover:from-yellow-400 hover:to-amber-500 transition-all duration-300 disabled:opacity-50 flex items-center mx-auto shadow-lg shadow-yellow-500/25"
-          >
-            {isLoading && <RefreshCw className="w-5 h-5 animate-spin mr-3" />}
-            Retry Connection
-          </button>
-        </div>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-amber-400 text-lg">Loading trading signals...</div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-3 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl">
-              <BarChart3 className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                Trading Signals
-              </h1>
-              <p className="text-gray-400 text-lg mt-1">
-                AI-powered market analysis and trading recommendations
-              </p>
-            </div>
+    <div className="min-h-screen bg-gray-900 text-white p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="w-3 h-8 bg-amber-500 rounded-full"></div>
+            <h1 className="text-3xl font-bold text-white">Trading Signals</h1>
           </div>
-
-          <div className="flex flex-wrap items-center gap-4 mt-4">
-            {stats && (
-              <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-800/50 px-3 py-1.5 rounded-full">
-                <Clock className="w-4 h-4" />
-                Last updated: {new Date().toLocaleTimeString()}
-              </div>
-            )}
-          </div>
+          <p className="text-gray-400 ml-5">Real-time actionable trading opportunities</p>
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Export Button */}
-          <button className="flex items-center gap-2 px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-400 hover:text-white hover:border-gray-600 transition-all duration-300">
-            <Download className="w-4 h-4" />
-            Export
-          </button>
-
-          {/* Refresh Button */}
-          <button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-gray-800 to-gray-700 rounded-2xl border border-gray-600 text-white hover:from-gray-700 hover:to-gray-600 transition-all duration-300 disabled:opacity-50 shadow-lg"
-          >
-            <RefreshCw
-              className={`w-5 h-5 ${isRefreshing ? "animate-spin" : ""}`}
-            />
-            Refresh
-          </button>
-        </div>
-      </div>
-
-      {/* Stats Summary */}
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl p-6 border border-gray-700/50 shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-2 bg-blue-500/10 rounded-xl">
-                <Target className="w-5 h-5 text-blue-400" />
-              </div>
-              <span className="text-2xl font-bold text-white">
-                {stats.total_signals}
-              </span>
-            </div>
-            <p className="text-gray-400 text-sm font-medium">Total Signals</p>
-            <p className="text-xs text-gray-500 mt-1">{stats.timeframe}</p>
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700/50">
+            <h3 className="text-sm font-medium text-gray-400 mb-2">Active Signals</h3>
+            <p className="text-3xl font-bold text-amber-400">{clientStats.total_signals}</p>
+            <p className="text-xs text-gray-500 mt-1">Last 24 hours</p>
           </div>
-
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl p-6 border border-gray-700/50 shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-2 bg-green-500/10 rounded-xl">
-                <TrendingUp className="w-5 h-5 text-green-400" />
-              </div>
-              <span className="text-2xl font-bold text-green-400">
-                {stats.decisions.long}
-              </span>
-            </div>
-            <p className="text-gray-400 text-sm font-medium">Long Signals</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl p-6 border border-gray-700/50 shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-2 bg-red-500/10 rounded-xl">
-                <TrendingDown className="w-5 h-5 text-red-400" />
-              </div>
-              <span className="text-2xl font-bold text-red-400">
-                {stats.decisions.short}
-              </span>
-            </div>
-            <p className="text-gray-400 text-sm font-medium">Short Signals</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl p-6 border border-gray-700/50 shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-2 bg-purple-500/10 rounded-xl">
-                <PieChart className="w-5 h-5 text-purple-400" />
-              </div>
-              <span className="text-2xl font-bold text-purple-400">
-                {stats.win_rate}%
-              </span>
-            </div>
-            <p className="text-gray-400 text-sm font-medium">Win Rate</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl p-6 border border-gray-700/50 shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-2 bg-amber-500/10 rounded-xl">
-                <Zap className="w-5 h-5 text-amber-400" />
-              </div>
-              <span className="text-2xl font-bold text-amber-400">
-                {stats.avg_holding_period}h
-              </span>
-            </div>
-            <p className="text-gray-400 text-sm font-medium">Avg Duration</p>
-          </div>
-        </div>
-      )}
-
-      {/* Search and Filters */}
-      <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl p-8 border border-gray-700/50 shadow-xl">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-6">
-          <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-xl">
-              <Filter className="w-6 h-6 text-white" />
-            </div>
-            Signal Filters
-          </h3>
-
-          <div className="flex items-center gap-4">
-            {/* Search Input */}
-            <div className="relative">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search signals..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-yellow-500 focus:outline-none w-64"
-              />
-            </div>
-
-            {hasActiveFilters && (
-              <button
-                onClick={clearFilters}
-                className="flex items-center gap-2 px-3 py-2 bg-red-500/10 text-red-400 rounded-xl border border-red-500/20 hover:bg-red-500/20 transition-all duration-300"
-              >
-                <X className="w-4 h-4" />
-                Clear Filters
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-3">
-              Symbol
-            </label>
-            <select
-              value={filters.symbol || ""}
-              onChange={(e) => handleFilterChange("symbol", e.target.value)}
-              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white focus:border-yellow-500 focus:outline-none transition-colors duration-300"
-            >
-              <option value="">All Symbols</option>
-              {availableSymbols.map((symbol) => (
-                <option key={symbol} value={symbol}>
-                  {symbol}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-3">
-              Decision
-            </label>
-            <select
-              value={filters.decision || ""}
-              onChange={(e) =>
-                handleFilterChange(
-                  "decision",
-                  e.target.value === ""
-                    ? undefined
-                    : (e.target.value as "long" | "short" | "hold")
-                )
-              }
-              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white focus:border-yellow-500 focus:outline-none transition-colors duration-300"
-            >
-              <option value="">All Decisions</option>
-              <option value="long">Long</option>
-              <option value="short">Short</option>
-              <option value="hold">Hold</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-3">
-              Start Date
-            </label>
-            <div className="relative">
-              <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-              <input
-                type="date"
-                value={filters.start_date || ""}
-                onChange={(e) =>
-                  handleFilterChange("start_date", e.target.value)
-                }
-                className="w-full pl-10 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white focus:border-yellow-500 focus:outline-none transition-colors duration-300"
-              />
+          <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700/50">
+            <h3 className="text-sm font-medium text-gray-400 mb-2">Long Positions</h3>
+            <p className="text-3xl font-bold text-emerald-400">{clientStats.decisions.long}</p>
+            <div className="w-full bg-gray-700 rounded-full h-1 mt-2">
+              <div 
+                className="bg-emerald-500 h-1 rounded-full transition-all duration-500"
+                style={{ 
+                  width: `${clientStats.total_signals > 0 ? (clientStats.decisions.long / clientStats.total_signals) * 100 : 0}%` 
+                }}
+              ></div>
             </div>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-3">
-              End Date
-            </label>
-            <div className="relative">
-              <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-              <input
-                type="date"
-                value={filters.end_date || ""}
-                onChange={(e) => handleFilterChange("end_date", e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white focus:border-yellow-500 focus:outline-none transition-colors duration-300"
-              />
+          <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700/50">
+            <h3 className="text-sm font-medium text-gray-400 mb-2">Short Positions</h3>
+            <p className="text-3xl font-bold text-rose-400">{clientStats.decisions.short}</p>
+            <div className="w-full bg-gray-700 rounded-full h-1 mt-2">
+              <div 
+                className="bg-rose-500 h-1 rounded-full transition-all duration-500"
+                style={{ 
+                  width: `${clientStats.total_signals > 0 ? (clientStats.decisions.short / clientStats.total_signals) * 100 : 0}%` 
+                }}
+              ></div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Signals List */}
-      <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl border border-gray-700/50 shadow-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-700/50">
-              <tr>
-                <th className="px-8 py-6 text-left text-sm font-semibold text-gray-300 uppercase tracking-wider">
-                  Symbol
-                </th>
-                <th className="px-8 py-6 text-left text-sm font-semibold text-gray-300 uppercase tracking-wider">
-                  Decision
-                </th>
-                <th className="px-8 py-6 text-left text-sm font-semibold text-gray-300 uppercase tracking-wider">
-                  Consensus
-                </th>
-                <th className="px-8 py-6 text-left text-sm font-semibold text-gray-300 uppercase tracking-wider">
-                  Created
-                </th>
-                <th className="px-8 py-6 text-left text-sm font-semibold text-gray-300 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-700/50">
-              {filteredSignals.map((signal) => (
-                <tr
-                  key={signal.id}
-                  className="hover:bg-gray-700/20 transition-all duration-300 group cursor-pointer"
-                  onClick={() => handleViewDetail(signal.id)}
-                >
-                  <td className="px-8 py-6 whitespace-nowrap">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-gray-700/50 rounded-xl group-hover:bg-gray-600/50 transition-colors">
-                        <Target className="w-4 h-4 text-yellow-400" />
-                      </div>
-                      <div>
-                        <div className="text-lg font-semibold text-white group-hover:text-yellow-400 transition-colors">
-                          {signal.symbol}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6 whitespace-nowrap">
-                    <span
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold ${getDecisionColor(
-                        signal.final_decision
-                      )}`}
-                    >
-                      {getDecisionIcon(signal.final_decision)}
-                      {signal.final_decision.toUpperCase()}
-                    </span>
-                  </td>
-                  <td className="px-8 py-6 whitespace-nowrap">
-                    <div
-                      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getConsensusStrengthBg(
-                        signal.consensus_strength
-                      )} ${getConsensusStrengthColor(
-                        signal.consensus_strength
-                      )}`}
-                    >
-                      {signal.consensus_strength.toFixed(1)}%
-                    </div>
-                  </td>
-                  <td className="px-8 py-6 whitespace-nowrap">
-                    <div className="text-sm text-gray-300">
-                      {new Date(signal.created_at).toLocaleDateString()}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {new Date(signal.created_at).toLocaleTimeString()}
-                    </div>
-                  </td>
-                  <td className="px-8 py-6 whitespace-nowrap">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewDetail(signal.id);
-                      }}
-                      className="flex items-center gap-2 px-4 py-2 bg-gray-700/50 text-gray-300 rounded-xl border border-gray-600 hover:bg-yellow-500/10 hover:text-yellow-400 hover:border-yellow-500/30 transition-all duration-300"
-                    >
-                      <Eye className="w-4 h-4" />
-                      Details
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Empty State */}
-        {filteredSignals.length === 0 && !isLoading && (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gray-700/50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Target className="w-10 h-10 text-gray-500" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-400 mb-2">
-              No signals found
-            </h3>
-            <p className="text-gray-500 mb-6">
-              Try adjusting your filters or search terms
+          <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700/50">
+            <h3 className="text-sm font-medium text-gray-400 mb-2">Avg Consensus</h3>
+            <p className={`text-3xl font-bold ${getConsensusStrengthColor(clientStats.avg_consensus_strength)}`}>
+              {clientStats.avg_consensus_strength}%
             </p>
-            {hasActiveFilters && (
-              <button
-                onClick={clearFilters}
-                className="px-6 py-3 bg-yellow-500/10 text-yellow-400 rounded-xl border border-yellow-500/20 hover:bg-yellow-500/20 transition-all duration-300"
-              >
-                Clear All Filters
-              </button>
-            )}
+            <p className="text-xs text-gray-500 mt-1">Signal Strength</p>
           </div>
-        )}
-      </div>
+        </div>
 
-      {/* Detail Modal */}
-      {showDetailModal && selectedSignal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl border border-gray-700/50 shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            {/* Header */}
-            <div className="sticky top-0 bg-gray-800/80 backdrop-blur-sm p-8 border-b border-gray-700/50 flex justify-between items-center">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl">
-                  <BarChart3 className="w-6 h-6 text-white" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Signals List */}
+          <div className="lg:col-span-2">
+            {/* Filters */}
+            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700/50 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Symbol
+                  </label>
+                  <select
+                    value={filters.symbol || ''}
+                    onChange={(e) => handleFilterChange({ 
+                      symbol: e.target.value || undefined 
+                    })}
+                    className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+                  >
+                    <option value="">All Symbols</option>
+                    {availableSymbols.map(symbol => (
+                      <option key={symbol} value={symbol}>{symbol}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-white">
-                    Signal Analysis
-                  </h3>
-                  <p className="text-gray-400">
-                    Detailed market analysis and recommendations
-                  </p>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Position Type
+                  </label>
+                  <select
+                    value={filters.decision || ''}
+                    onChange={(e) => handleFilterChange({ 
+                      decision: e.target.value as 'long' | 'short' | undefined 
+                    })}
+                    className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+                  >
+                    <option value="">All Positions</option>
+                    <option value="long">Long Only</option>
+                    <option value="short">Short Only</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Show Results
+                  </label>
+                  <select
+                    value={filters.limit}
+                    onChange={(e) => handleFilterChange({ 
+                      limit: parseInt(e.target.value) 
+                    })}
+                    className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+                  >
+                    <option value={10}>10 signals</option>
+                    <option value={20}>20 signals</option>
+                    <option value={50}>50 signals</option>
+                    <option value={100}>100 signals</option>
+                  </select>
                 </div>
               </div>
-              <button
-                onClick={closeModal}
-                className="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-xl transition-all duration-300"
-              >
-                <X className="w-6 h-6" />
-              </button>
+              <div className="mt-4 text-sm text-gray-400">
+                Showing {filteredSignals.length} of {allSignals.length} active signals
+              </div>
             </div>
 
-            {/* Content */}
-            <div className="p-8 space-y-8">
-              {/* Overview */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="bg-gray-700/30 rounded-2xl p-6 border border-gray-600/30">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Target className="w-5 h-5 text-yellow-400" />
-                    <span className="text-gray-400 font-medium">Symbol</span>
+            {/* Signals Grid */}
+            <div className="space-y-4">
+              {filteredSignals.map(signal => (
+                <div
+                  key={signal.id}
+                  className={`bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 cursor-pointer transition-all duration-300 hover:bg-gray-800/50 hover:border-amber-500/30 border-2 ${
+                    selectedSignal?.id === signal.id 
+                      ? 'border-amber-500 bg-gray-800/60 shadow-lg shadow-amber-500/10' 
+                      : 'border-transparent hover:shadow-lg'
+                  }`}
+                  onClick={() => handleSignalSelect(signal.id)}
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="text-2xl font-bold text-white">
+                        {signal.symbol}
+                      </div>
+                      <span className={`px-3 py-1.5 rounded-full text-sm font-semibold ${getDecisionColor(signal.final_decision)}`}>
+                        {signal.final_decision.toUpperCase()}
+                      </span>
+                      <div className={`text-sm font-semibold ${getConsensusStrengthColor(signal.consensus_strength)}`}>
+                        {signal.consensus_strength}% Consensus
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm text-gray-400">
+                        {formatDate(signal.created_at)}
+                      </div>
+                      {signal.analysis_duration_ms && (
+                        <div className="text-xs text-amber-400">
+                          Analyzed in {signal.analysis_duration_ms}ms
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-2xl font-bold text-white">
-                    {selectedSignal.symbol}
-                  </p>
-                </div>
 
-                <div className="bg-gray-700/30 rounded-2xl p-6 border border-gray-600/30">
-                  <div className="flex items-center gap-3 mb-4">
-                    <TrendingUp className="w-5 h-5 text-green-400" />
-                    <span className="text-gray-400 font-medium">Decision</span>
-                  </div>
-                  <div
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-lg font-bold ${getDecisionColor(
-                      selectedSignal.final_decision
-                    )}`}
-                  >
-                    {getDecisionIcon(selectedSignal.final_decision)}
-                    {selectedSignal.final_decision.toUpperCase()}
-                  </div>
-                </div>
-
-                <div className="bg-gray-700/30 rounded-2xl p-6 border border-gray-600/30">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Shield className="w-5 h-5 text-blue-400" />
-                    <span className="text-gray-400 font-medium">Consensus</span>
-                  </div>
-                  <div
-                    className={`text-2xl font-bold ${getConsensusStrengthColor(
-                      selectedSignal.consensus_strength
-                    )}`}
-                  >
-                    {selectedSignal.consensus_strength.toFixed(1)}%
-                  </div>
-                </div>
-              </div>
-
-              {/* Analysis Summary */}
-              {selectedSignal.analysis_summary && (
-                <div className="bg-gray-700/30 rounded-2xl p-6 border border-gray-600/30">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-yellow-400" />
-                    Analysis Summary
-                  </h4>
-                  <p className="text-gray-300 leading-relaxed">
-                    {selectedSignal.analysis_summary}
-                  </p>
-                </div>
-              )}
-
-              {/* Trading Parameters */}
-              {(selectedSignal.entry_price ||
-                selectedSignal.take_profit_price ||
-                selectedSignal.stop_loss_price) && (
-                <div className="bg-gray-700/30 rounded-2xl p-6 border border-gray-600/30">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-green-400" />
-                    Trading Parameters
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {selectedSignal.entry_price && (
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    {signal.entry_price && (
                       <div>
-                        <span className="text-gray-400 text-sm">
-                          Entry Price
-                        </span>
-                        <p className="text-white font-semibold">
-                          ${selectedSignal.entry_price.toFixed(2)}
-                        </p>
+                        <span className="text-gray-400 text-sm">Entry Price</span>
+                        <div className="text-lg font-semibold text-white">
+                          ${signal.entry_price.toFixed(2)}
+                        </div>
                       </div>
                     )}
-                    {selectedSignal.take_profit_price && (
+                    {signal.take_profit_price && signal.entry_price && (
                       <div>
-                        <span className="text-gray-400 text-sm">
-                          Take Profit
-                        </span>
-                        <p className="text-green-400 font-semibold">
-                          ${selectedSignal.take_profit_price.toFixed(2)}
-                        </p>
+                        <span className="text-gray-400 text-sm">Take Profit</span>
+                        <div className="text-lg font-semibold text-emerald-400">
+                          ${signal.take_profit_price.toFixed(2)}
+                          <span className="text-sm ml-2">
+                            (+{(((signal.take_profit_price - signal.entry_price) / signal.entry_price) * 100).toFixed(2)}%)
+                          </span>
+                        </div>
                       </div>
                     )}
-                    {selectedSignal.stop_loss_price && (
+                    {signal.stop_loss_price && signal.entry_price && (
                       <div>
                         <span className="text-gray-400 text-sm">Stop Loss</span>
-                        <p className="text-red-400 font-semibold">
-                          ${selectedSignal.stop_loss_price.toFixed(2)}
-                        </p>
+                        <div className="text-lg font-semibold text-rose-400">
+                          ${signal.stop_loss_price.toFixed(2)}
+                          <span className="text-sm ml-2">
+                            ({(((signal.stop_loss_price - signal.entry_price) / signal.entry_price) * 100).toFixed(2)}%)
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    {signal.risk_reward_ratio && (
+                      <div>
+                        <span className="text-gray-400 text-sm">Risk/Reward</span>
+                        <div className={`text-lg font-semibold ${getPriceChangeColor(signal.risk_reward_ratio)}`}>
+                          {signal.risk_reward_ratio.toFixed(2)}:1
+                        </div>
                       </div>
                     )}
                   </div>
                 </div>
-              )}
+              ))}
 
-              {/* Technical Indicators */}
-              {selectedSignal.technical_indicators && (
-                <div className="bg-gray-700/30 rounded-2xl p-6 border border-gray-600/30">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <PieChart className="w-5 h-5 text-purple-400" />
-                    Technical Indicators
-                  </h4>
-                  <pre className="text-sm text-gray-300 bg-gray-800/50 p-4 rounded-xl overflow-auto max-h-60">
-                    {JSON.stringify(
-                      selectedSignal.technical_indicators,
-                      null,
-                      2
+              {filteredSignals.length === 0 && !loading && (
+                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-12 text-center border border-gray-700/50">
+                  <div className="text-amber-400 text-6xl mb-4">⚡</div>
+                  <p className="text-gray-400 text-lg">No active trading signals found</p>
+                  <p className="text-gray-500 mt-2">Try adjusting your filters</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Signal Details Panel */}
+          <div className="lg:col-span-1">
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 sticky top-6">
+              {selectedSignal ? (
+                <>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold text-white">
+                      {selectedSignal.symbol}
+                    </h3>
+                    <span className={`px-3 py-1.5 rounded-full text-sm font-semibold ${getDecisionColor(selectedSignal.final_decision)}`}>
+                      {selectedSignal.final_decision.toUpperCase()}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    {/* Consensus & Timing */}
+                    <div className="bg-gray-700/30 rounded-lg p-4">
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-gray-400">Consensus Strength</span>
+                        <span className={`text-lg font-bold ${getConsensusStrengthColor(selectedSignal.consensus_strength)}`}>
+                          {selectedSignal.consensus_strength}%
+                        </span>
+                      </div>
+                      
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400">Signal Generated</span>
+                        <span className="text-white">{formatDate(selectedSignal.created_at)}</span>
+                      </div>
+                      
+                      {selectedSignal.analysis_duration_ms && (
+                        <div className="flex justify-between text-sm mt-2">
+                          <span className="text-gray-400">Analysis Speed</span>
+                          <span className="text-amber-400">{selectedSignal.analysis_duration_ms}ms</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Price Levels */}
+                    {(selectedSignal.entry_price || selectedSignal.take_profit_price || selectedSignal.stop_loss_price) && (
+                      <div>
+                        <h4 className="font-semibold text-white mb-4 text-lg border-b border-gray-700 pb-2">
+                          Price Levels
+                        </h4>
+                        <div className="space-y-3">
+                          {selectedSignal.entry_price && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-400">Entry Price</span>
+                              <span className="text-lg font-bold text-white">
+                                ${selectedSignal.entry_price.toFixed(2)}
+                              </span>
+                            </div>
+                          )}
+                          {selectedSignal.take_profit_price && selectedSignal.entry_price && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-400">Take Profit</span>
+                              <div className="text-right">
+                                <div className="text-lg font-bold text-emerald-400">
+                                  ${selectedSignal.take_profit_price.toFixed(2)}
+                                </div>
+                                <div className="text-sm text-emerald-400">
+                                  +{(((selectedSignal.take_profit_price - selectedSignal.entry_price) / selectedSignal.entry_price) * 100).toFixed(2)}%
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          {selectedSignal.stop_loss_price && selectedSignal.entry_price && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-400">Stop Loss</span>
+                              <div className="text-right">
+                                <div className="text-lg font-bold text-rose-400">
+                                  ${selectedSignal.stop_loss_price.toFixed(2)}
+                                </div>
+                                <div className="text-sm text-rose-400">
+                                  {(((selectedSignal.stop_loss_price - selectedSignal.entry_price) / selectedSignal.entry_price) * 100).toFixed(2)}%
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     )}
-                  </pre>
+
+                    {/* Risk Metrics */}
+                    {(selectedSignal.estimated_tp_percent || selectedSignal.estimated_sl_percent || selectedSignal.risk_reward_ratio) && (
+                      <div>
+                        <h4 className="font-semibold text-white mb-4 text-lg border-b border-gray-700 pb-2">
+                          Risk Metrics
+                        </h4>
+                        <div className="space-y-3">
+                          {selectedSignal.estimated_tp_percent && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-400">Target Profit</span>
+                              <span className="text-lg font-bold text-emerald-400">
+                                +{selectedSignal.estimated_tp_percent.toFixed(2)}%
+                              </span>
+                            </div>
+                          )}
+                          {selectedSignal.estimated_sl_percent && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-400">Stop Loss</span>
+                              <span className="text-lg font-bold text-rose-400">
+                                -{selectedSignal.estimated_sl_percent.toFixed(2)}%
+                              </span>
+                            </div>
+                          )}
+                          {selectedSignal.risk_reward_ratio && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-400">Risk/Reward Ratio</span>
+                              <span className={`text-lg font-bold ${getPriceChangeColor(selectedSignal.risk_reward_ratio)}`}>
+                                {selectedSignal.risk_reward_ratio.toFixed(2)}:1
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Market Data */}
+                    <div>
+                      <h4 className="font-semibold text-white mb-3 text-lg border-b border-gray-700 pb-2">
+                        Market Analysis
+                      </h4>
+                      <div className="text-gray-400 text-sm">
+                        <p>Comprehensive market data and technical indicators analyzed for this signal</p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="text-amber-400 text-6xl mb-4">📊</div>
+                  <p className="text-gray-400 text-lg">Select a signal</p>
+                  <p className="text-gray-500 mt-2">Choose a trading signal to view detailed analysis</p>
                 </div>
               )}
             </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
 
-export default SignalsPage;
+export default SignalPage;
