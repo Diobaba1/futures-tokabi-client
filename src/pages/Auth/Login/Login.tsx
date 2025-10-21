@@ -4,17 +4,19 @@ import { useAuth } from '../../../components/contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { LoginRequest } from '../../../types';
 import { motion } from 'framer-motion';
+import { useToast } from '../../../components/ui/Toast';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState<LoginRequest>({ email: '', password: '' });
-  const [error, setError] = useState('');
   const { login, isLoading } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await login(formData);
+      showToast('Login successful! Redirecting...', 'success', 3000);
       navigate('/dashboard');
     } catch (err: any) {
       let errorMsg = 'Login failed';
@@ -25,7 +27,7 @@ const Login: React.FC = () => {
           errorMsg = err.response.data.detail;
         }
       }
-      setError(errorMsg);
+      showToast(errorMsg, 'error', 5000);
     }
   };
 
@@ -106,19 +108,6 @@ const Login: React.FC = () => {
           className="mt-8 space-y-6 bg-gray-800/80 backdrop-blur-sm border border-gray-700/50 rounded-2xl shadow-2xl p-8"
           onSubmit={handleSubmit}
         >
-          {error && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-red-900/50 border border-red-700 text-red-200 px-4 py-3 rounded-lg flex items-center space-x-2"
-            >
-              <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              <span className="text-sm font-medium">{error}</span>
-            </motion.div>
-          )}
-
           <div className="space-y-5">
             {/* Email Field */}
             <motion.div 

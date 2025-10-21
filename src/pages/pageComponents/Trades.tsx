@@ -3,11 +3,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../components/contexts/AuthContext';
 import { tradeService } from '../../api/services';
-import { TradeResponse } from '../../types/trades.types';
+import { TradeDetailResponse, TradeListResponse } from '../../types/trades.types';
 
 const Trades: React.FC = () => {
   const { user } = useAuth();
-  const [trades, setTrades] = useState<TradeResponse[]>([]);
+  const [trades, setTrades] = useState<TradeDetailResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [status, setStatus] = useState<string | undefined>(undefined);
@@ -23,11 +23,13 @@ const Trades: React.FC = () => {
     setError(null);
     
     try {
-      const data = await tradeService.getTrades(status);
-      setTrades(data);
+      const params = status ? { status } : {};
+      const data: TradeListResponse = await tradeService.getTrades(params);
+      setTrades(data.trades || []);
     } catch (error) {
       console.error('Failed to load trades:', error);
       setError('Failed to load trades. Please try again.');
+      setTrades([]);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -40,7 +42,7 @@ const Trades: React.FC = () => {
     }
   }, [user, loadTrades]);
 
-  const filteredTrades = trades.filter(trade =>
+  const filteredTrades = (trades || []).filter(trade =>
     trade.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
     trade.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -54,8 +56,8 @@ const Trades: React.FC = () => {
     }
   };
 
-  const getSideColor = (side: string) => {
-    return side.toLowerCase() === 'buy' 
+  const getSideColor = (side: 'long' | 'short') => {
+    return side === 'long' 
       ? 'text-green-400 bg-green-400/10 border-green-400/20' 
       : 'text-red-400 bg-red-400/10 border-red-400/20';
   };
@@ -71,6 +73,20 @@ const Trades: React.FC = () => {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(amount);
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 8
+    }).format(price);
+  };
+
+  const formatQuantity = (quantity: number) => {
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 4,
+      maximumFractionDigits: 8
+    }).format(quantity);
   };
 
   const formatDate = (dateString: string) => {
@@ -191,24 +207,24 @@ const Trades: React.FC = () => {
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 text-center">
-          <div className="text-2xl font-bold text-white mb-1">{trades.length}</div>
+          <div className="text-2xl font-bold text-white mb-1">{(trades || []).length}</div>
           <div className="text-gray-400 text-sm">Total Trades</div>
         </div>
         <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 text-center">
           <div className="text-2xl font-bold text-green-400 mb-1">
-            {trades.filter(t => t.status.toLowerCase() === 'open').length}
+            {(trades || []).filter(t => t.status.toLowerCase() === 'open').length}
           </div>
           <div className="text-gray-400 text-sm">Open Trades</div>
         </div>
         <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 text-center">
           <div className="text-2xl font-bold text-blue-400 mb-1">
-            {trades.filter(t => t.status.toLowerCase() === 'closed').length}
+            {(trades || []).filter(t => t.status.toLowerCase() === 'closed').length}
           </div>
           <div className="text-gray-400 text-sm">Closed Trades</div>
         </div>
         <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 text-center">
           <div className="text-2xl font-bold text-yellow-400 mb-1">
-            {formatCurrency(trades.reduce((sum, trade) => sum + (trade.realized_pnl_usd || trade.unrealized_pnl_usd || 0), 0))}
+            {formatCurrency((trades || []).reduce((sum, trade) => sum + (trade.realized_pnl_usd || 0), 0))}
           </div>
           <div className="text-gray-400 text-sm">Total P&L</div>
         </div>
@@ -282,15 +298,14 @@ const Trades: React.FC = () => {
                         </span>
                       </td>
                       <td className="py-4 px-6 text-white font-medium">
-                        {/* Remove size column since it doesn't exist in TradeResponse */}
-                        N/A
+                        {trade.quantity ? formatQuantity(trade.quantity) : 'N/A'}
                       </td>
                       <td className="py-4 px-6 text-white">
-                        {trade.entry_price ? formatCurrency(trade.entry_price) : 'N/A'}
+                        {trade.entry_price ? formatPrice(trade.entry_price) : 'N/A'}
                       </td>
                       <td className="py-4 px-6">
-                        <span className={`font-bold ${getPnlColor(trade.realized_pnl_usd || trade.unrealized_pnl_usd || 0)}`}>
-                          {formatCurrency(trade.realized_pnl_usd || trade.unrealized_pnl_usd || 0)}
+                        <span className={`font-bold ${getPnlColor(trade.realized_pnl_usd || 0)}`}>
+                          {formatCurrency(trade.realized_pnl_usd || 0)}
                         </span>
                       </td>
                       <td className="py-4 px-6 text-gray-400 text-sm">

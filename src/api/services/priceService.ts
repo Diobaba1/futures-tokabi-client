@@ -1,5 +1,5 @@
 import axiosInstance from '../axiosConfig';
-import { API } from '../endpoints';
+import { API_ENDPOINTS } from '../endpoints';
 
 export interface TokenPrice {
   id: number;

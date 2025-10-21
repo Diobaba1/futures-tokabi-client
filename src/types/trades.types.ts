@@ -1,30 +1,43 @@
-// src/types/trade.types.ts
-export interface TradeResponse {
-  id: string;
-  user_id: string;
-  signal_id?: string;
+// src/types/trades.types.ts
+export interface TradeBase {
   symbol: string;
-  side: string;
-  position_type: string;
+  side: 'long' | 'short';
   entry_price: number;
-  position_size_usd: number;
-  leverage: number;
   quantity: number;
-  take_profit_price: number;
-  stop_loss_price: number;
-  trailing_stop_enabled: boolean;
-  exit_price?: number;
+  leverage: number;
+  take_profit_price?: number;
+  stop_loss_price?: number;
+  status: 'open' | 'closed';
   exit_reason?: string;
-  unrealized_pnl_usd: number;
   realized_pnl_usd?: number;
   realized_pnl_percent?: number;
-  fees_usd: number;
-  entry_order_id?: string;
-  exit_order_id?: string;
-  status: string;
+}
+
+export interface CreateTradeRequest extends TradeBase {
+  // Additional fields for creation if needed
+}
+
+export interface UpdateTradeRequest {
+  take_profit_price?: number;
+  stop_loss_price?: number;
+  status?: 'open' | 'closed';
+  exit_reason?: string;
+}
+
+export interface TradeDetailResponse extends TradeBase {
+  id: string;
+  user_id: string;
   created_at: string;
   opened_at?: string;
   closed_at?: string;
-  error_message?: string;
-  retry_count: number;
+}
+
+export interface TradeListResponse {
+  trades: TradeDetailResponse[];
+  pagination: {
+    total: number;
+    limit: number;
+    offset: number;
+    has_more: boolean;
+  };
 }

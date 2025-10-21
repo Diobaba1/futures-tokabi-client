@@ -19,7 +19,8 @@ export type {
 } from './user.types';
 
 export type {
-  TradeResponse,
+  TradeDetailResponse,
+  TradeListResponse
 } from './trades.types';
 
 export type {

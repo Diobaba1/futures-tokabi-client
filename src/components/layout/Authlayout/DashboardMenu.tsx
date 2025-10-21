@@ -57,6 +57,12 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
           description: 'Real-time execution'
         },
         { 
+          name: 'AI Signals', 
+          href: '/dashboard/signals', 
+          icon: Zap,
+          description: 'AI consensus Signals'
+        },
+        { 
           name: 'Portfolio', 
           href: '/dashboard/portfolio', 
           icon: Briefcase,

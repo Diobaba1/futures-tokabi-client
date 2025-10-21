@@ -1,20 +1,43 @@
 // src/api/services/tradeService.ts
 import axiosInstance from '../axiosConfig';
-import { API } from '../endpoints';
-import { TradeResponse } from '../../types/trades.types';
+import { API_ENDPOINTS } from '../endpoints';
+import type { 
+  TradeListResponse, 
+  TradeDetailResponse, 
+  CreateTradeRequest, 
+  UpdateTradeRequest 
+} from '../../types/trades.types';
 
 export const tradeService = {
-  async getTrades(status?: string, limit: number = 50, offset: number = 0): Promise<TradeResponse[]> {
-    let url = API.TRADES.LIST;
-    if (status) url += `?status=${status}`;
-    if (limit !== 50) url += `${url.includes('?') ? '&' : '?'}limit=${limit}`;
-    if (offset > 0) url += `${url.includes('?') ? '&' : '?'}offset=${offset}`;
+  getTrades: async (params?: {
+    status?: string;
+    symbol?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<TradeListResponse> => {
+    const response = await axiosInstance.get(API_ENDPOINTS.TRADES.LIST, { params });
+    return response.data;
+  },
+
+  getTrade: async (id: string): Promise<TradeDetailResponse> => {
+    const url = API_ENDPOINTS.TRADES.DETAIL.replace('{id}', id);
     const response = await axiosInstance.get(url);
     return response.data;
   },
 
-  async getTrade(tradeId: string): Promise<TradeResponse> {
-    const response = await axiosInstance.get(API.TRADES.DETAIL(tradeId));
+  createTrade: async (data: CreateTradeRequest): Promise<TradeDetailResponse> => {
+    const response = await axiosInstance.post(API_ENDPOINTS.TRADES.CREATE, data);
     return response.data;
+  },
+
+  updateTrade: async (id: string, data: UpdateTradeRequest): Promise<TradeDetailResponse> => {
+    const url = API_ENDPOINTS.TRADES.UPDATE.replace('{id}', id);
+    const response = await axiosInstance.patch(url, data);
+    return response.data;
+  },
+
+  deleteTrade: async (id: string): Promise<void> => {
+    const url = API_ENDPOINTS.TRADES.DELETE.replace('{id}', id);
+    await axiosInstance.delete(url);
   },
 };

@@ -1,6 +1,6 @@
 // src/api/services/axiosInstance.ts (updated from provided)
 import axios from 'axios';
-import { API } from './endpoints';
+import { API_ENDPOINTS } from './endpoints';
 
 const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL,

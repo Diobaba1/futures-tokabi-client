@@ -3,6 +3,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./components/contexts/AuthContext";
 import { AnalyticsProvider } from "./components/contexts/AnalyticsContext";
+import { ToastProvider } from "./components/ui/Toast";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
 import PublicLayout from "./components/layout/PublicLayout";
 import DashboardLayout from "./components/layout/DashboardLayout";
@@ -19,6 +20,8 @@ import "./App.css";
 import CommunityPage from "./pages/pageComponents/Community";
 import APIKeyManager from "./pages/walletpages/APIKeyManager";
 import Billing from "./pages/Billing/Billing";
+import PortfolioAnalyticsComponent from "./pages/analytics/PortfolioAnalytics";
+import SignalsPage from "./pages/pageComponents/SignalsPage";
 
 interface RouteConfig {
   path: string;
@@ -68,6 +71,8 @@ const dashboardRoutes: RouteConfig[] = [
   { path: "/dashboard/billing", element: <Billing />, layout: DashboardLayout, protected: true },
   { path: "/dashboard/trading", element: <Trades />, layout: DashboardLayout, protected: true },
   { path: "/dashboard/settings", element: <Profile />, layout: DashboardLayout, protected: true },
+  { path: "/dashboard/portfolio", element: <PortfolioAnalyticsComponent />, layout: DashboardLayout, protected: true },
+  { path: "/dashboard/signals", element: <SignalsPage />, layout: DashboardLayout, protected: true },
 
   { path: "/dashboard/performance", element: <div>Performance Page</div>, layout: DashboardLayout, protected: true },
 ];
@@ -95,32 +100,34 @@ function renderRoute({ path, element, layout: Layout, protected: isProtected, re
 function App() {
   return (
     <AuthProvider>
-      <AnalyticsProvider>
-        <Router>
-          <Routes>
-            {/* Public Routes */}
-            {publicRoutes.map(renderRoute)}
+      <ToastProvider>
+        <AnalyticsProvider>
+          <Router>
+            <Routes>
+              {/* Public Routes */}
+              {publicRoutes.map(renderRoute)}
 
-            {/* Dashboard Routes */}
-            {dashboardRoutes.map(renderRoute)}
+              {/* Dashboard Routes */}
+              {dashboardRoutes.map(renderRoute)}
 
-            {/* 404 Page */}
-            <Route
-              path="*"
-              element={
-                <PublicLayout>
-                  <div className="min-h-screen flex items-center justify-center">
-                    <div className="text-center">
-                      <h1 className="text-4xl font-bold text-white mb-4">404</h1>
-                      <p className="text-gray-400 text-lg">Page not found</p>
+              {/* 404 Page */}
+              <Route
+                path="*"
+                element={
+                  <PublicLayout>
+                    <div className="min-h-screen flex items-center justify-center">
+                      <div className="text-center">
+                        <h1 className="text-4xl font-bold text-white mb-4">404</h1>
+                        <p className="text-gray-400 text-lg">Page not found</p>
+                      </div>
                     </div>
-                  </div>
-                </PublicLayout>
-              }
-            />
-          </Routes>
-        </Router>
-      </AnalyticsProvider>
+                  </PublicLayout>
+                }
+              />
+            </Routes>
+          </Router>
+        </AnalyticsProvider>
+      </ToastProvider>
     </AuthProvider>
   );
 }

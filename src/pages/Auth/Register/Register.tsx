@@ -1,19 +1,21 @@
 // src/pages/Register.tsx
 import React, { useState } from 'react';
 import { useAuth } from '../../../components/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { RegisterRequest } from '../../../types';
+import { useToast } from '../../../components/ui/Toast';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState<RegisterRequest>({ email: '', full_name: '', password: '' });
-  const [error, setError] = useState('');
   const { register, isLoading } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await register(formData);
+      showToast('Registration successful! Redirecting...', 'success', 3000);
       navigate('/dashboard');
     } catch (err: any) {
       let errorMsg = 'Registration failed';
@@ -24,7 +26,7 @@ const Register: React.FC = () => {
           errorMsg = err.response.data.detail;
         }
       }
-      setError(errorMsg);
+      showToast(errorMsg, 'error', 5000);
     }
   };
 
@@ -56,15 +58,6 @@ const Register: React.FC = () => {
 
         {/* Form Card */}
         <form className="mt-8 space-y-6 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-900/50 border border-red-700 text-red-200 px-4 py-3 rounded-lg flex items-center space-x-2">
-              <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              <span className="text-sm">{error}</span>
-            </div>
-          )}
-
           <div className="space-y-4">
             {/* Full Name Field */}
             <div className="relative">
@@ -143,12 +136,12 @@ const Register: React.FC = () => {
           <div className="text-center pt-2">
             <p className="text-gray-400 text-sm">
               Already have an account?{' '}
-              <a 
-                href="/login" 
+              <Link 
+                to="/login" 
                 className="font-semibold text-yellow-400 hover:text-yellow-300 transition-colors duration-200"
               >
                 Sign in here
-              </a>
+              </Link>
             </p>
           </div>
         </form>

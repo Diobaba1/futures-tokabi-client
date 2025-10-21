@@ -1,58 +1,60 @@
-// src/endpoints.ts
-const AUTH = {
-  REGISTER: '/auth/register',
-  LOGIN: '/auth/login',
-};
+// src/services/endpoints.ts
+export const API_ENDPOINTS = {
+  // Authentication
+  AUTH: {
+    LOGIN: "/auth/login",
+    REGISTER: "/auth/register",
+    LOGOUT: "/auth/logout",
+    PROFILE: "/auth/profile",
+  },
 
-const USERS = {
-  ME: '/users/me',
-  API_KEYS: '/users/api-keys',
-  API_KEYS_ID: (keyId: string) => `/users/api-keys/${keyId}`,
-  SUBSCRIPTION: '/users/subscription',
-};
+  // Users
+  USERS: {
+    ME: "/users/me",
+    UPDATE: "/users/me",
 
-const TRADES = {
-  LIST: '/trades',
-  DETAIL: (tradeId: string) => `/trades/${tradeId}`,
-};
+    API_KEYS: "/users/api-keys",
+    API_KEYS_ID: (keyId: string) => `/users/api-keys/${keyId}`,
+    SUBSCRIPTION: "/users/subscription",
+  },
 
-const ANALYTICS = {
-  PORTFOLIO: '/analytics/portfolio',
-  SYSTEM: '/analytics/system',
-};
+  // Portfolio
+  PORTFOLIO: {
+    GET: "/portfolio/portfolio/",
+  },
 
-const STREAM = {
-  WS_PORTFOLIO: (userId: string) => `/stream/ws/portfolio/${userId}`,
-};
+  // Trades
+  TRADES: {
+    LIST: "/trades/",
+    DETAIL: "/trades/{id}",
+    CREATE: "/trades/",
+    UPDATE: "/trades/{id}",
+    DELETE: "/trades/{id}",
+  },
 
-const GENERAL = {
-  ROOT: '/',
-  HEALTH: '/health',
-  METRICS: '/metrics',
-  PROTECTED_TEST: '/protected-test',
-};
+  // Analytics
+  ANALYTICS: {
+    PORTFOLIO: "/analytics/portfolio",
+    PERFORMANCE: "/analytics/performance",
+    HISTORY: "/analytics/history",
+    SYSTEM: "/system"
+  },
 
-// Legacy for walletService compatibility (backend may not support, but for compile)
-const WALLETS = {
-  LIST: '/wallets/',
-  CREATE: '/wallets/',
-  DETAIL: (walletId: string) => `/wallets/${walletId}/`,
-  UPDATE: (walletId: string) => `/wallets/${walletId}/`,
-  DELETE: (walletId: string) => `/wallets/${walletId}/`,
-  TASK_STATUS: (taskId: string) => `/tasks/${taskId}/`,
-};
+  // Signals (open endpoints)
+  SIGNALS: {
+    LIST: "/signals/",
+    DETAIL: "/signals/{signal_id}",
+    SYMBOLS: "/signals/symbols/",
+    STATS: "/signals/stats/summary",
+  },
 
-const PRICES = {
-  LIVE: '/live-prices/',
-};
+  // Binance Stream (assumed)
+  BINANCE: {
+    STREAM: "/binance/stream",
+  },
 
-export const API = {
-  AUTH,
-  USERS,
-  TRADES,
-  ANALYTICS,
-  STREAM,
-  GENERAL,
-  WALLETS,
-  PRICES,
+  // Root and Health
+  ROOT: "/",
+  HEALTH: "/health",
+  METRICS: "/metrics",
 } as const;

@@ -14,7 +14,6 @@ import {
   RegisterRequest,
   UserResponse,
 } from "../../types/auth.types";
-import { websocketService } from "../../api/services/websocketService";
 
 interface AuthContextType {
   user: UserResponse | null;
@@ -24,8 +23,6 @@ interface AuthContextType {
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
-  websocketStatus: string;
-  reconnectWebSocket: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -46,69 +43,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [websocketStatus, setWebsocketStatus] = useState<string>("idle");
-  const unsubscribeRef = useRef<(() => void) | null>(null);
-  const isConnectingRef = useRef(false);
   const hasInitialized = useRef(false);
-
-  const connectWebSocket = useCallback((userId: string, token: string) => {
-    try {
-      if (isConnectingRef.current || websocketService.isConnected()) {
-        return;
-      }
-
-      isConnectingRef.current = true;
-
-      if (unsubscribeRef.current) {
-        unsubscribeRef.current();
-        unsubscribeRef.current = null;
-      }
-
-      websocketService.disconnect();
-
-      const wsPath = `/ws/portfolio/${userId}`;
-      
-      unsubscribeRef.current = websocketService.onConnectionChange((status) => {
-        console.log("WebSocket connection status changed:", status);
-        setWebsocketStatus(status);
-        
-        if (status === "connected" || status === "error" || status === "disconnected") {
-          isConnectingRef.current = false;
-        }
-
-        if (status === "error") {
-          console.error("WebSocket connection failed. Possible issues:");
-          console.error("1. Server WebSocket endpoint availability");
-          console.error("2. CORS configuration");
-          console.error("3. Token validity");
-          console.error("4. Network connectivity");
-        }
-
-        if (status === "connected") {
-          console.log("✅ WebSocket connected successfully for user:", userId);
-        }
-      });
-
-      setTimeout(() => {
-        websocketService.connect(wsPath, token);
-      }, 100);
-
-    } catch (error) {
-      console.error("Error connecting WebSocket:", error);
-      setWebsocketStatus("error");
-      isConnectingRef.current = false;
-    }
-  }, []);
-
-  const reconnectWebSocket = useCallback(() => {
-    if (user?.id) {
-      const token = localStorage.getItem("accessToken");
-      if (token) {
-        console.log("🔄 Manually reconnecting WebSocket...");
-        connectWebSocket(user.id, token);
-      }
-    }
-  }, [user?.id, connectWebSocket]);
 
   const clearAuth = useCallback(async () => {
     localStorage.removeItem("accessToken");
@@ -116,14 +51,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     setIsLoading(false);
-    setWebsocketStatus("idle");
-    isConnectingRef.current = false;
-    
-    if (unsubscribeRef.current) {
-      unsubscribeRef.current();
-      unsubscribeRef.current = null;
-    }
-    websocketService.disconnect();
   }, []);
 
   const refreshUser = useCallback(async () => {
@@ -136,11 +63,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const fetchedUser = await authService.getProfile();
       setUser(fetchedUser);
       setIsAuthenticated(true);
-      
-      if (fetchedUser.id && !websocketService.isConnected()) {
-        console.log("🔄 Setting up WebSocket for user:", fetchedUser.id);
-        connectWebSocket(fetchedUser.id, token);
-      }
     } catch (error) {
       console.error("Failed to refresh user:", error);
       await clearAuth();
@@ -148,7 +70,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [connectWebSocket, clearAuth]);
+  }, [clearAuth]);
 
   useEffect(() => {
     if (hasInitialized.current) return;
@@ -169,13 +91,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     initializeAuth();
-
-    return () => {
-      if (unsubscribeRef.current) {
-        unsubscribeRef.current();
-      }
-      websocketService.disconnect();
-    };
   }, [refreshUser, clearAuth]);
 
   const login = useCallback(async (data: LoginRequest) => {
@@ -223,8 +138,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     refreshUser,
-    websocketStatus,
-    reconnectWebSocket,
   };
 
   return (
