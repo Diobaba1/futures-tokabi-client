@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
   SignalResponse,
   SignalDetailResponse,
-  SignalStats,
   SignalFilters
 } from '../../types/signals.types';
 import { signalsService } from '../../api/services/signalsService';
@@ -266,7 +265,7 @@ const SignalPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-col lg:grid lg:grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Main Content Area */}
           <div className="lg:col-span-2">
             {/* Filters */}

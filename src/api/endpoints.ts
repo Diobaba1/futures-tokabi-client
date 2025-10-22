@@ -20,7 +20,7 @@ export const API_ENDPOINTS = {
 
   // Portfolio
   PORTFOLIO: {
-    GET: "/portfolio/portfolio/",
+    GET: "/portfolio/portfolio",
   },
 
   // Trades

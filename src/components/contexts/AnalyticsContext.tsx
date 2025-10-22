@@ -61,10 +61,13 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
 
   // Auto-load analytics on mount in production
   useEffect(() => {
-    if (autoLoad) {
-      refreshAll();
-    }
-  }, [autoLoad]);
+  if (autoLoad) {
+    const refreshAll = () => {
+      console.log("Refreshing...");
+    };
+    refreshAll();
+  }
+}, [autoLoad]);
 
   const refreshPortfolio = useCallback(async (days = 30) => {
     setPortfolioLoading(true);

@@ -1,5 +1,5 @@
 // src/components/ui/Toast.tsx
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ToastMessage {

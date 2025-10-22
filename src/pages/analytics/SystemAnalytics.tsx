@@ -1,19 +1,11 @@
 // src/components/SystemAnalytics.tsx
 import React, { useEffect, useState } from 'react';
 import { useAnalytics } from '../../components/contexts/AnalyticsContext';
-import { SystemAnalytics as SystemAnalyticsType, SignalSummary, SystemTradeSummary } from '../../types/analytics.types';
 import { 
   Activity, 
-  TrendingUp, 
-  TrendingDown, 
-  Pause, 
-  Users, 
   Zap, 
   Target,
   BarChart3,
-  Shield,
-  CheckCircle2,
-  AlertTriangle,
   RefreshCw,
   AlertCircle
 } from 'lucide-react';
@@ -93,7 +85,7 @@ const SystemAnalyticsComponent: React.FC = () => {
     );
   }
 
-  const { period_stats, recent_signals, recent_trades } = system;
+  const { period_stats} = system;
 
   // Safe data access with fallbacks
   const safePeriodStats = period_stats || {
@@ -103,26 +95,7 @@ const SystemAnalyticsComponent: React.FC = () => {
     decisions: { long: 0, short: 0, hold: 0 }
   };
 
-  const safeRecentSignals = recent_signals || [];
-  const safeRecentTrades = recent_trades || [];
 
-  const getDecisionColor = (type: 'long' | 'short' | 'hold') => {
-    switch (type) {
-      case 'long': return 'text-green-400';
-      case 'short': return 'text-red-400';
-      case 'hold': return 'text-yellow-400';
-      default: return 'text-gray-400';
-    }
-  };
-
-  const getDecisionIcon = (type: 'long' | 'short' | 'hold') => {
-    switch (type) {
-      case 'long': return <TrendingUp className="w-4 h-4" />;
-      case 'short': return <TrendingDown className="w-4 h-4" />;
-      case 'hold': return <Pause className="w-4 h-4" />;
-      default: return <Activity className="w-4 h-4" />;
-    }
-  };
 
   const getConsensusStrengthColor = (strength: number) => {
     if (strength >= 80) return 'text-green-400';
@@ -139,7 +112,6 @@ const SystemAnalyticsComponent: React.FC = () => {
   const formatPercent = (value: number) => 
     `${value.toFixed(2)}%`;
 
-  const totalSignals = safePeriodStats.total_signals || 0;
 
   return (
     <div className="space-y-6">
