@@ -2,16 +2,16 @@
 export const API_ENDPOINTS = {
   // Authentication
   AUTH: {
-    LOGIN: "/auth/login",
-    REGISTER: "/auth/register",
-    LOGOUT: "/auth/logout",
-    PROFILE: "/auth/profile",
+    LOGIN: "/auth/login/",
+    REGISTER: "/auth/register/",
+    LOGOUT: "/auth/logout/",
+    PROFILE: "/auth/profile/",
   },
 
   // Users
   USERS: {
-    ME: "/users/me",
-    UPDATE: "/users/me",
+    ME: "/users/me/",
+    UPDATE: "/users/me/",
 
     API_KEYS: "/users/api-keys",
     API_KEYS_ID: (keyId: string) => `/users/api-keys/${keyId}`,
@@ -20,7 +20,7 @@ export const API_ENDPOINTS = {
 
   // Portfolio
   PORTFOLIO: {
-    GET: "/portfolio/portfolio",
+    GET: "/portfolio/portfolio/",
   },
 
   // Trades
@@ -34,10 +34,10 @@ export const API_ENDPOINTS = {
 
   // Analytics
   ANALYTICS: {
-    PORTFOLIO: "/analytics/portfolio",
-    PERFORMANCE: "/analytics/performance",
-    HISTORY: "/analytics/history",
-    SYSTEM: "/analytics/system"
+    PORTFOLIO: "/analytics/portfolio/",
+    PERFORMANCE: "/analytics/performance/",
+    HISTORY: "/analytics/history/",
+    SYSTEM: "/analytics/system/"
   },
 
   // Signals (open endpoints)
