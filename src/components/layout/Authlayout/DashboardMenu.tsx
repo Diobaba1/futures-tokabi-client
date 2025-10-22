@@ -6,7 +6,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { 
   BarChart3, 
   Zap, 
-  Briefcase, 
   FileText, 
   Shield, 
   Key, 
@@ -62,12 +61,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
           icon: Zap,
           description: 'AI consensus Signals'
         },
-        { 
-          name: 'Portfolio', 
-          href: '/dashboard/portfolio', 
-          icon: Briefcase,
-          description: 'Asset management'
-        },
+        
       ]
     },
     {

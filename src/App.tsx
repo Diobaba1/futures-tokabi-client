@@ -20,7 +20,6 @@ import "./App.css";
 import CommunityPage from "./pages/pageComponents/Community";
 import APIKeyManager from "./pages/walletpages/APIKeyManager";
 import Billing from "./pages/Billing/Billing";
-import PortfolioAnalyticsComponent from "./pages/analytics/PortfolioAnalytics";
 import SignalsPage from "./pages/pageComponents/SignalsPage";
 
 interface RouteConfig {
@@ -71,7 +70,6 @@ const dashboardRoutes: RouteConfig[] = [
   { path: "/dashboard/billing", element: <Billing />, layout: DashboardLayout, protected: true },
   { path: "/dashboard/trading", element: <Trades />, layout: DashboardLayout, protected: true },
   { path: "/dashboard/settings", element: <Profile />, layout: DashboardLayout, protected: true },
-  { path: "/dashboard/portfolio", element: <PortfolioAnalyticsComponent />, layout: DashboardLayout, protected: true },
   { path: "/dashboard/signals", element: <SignalsPage />, layout: DashboardLayout, protected: true },
 
   { path: "/dashboard/performance", element: <div>Performance Page</div>, layout: DashboardLayout, protected: true },
