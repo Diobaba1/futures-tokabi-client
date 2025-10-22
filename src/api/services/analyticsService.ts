@@ -5,7 +5,7 @@ import { PortfolioAnalytics, SystemAnalytics } from '../../types/analytics.types
 
 export const analyticsService = {
   async getPortfolioAnalytics(days: number = 30): Promise<PortfolioAnalytics> {
-    const url = `${API_ENDPOINTS.ANALYTICS.PORTFOLIO}${days !== 30 ? `?days=${days}` : ''}`;
+    const url = `${API_ENDPOINTS.PORTFOLIO.GET}${days !== 30 ? `?days=${days}` : ''}`;
     const response = await axiosInstance.get(url);
     return response.data;
   },
