@@ -6,6 +6,7 @@ import React, {
   ReactNode,
   useCallback,
   useMemo,
+  useEffect,
 } from "react";
 import {
   PortfolioAnalytics,
@@ -18,13 +19,16 @@ interface AnalyticsContextType {
   system: SystemAnalytics | null;
   portfolioLoading: boolean;
   systemLoading: boolean;
-  loading: boolean; // Add this for backward compatibility
-  fetchPortfolio: () => Promise<void>; // Add this alias for refreshPortfolio
-  fetchSystem: () => Promise<void>; // Add this alias for refreshSystem
+  portfolioError: string | null;
+  systemError: string | null;
+  loading: boolean;
+  fetchPortfolio: () => Promise<void>;
+  fetchSystem: () => Promise<void>;
   refreshPortfolio: (days?: number) => Promise<void>;
   refreshSystem: (days?: number) => Promise<void>;
   refreshAll: (portfolioDays?: number, systemDays?: number) => Promise<void>;
   clearAnalytics: () => void;
+  clearErrors: () => void;
 }
 
 const AnalyticsContext = createContext<AnalyticsContextType | undefined>(
@@ -41,22 +45,36 @@ export const useAnalytics = (): AnalyticsContextType => {
 
 interface AnalyticsProviderProps {
   children: ReactNode;
+  autoLoad?: boolean;
 }
 
 export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
   children,
+  autoLoad = true,
 }) => {
   const [portfolio, setPortfolio] = useState<PortfolioAnalytics | null>(null);
   const [system, setSystem] = useState<SystemAnalytics | null>(null);
   const [portfolioLoading, setPortfolioLoading] = useState(false);
   const [systemLoading, setSystemLoading] = useState(false);
+  const [portfolioError, setPortfolioError] = useState<string | null>(null);
+  const [systemError, setSystemError] = useState<string | null>(null);
+
+  // Auto-load analytics on mount in production
+  useEffect(() => {
+    if (autoLoad) {
+      refreshAll();
+    }
+  }, [autoLoad]);
 
   const refreshPortfolio = useCallback(async (days = 30) => {
     setPortfolioLoading(true);
+    setPortfolioError(null);
     try {
       const data = await analyticsService.getPortfolioAnalytics(days);
       setPortfolio(data);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch portfolio analytics';
+      setPortfolioError(errorMessage);
       console.error("[AnalyticsContext] Failed to fetch portfolio analytics", error);
     } finally {
       setPortfolioLoading(false);
@@ -65,17 +83,19 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
 
   const refreshSystem = useCallback(async (days = 7) => {
     setSystemLoading(true);
+    setSystemError(null);
     try {
       const data = await analyticsService.getSystemAnalytics(days);
       setSystem(data);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch system analytics';
+      setSystemError(errorMessage);
       console.error("[AnalyticsContext] Failed to fetch system analytics", error);
     } finally {
       setSystemLoading(false);
     }
   }, []);
 
-  // Add aliases for backward compatibility
   const fetchPortfolio = useCallback(() => refreshPortfolio(30), [refreshPortfolio]);
   const fetchSystem = useCallback(() => refreshSystem(7), [refreshSystem]);
 
@@ -89,9 +109,15 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
   const clearAnalytics = useCallback(() => {
     setPortfolio(null);
     setSystem(null);
+    setPortfolioError(null);
+    setSystemError(null);
   }, []);
 
-  // Combined loading state for backward compatibility
+  const clearErrors = useCallback(() => {
+    setPortfolioError(null);
+    setSystemError(null);
+  }, []);
+
   const loading = portfolioLoading || systemLoading;
 
   const value = useMemo<AnalyticsContextType>(
@@ -100,19 +126,8 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
       system,
       portfolioLoading,
       systemLoading,
-      loading, // Add combined loading state
-      fetchPortfolio, // Add alias
-      fetchSystem, // Add alias
-      refreshPortfolio,
-      refreshSystem,
-      refreshAll,
-      clearAnalytics,
-    }),
-    [
-      portfolio,
-      system,
-      portfolioLoading,
-      systemLoading,
+      portfolioError,
+      systemError,
       loading,
       fetchPortfolio,
       fetchSystem,
@@ -120,6 +135,23 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
       refreshSystem,
       refreshAll,
       clearAnalytics,
+      clearErrors,
+    }),
+    [
+      portfolio,
+      system,
+      portfolioLoading,
+      systemLoading,
+      portfolioError,
+      systemError,
+      loading,
+      fetchPortfolio,
+      fetchSystem,
+      refreshPortfolio,
+      refreshSystem,
+      refreshAll,
+      clearAnalytics,
+      clearErrors,
     ]
   );
 
