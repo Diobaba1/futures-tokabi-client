@@ -12,7 +12,8 @@ import {
   CreditCard, 
   Settings,
   HelpCircle,
-  LogOut
+  LogOut,
+  Bell
 } from 'lucide-react';
 
 interface DashboardMenuProps {
@@ -61,7 +62,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
           icon: Zap,
           description: 'AI consensus Signals'
         },
-        
+        ///dashboard/notifications
       ]
     },
     {
@@ -90,6 +91,14 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
           icon: Key,
           description: 'Exchange connections'
         },
+
+        { 
+          name: 'Notfication', 
+          href: '/dashboard/notifications', 
+          icon: Bell,
+          description: 'Exchange connections'
+        },
+
         { 
           name: 'Billing', 
           href: '/dashboard/billing', 

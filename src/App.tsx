@@ -21,6 +21,7 @@ import CommunityPage from "./pages/pageComponents/Community";
 import APIKeyManager from "./pages/walletpages/APIKeyManager";
 import Billing from "./pages/Billing/Billing";
 import SignalsPage from "./pages/pageComponents/SignalsPage";
+import TgConfigPage from "./pages/config/tgConfigPage";
 
 interface RouteConfig {
   path: string;
@@ -67,6 +68,7 @@ const publicRoutes: RouteConfig[] = [
 const dashboardRoutes: RouteConfig[] = [
   { path: "/dashboard", element: <Dashboard />, layout: DashboardLayout, protected: true },
   { path: "/dashboard/api-key", element: <APIKeyManager />, layout: DashboardLayout, protected: true },
+  { path: "/dashboard/notifications", element: <TgConfigPage />, layout: DashboardLayout, protected: true },
   { path: "/dashboard/billing", element: <Billing />, layout: DashboardLayout, protected: true },
   { path: "/dashboard/trading", element: <Trades />, layout: DashboardLayout, protected: true },
   { path: "/dashboard/settings", element: <Profile />, layout: DashboardLayout, protected: true },

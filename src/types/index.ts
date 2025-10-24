@@ -37,3 +37,12 @@ export interface TokenPrice {
   price: number;
   change_24h?: number;
 }
+
+
+export type {
+  TelegramConfigCreate,
+  TelegramConfigUpdate,
+
+  TelegramConfigResponse
+
+} from './telegram-config.types'

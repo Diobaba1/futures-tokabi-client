@@ -16,6 +16,10 @@ export const API_ENDPOINTS = {
     API_KEYS: "/users/api-keys",
     API_KEYS_ID: (keyId: string) => `/users/api-keys/${keyId}`,
     SUBSCRIPTION: "/users/subscription",
+
+    // Telegram Config
+    TELEGRAM: "/tg/telegram-config",
+    TELEGRAM_ID: (configId: string) => `/tg/telegram-config/${configId}`,
   },
 
   // Portfolio
