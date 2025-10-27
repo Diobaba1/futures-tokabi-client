@@ -441,7 +441,7 @@ const SignalPage: React.FC = () => {
                             <div>
                               <span className="text-gray-400 text-sm">Entry Price</span>
                               <div className="text-lg font-semibold text-white">
-                                ${signal.entry_price.toLocaleString()}
+                                ${signal.entry_price}
                               </div>
                             </div>
                           )}
@@ -449,7 +449,7 @@ const SignalPage: React.FC = () => {
                             <div>
                               <span className="text-gray-400 text-sm">Take Profit</span>
                               <div className="text-lg font-semibold text-emerald-400">
-                                ${signal.take_profit_price.toLocaleString()}
+                                ${signal.take_profit_price}
                                 <span className="text-sm ml-2">(+{tpPercentage.toFixed(2)}%)</span>
                               </div>
                             </div>
@@ -458,7 +458,7 @@ const SignalPage: React.FC = () => {
                             <div>
                               <span className="text-gray-400 text-sm">Stop Loss</span>
                               <div className="text-lg font-semibold text-rose-400">
-                                ${signal.stop_loss_price.toLocaleString()}
+                                ${signal.stop_loss_price}
                                 <span className="text-sm ml-2">({slPercentage.toFixed(2)}%)</span>
                               </div>
                             </div>
@@ -582,7 +582,7 @@ const SignalPage: React.FC = () => {
                             <div className="flex justify-between items-center">
                               <span className="text-gray-400">Entry Price</span>
                               <span className="text-lg font-bold text-white">
-                                ${selectedSignal.entry_price.toLocaleString()}
+                                ${selectedSignal.entry_price}
                               </span>
                             </div>
                           )}
@@ -591,7 +591,7 @@ const SignalPage: React.FC = () => {
                               <span className="text-gray-400">Take Profit</span>
                               <div className="text-right">
                                 <div className="text-lg font-bold text-emerald-400">
-                                  ${selectedSignal.take_profit_price.toLocaleString()}
+                                  ${selectedSignal.take_profit_price}
                                 </div>
                               </div>
                             </div>
@@ -601,7 +601,7 @@ const SignalPage: React.FC = () => {
                               <span className="text-gray-400">Stop Loss</span>
                               <div className="text-right">
                                 <div className="text-lg font-bold text-rose-400">
-                                  ${selectedSignal.stop_loss_price.toLocaleString()}
+                                  ${selectedSignal.stop_loss_price}
                                 </div>
                               </div>
                             </div>
