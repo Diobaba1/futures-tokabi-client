@@ -1,4 +1,3 @@
-// src/components/SystemAnalytics.tsx
 import React, { useEffect, useState } from 'react';
 import { useAnalytics } from '../../components/contexts/AnalyticsContext';
 import { 
@@ -7,8 +6,34 @@ import {
   Target,
   BarChart3,
   RefreshCw,
-  AlertCircle
+  AlertCircle,
+  TrendingUp,
+  Award,
+  Shield,
+  Rocket
 } from 'lucide-react';
+
+interface SignalQualityDistribution {
+  divine: number;
+  excellent: number;
+  very_good: number;
+  good: number;
+  caution: number;
+}
+
+interface MostActiveSymbol {
+  symbol: string;
+  signal_count: number;
+}
+
+interface SignalSummary {
+  id: string;
+  symbol: string;
+  decision: string;
+  consensus_strength: number;
+  signal_quality: string;
+  created_at: string;
+}
 
 const SystemAnalyticsComponent: React.FC = () => {
   const { system, systemLoading, systemError, refreshSystem } = useAnalytics();
@@ -85,17 +110,31 @@ const SystemAnalyticsComponent: React.FC = () => {
     );
   }
 
-  const { period_stats} = system;
+  const { period_stats, analytics_summary, recent_signals, recent_trades } = system;
 
   // Safe data access with fallbacks
   const safePeriodStats = period_stats || {
+    timeframe: "7d",
     total_signals: 0,
     avg_consensus_strength: 0,
+    avg_leverage: 0,
     system_pnl_usd: 0,
-    decisions: { long: 0, short: 0, hold: 0 }
+    success_rate: 0,
+    total_futures_ready: 0,
+    decisions: { long: 0, short: 0, hold: 0 },
+    signal_quality_distribution: { divine: 0, excellent: 0, very_good: 0, good: 0, caution: 0 },
+    most_active_symbols: []
   };
 
+  const safeAnalyticsSummary = analytics_summary || {
+    total_analyzed_period: 0,
+    high_quality_signals: 0,
+    avg_risk_reward: 0,
+    leverage_distribution: { low_risk: 0, medium_risk: 0, high_risk: 0 }
+  };
 
+  const safeRecentSignals: SignalSummary[] = recent_signals || [];
+  const safeRecentTrades = recent_trades || [];
 
   const getConsensusStrengthColor = (strength: number) => {
     if (strength >= 80) return 'text-green-400';
@@ -106,12 +145,25 @@ const SystemAnalyticsComponent: React.FC = () => {
   const getPnLColor = (value: number) => 
     value >= 0 ? 'text-green-400' : 'text-red-400';
 
+  const getSignalQualityColor = (quality: string) => {
+    const colors = {
+      divine: 'text-yellow-400',
+      excellent: 'text-purple-400',
+      very_good: 'text-blue-400',
+      good: 'text-green-400',
+      caution: 'text-orange-400'
+    };
+    return colors[quality as keyof typeof colors] || 'text-gray-400';
+  };
+
   const formatCurrency = (value: number) => 
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 
   const formatPercent = (value: number) => 
     `${value.toFixed(2)}%`;
 
+  const formatNumber = (value: number) => 
+    value.toFixed(2);
 
   return (
     <div className="space-y-6">
@@ -172,7 +224,7 @@ const SystemAnalyticsComponent: React.FC = () => {
             </div>
           </div>
           <h3 className="text-lg font-semibold text-white mb-1">Total Signals</h3>
-          <p className="text-gray-400 text-sm">Current period</p>
+          <p className="text-gray-400 text-sm">{safePeriodStats.timeframe}</p>
         </div>
 
         {/* Average Consensus */}
@@ -199,21 +251,130 @@ const SystemAnalyticsComponent: React.FC = () => {
           <p className="text-gray-400 text-sm">Total performance</p>
         </div>
 
-        {/* Decision Distribution */}
+        {/* Success Rate */}
         <div className="bg-gray-800/40 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
           <div className="flex items-center justify-between mb-4">
-            <Activity className="w-8 h-8 text-purple-400" />
-            <div className="text-2xl font-black text-white">
-              {safePeriodStats.decisions.long + safePeriodStats.decisions.short + safePeriodStats.decisions.hold}
+            <Award className="w-8 h-8 text-purple-400" />
+            <div className={`text-2xl font-black ${safePeriodStats.success_rate >= 50 ? 'text-green-400' : 'text-yellow-400'}`}>
+              {formatPercent(safePeriodStats.success_rate)}
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-white mb-1">Total Decisions</h3>
-          <p className="text-gray-400 text-sm">AI consensus results</p>
+          <h3 className="text-lg font-semibold text-white mb-1">Success Rate</h3>
+          <p className="text-gray-400 text-sm">Trade accuracy</p>
         </div>
       </div>
 
-      {/* Rest of the component remains the same but uses safe data accessors */}
-      {/* ... (other sections using safePeriodStats, safeRecentSignals, safeRecentTrades) ... */}
+      {/* Secondary Metrics Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Average Leverage */}
+        <div className="bg-gray-800/30 rounded-xl p-4 border border-gray-700/50">
+          <div className="flex items-center gap-3">
+            <TrendingUp className="w-6 h-6 text-amber-400" />
+            <div>
+              <h4 className="text-white font-semibold">Avg Leverage</h4>
+              <p className="text-2xl font-bold text-amber-400">
+                {formatNumber(safePeriodStats.avg_leverage)}x
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Futures Ready */}
+        <div className="bg-gray-800/30 rounded-xl p-4 border border-gray-700/50">
+          <div className="flex items-center gap-3">
+            <Rocket className="w-6 h-6 text-green-400" />
+            <div>
+              <h4 className="text-white font-semibold">Futures Ready</h4>
+              <p className="text-2xl font-bold text-green-400">
+                {safePeriodStats.total_futures_ready}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* High Quality Signals */}
+        <div className="bg-gray-800/30 rounded-xl p-4 border border-gray-700/50">
+          <div className="flex items-center gap-3">
+            <Shield className="w-6 h-6 text-blue-400" />
+            <div>
+              <h4 className="text-white font-semibold">Premium Signals</h4>
+              <p className="text-2xl font-bold text-blue-400">
+                {safeAnalyticsSummary.high_quality_signals}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Signal Quality Distribution */}
+      <div className="bg-gray-800/40 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
+        <h3 className="text-xl font-bold text-white mb-4">Signal Quality Distribution</h3>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {Object.entries(safePeriodStats.signal_quality_distribution).map(([quality, count]) => (
+            <div key={quality} className="text-center">
+              <div className={`text-2xl font-bold ${getSignalQualityColor(quality)} mb-2`}>
+                {count as number}
+              </div>
+              <div className="text-sm font-semibold text-white capitalize">
+                {quality.replace('_', ' ')}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Most Active Symbols */}
+      {safePeriodStats.most_active_symbols.length > 0 && (
+        <div className="bg-gray-800/40 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
+          <h3 className="text-xl font-bold text-white mb-4">Most Active Symbols</h3>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {safePeriodStats.most_active_symbols.map(({ symbol, signal_count }: MostActiveSymbol) => (
+              <div key={symbol} className="text-center">
+                <div className="text-2xl font-bold text-white mb-2">
+                  {signal_count}
+                </div>
+                <div className="text-sm font-semibold text-amber-400">
+                  {symbol}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recent Signals */}
+      {safeRecentSignals.length > 0 && (
+        <div className="bg-gray-800/40 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
+          <h3 className="text-xl font-bold text-white mb-4">Recent Signals</h3>
+          <div className="space-y-3">
+            {safeRecentSignals.slice(0, 5).map((signal: SignalSummary) => (
+              <div key={signal.id} className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                    signal.decision === 'long' ? 'bg-green-500/20 text-green-400' : 
+                    signal.decision === 'short' ? 'bg-red-500/20 text-red-400' : 
+                    'bg-gray-500/20 text-gray-400'
+                  }`}>
+                    {signal.decision.toUpperCase()}
+                  </span>
+                  <span className="text-white font-semibold">{signal.symbol}</span>
+                  <span className={`text-xs ${getSignalQualityColor(signal.signal_quality)}`}>
+                    {signal.signal_quality}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <div className={`text-sm font-semibold ${getConsensusStrengthColor(signal.consensus_strength)}`}>
+                    {formatPercent(signal.consensus_strength)}
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    {new Date(signal.created_at).toLocaleTimeString()}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
