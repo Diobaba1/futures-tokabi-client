@@ -126,9 +126,9 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
   ];
 
   const quickStats = [
-    { label: 'Daily P&L', value: '+2.4%', color: 'text-yellow-400' },
-    { label: 'Active Models', value: '3/5', color: 'text-yellow-400' },
-    { label: 'Win Rate', value: '87.3%', color: 'text-yellow-400' },
+    { label: 'Daily P&L', value: '+2.4%', color: 'text-cyan-800' },
+    { label: 'Active Models', value: '3/5', color: 'text-cyan-800' },
+    { label: 'Win Rate', value: '87.3%', color: 'text-cyan-800' },
   ];
 
   const handleConnectExchange = () => {
@@ -192,13 +192,13 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
               to="/dashboard" 
               className={`flex items-center group ${isCollapsed ? 'justify-center' : 'space-x-3'}`}
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/25">
+              <div className="w-10 h-10 bg-gradient-to-br from-cyan-900 to-cyan-900 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-900/25">
                 <TrendingUp className="w-5 h-5 text-white" />
               </div>
               {!isCollapsed && (
                 <div className="flex flex-col">
                   <span className="text-white font-light text-xl">TOKABI</span>
-                  <span className="text-yellow-400 text-xs font-medium tracking-wider">DASHBOARD</span>
+                  <span className="text-cyan-800 text-xs font-medium tracking-wider">DASHBOARD</span>
                 </div>
               )}
             </Link>
@@ -238,7 +238,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleConnectExchange}
-            className={`w-full py-3 bg-gradient-to-r from-yellow-500 to-yellow-500 text-white font-medium rounded-lg hover:from-yellow-400 hover:to-yellow-400 transition-all duration-300 shadow-lg shadow-yellow-500/25 flex items-center justify-center ${
+            className={`w-full py-3 bg-gradient-to-r from-cyan-900 to-cyan-900 text-white font-medium rounded-lg hover:from-cyan-800 hover:to-cyan-800 transition-all duration-300 shadow-lg shadow-cyan-900/25 flex items-center justify-center ${
               isCollapsed ? 'px-2' : 'space-x-2 text-sm'
             }`}
           >
@@ -281,7 +281,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                           isCollapsed ? 'p-3 justify-center' : 'p-3'
                         } ${
                           isActive
-                            ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400 shadow-lg shadow-yellow-500/10'
+                            ? 'bg-cyan-900/10 border-cyan-900/30 text-cyan-800 shadow-lg shadow-cyan-900/10'
                             : 'text-gray-300 hover:bg-gray-800/30 hover:text-white border-transparent hover:border-gray-700/30'
                         }`}
                       >
@@ -293,7 +293,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                             <div className="flex-1 min-w-0">
                               <div className="font-medium text-sm">{item.name}</div>
                               <div className={`text-xs transition-colors duration-200 font-light ${
-                                isActive ? 'text-yellow-300/70' : 'text-gray-400 group-hover:text-gray-300'
+                                isActive ? 'text-cyan-300/70' : 'text-gray-400 group-hover:text-gray-300'
                               }`}>
                                 {item.description}
                               </div>
@@ -302,14 +302,14 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                           {!isCollapsed && isActive && (
                             <motion.div
                               layoutId="activeMenuIndicator"
-                              className="w-1.5 h-1.5 bg-yellow-400 rounded-full shadow-lg shadow-yellow-400/50"
+                              className="w-1.5 h-1.5 bg-cyan-800 rounded-full shadow-lg shadow-cyan-800/50"
                             />
                           )}
                         </div>
                         {isCollapsed && isActive && (
                           <motion.div
                             layoutId="activeMenuIndicatorCollapsed"
-                            className="w-1 h-1 bg-yellow-400 rounded-full mx-auto mt-2 shadow-lg shadow-yellow-400/50"
+                            className="w-1 h-1 bg-cyan-800 rounded-full mx-auto mt-2 shadow-lg shadow-cyan-800/50"
                           />
                         )}
                       </motion.button>
@@ -328,7 +328,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
             <div className={`flex items-center rounded-lg bg-gray-800/20 border border-gray-700/30 ${
               isCollapsed ? 'p-2 justify-center' : 'p-3 space-x-3'
             }`}>
-              <div className="w-8 h-8 bg-gradient-to-br from-yellow-500 to-yellow-500 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-cyan-900 to-cyan-900 rounded-full flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />
               </div>
               {!isCollapsed && (
@@ -338,7 +338,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                 </div>
               )}
               {!isCollapsed && (
-                <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
+                <div className="w-1.5 h-1.5 bg-cyan-800 rounded-full"></div>
               )}
             </div>
 
@@ -349,7 +349,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                   window.open('https://support.tokabi.com', '_blank');
                   onClose();
                 }}
-                className={`text-gray-400 hover:text-yellow-400 transition-colors duration-200 text-sm font-medium rounded-lg border border-gray-700/30 hover:border-yellow-500/30 hover:bg-yellow-500/5 ${
+                className={`text-gray-400 hover:text-cyan-800 transition-colors duration-200 text-sm font-medium rounded-lg border border-gray-700/30 hover:border-cyan-900/30 hover:bg-cyan-900/5 ${
                   isCollapsed ? 'p-2 flex justify-center' : 'p-2'
                 }`}
                 title={isCollapsed ? "Support" : undefined}
@@ -405,13 +405,13 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
               to="/dashboard" 
               className={`flex items-center group ${isCollapsed ? 'justify-center' : 'space-x-3'}`}
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/25">
+              <div className="w-10 h-10 bg-gradient-to-br from-cyan-900 to-cyan-900 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-900/25">
                 <TrendingUp className="w-5 h-5 text-white" />
               </div>
               {!isCollapsed && (
                 <div className="flex flex-col">
                   <span className="text-white font-light text-xl">TOKABI</span>
-                  <span className="text-yellow-400 text-xs font-medium tracking-wider">DASHBOARD</span>
+                  <span className="text-cyan-800 text-xs font-medium tracking-wider">DASHBOARD</span>
                 </div>
               )}
             </Link>
@@ -436,7 +436,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleConnectExchange}
-              className={`w-full py-3 bg-gradient-to-r from-yellow-500 to-yellow-500 text-white font-medium rounded-lg hover:from-yellow-400 hover:to-yellow-400 transition-all duration-300 shadow-lg shadow-yellow-500/25 flex items-center justify-center ${
+              className={`w-full py-3 bg-gradient-to-r from-cyan-900 to-cyan-900 text-white font-medium rounded-lg hover:from-cyan-800 hover:to-cyan-800 transition-all duration-300 shadow-lg shadow-cyan-900/25 flex items-center justify-center ${
                 isCollapsed ? 'px-2' : 'space-x-2 text-sm'
               }`}
             >
@@ -474,7 +474,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                             isCollapsed ? 'p-3 justify-center' : 'p-3'
                           } ${
                             isActive
-                              ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400 shadow-lg shadow-yellow-500/10'
+                              ? 'bg-cyan-900/10 border-cyan-900/30 text-cyan-800 shadow-lg shadow-cyan-900/10'
                               : 'text-gray-300 hover:bg-gray-800/30 hover:text-white border-transparent hover:border-gray-700/30'
                           }`}
                         >
@@ -486,7 +486,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                               <div className="flex-1 min-w-0">
                                 <div className="font-medium text-sm">{item.name}</div>
                                 <div className={`text-xs transition-colors duration-200 font-light ${
-                                  isActive ? 'text-yellow-300/70' : 'text-gray-400 group-hover:text-gray-300'
+                                  isActive ? 'text-cyan-300/70' : 'text-gray-400 group-hover:text-gray-300'
                                 }`}>
                                   {item.description}
                                 </div>
@@ -495,14 +495,14 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                             {!isCollapsed && isActive && (
                               <motion.div
                                 layoutId="activeMenuIndicator"
-                                className="w-1.5 h-1.5 bg-yellow-400 rounded-full shadow-lg shadow-yellow-400/50"
+                                className="w-1.5 h-1.5 bg-cyan-800 rounded-full shadow-lg shadow-cyan-800/50"
                               />
                             )}
                           </div>
                           {isCollapsed && isActive && (
                             <motion.div
                               layoutId="activeMenuIndicatorCollapsed"
-                              className="w-1 h-1 bg-yellow-400 rounded-full mx-auto mt-2 shadow-lg shadow-yellow-400/50"
+                              className="w-1 h-1 bg-cyan-800 rounded-full mx-auto mt-2 shadow-lg shadow-cyan-800/50"
                             />
                           )}
                         </motion.button>
@@ -521,7 +521,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
               <div className={`flex items-center rounded-lg bg-gray-800/20 border border-gray-700/30 ${
                 isCollapsed ? 'p-2 justify-center' : 'p-3 space-x-3'
               }`}>
-                <div className="w-8 h-8 bg-gradient-to-br from-yellow-500 to-yellow-500 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-br from-cyan-900 to-cyan-900 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-white" />
                 </div>
                 {!isCollapsed && (
@@ -531,7 +531,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                   </div>
                 )}
                 {!isCollapsed && (
-                  <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-cyan-800 rounded-full"></div>
                 )}
               </div>
 
@@ -539,7 +539,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
               <div className={`grid gap-2 ${isCollapsed ? 'grid-cols-1' : 'grid-cols-2'}`}>
                 <button 
                   onClick={() => window.open('https://support.tokabi.com', '_blank')}
-                  className={`text-gray-400 hover:text-yellow-400 transition-colors duration-200 text-sm font-medium rounded-lg border border-gray-700/30 hover:border-yellow-500/30 hover:bg-yellow-500/5 ${
+                  className={`text-gray-400 hover:text-cyan-800 transition-colors duration-200 text-sm font-medium rounded-lg border border-gray-700/30 hover:border-cyan-900/30 hover:bg-cyan-900/5 ${
                     isCollapsed ? 'p-2 flex justify-center' : 'p-2'
                   }`}
                   title={isCollapsed ? "Support" : undefined}

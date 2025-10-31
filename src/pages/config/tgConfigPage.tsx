@@ -157,40 +157,40 @@ const TgConfigPage: React.FC = () => {
   const hasChanges = config && (formData.chat_id !== config.chat_id || formData.bot_token !== config.bot_token);
 
   const StepGuide = () => (
-    <div className="bg-gradient-to-br from-amber-500/10 to-yellow-500/10 border border-amber-500/20 rounded-2xl p-6 mb-6">
+    <div className="bg-gradient-to-br from-cyan-800/10 to-cyan-900/10 border border-cyan-800/20 rounded-2xl p-6 mb-6">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-yellow-500 rounded-xl flex items-center justify-center">
+        <div className="w-8 h-8 bg-gradient-to-br from-cyan-800 to-cyan-900 rounded-xl flex items-center justify-center">
           <Settings className="w-4 h-4 text-white" />
         </div>
-        <h3 className="text-lg font-bold text-amber-200">Setup Guide</h3>
+        <h3 className="text-lg font-bold text-cyan-600">Setup Guide</h3>
       </div>
       
       <div className="grid md:grid-cols-3 gap-4">
-        <div className="bg-amber-500/5 rounded-xl p-4 border border-amber-500/10">
+        <div className="bg-cyan-800/5 rounded-xl p-4 border border-cyan-800/10">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 bg-amber-500/20 rounded-full flex items-center justify-center text-xs font-bold text-amber-300">1</div>
-            <Bot className="w-4 h-4 text-amber-400" />
+            <div className="w-6 h-6 bg-cyan-800/20 rounded-full flex items-center justify-center text-xs font-bold text-cyan-700">1</div>
+            <Bot className="w-4 h-4 text-cyan-800" />
           </div>
           <p className="text-sm text-amber-100/80 font-medium mb-1">Create Bot</p>
-          <p className="text-xs text-amber-500/70">Message <span className="font-mono text-amber-300">@BotFather</span> and create new bot</p>
+          <p className="text-xs text-cyan-800/70">Message <span className="font-mono text-cyan-700">@BotFather</span> and create new bot</p>
         </div>
         
-        <div className="bg-amber-500/5 rounded-xl p-4 border border-amber-500/10">
+        <div className="bg-cyan-800/5 rounded-xl p-4 border border-cyan-800/10">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 bg-amber-500/20 rounded-full flex items-center justify-center text-xs font-bold text-amber-300">2</div>
-            <MessageCircle className="w-4 h-4 text-amber-400" />
+            <div className="w-6 h-6 bg-cyan-800/20 rounded-full flex items-center justify-center text-xs font-bold text-cyan-700">2</div>
+            <MessageCircle className="w-4 h-4 text-cyan-800" />
           </div>
           <p className="text-sm text-amber-100/80 font-medium mb-1">Get Chat ID</p>
-          <p className="text-xs text-amber-500/70">Message <span className="font-mono text-amber-300">@userinfobot</span> to get your Chat ID</p>
+          <p className="text-xs text-cyan-800/70">Message <span className="font-mono text-cyan-700">@userinfobot</span> to get your Chat ID</p>
         </div>
         
-        <div className="bg-amber-500/5 rounded-xl p-4 border border-amber-500/10">
+        <div className="bg-cyan-800/5 rounded-xl p-4 border border-cyan-800/10">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 bg-amber-500/20 rounded-full flex items-center justify-center text-xs font-bold text-amber-300">3</div>
-            <Zap className="w-4 h-4 text-amber-400" />
+            <div className="w-6 h-6 bg-cyan-800/20 rounded-full flex items-center justify-center text-xs font-bold text-cyan-700">3</div>
+            <Zap className="w-4 h-4 text-cyan-800" />
           </div>
           <p className="text-sm text-amber-100/80 font-medium mb-1">Configure</p>
-          <p className="text-xs text-amber-500/70">Enter details below and start receiving signals</p>
+          <p className="text-xs text-cyan-800/70">Enter details below and start receiving signals</p>
         </div>
       </div>
     </div>
@@ -203,16 +203,16 @@ const TgConfigPage: React.FC = () => {
         <div className="flex items-center justify-between mb-8">
           <button
             onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-3 text-gray-400 hover:text-amber-400 transition-all duration-300 group"
+            className="flex items-center gap-3 text-gray-400 hover:text-cyan-800 transition-all duration-300 group"
           >
-            <div className="w-10 h-10 bg-gray-800/50 rounded-xl flex items-center justify-center group-hover:bg-amber-500/10 border border-gray-700 group-hover:border-amber-500/30 transition-all">
+            <div className="w-10 h-10 bg-gray-800/50 rounded-xl flex items-center justify-center group-hover:bg-cyan-800/10 border border-gray-700 group-hover:border-cyan-800/30 transition-all">
               <ArrowLeft className="w-5 h-5 group-hover:scale-110 transition-transform" />
             </div>
             <span className="font-medium">Back to Dashboard</span>
           </button>
           
           <div className="text-right">
-            <div className="flex items-center gap-2 text-amber-400">
+            <div className="flex items-center gap-2 text-cyan-800">
               <Crown className="w-5 h-5" />
               <span className="font-semibold text-sm">Premium Setup</span>
             </div>
@@ -225,15 +225,15 @@ const TgConfigPage: React.FC = () => {
           {/* Left Column - Form */}
           <div className="lg:col-span-2">
             {/* Main Card */}
-            <div className="bg-gradient-to-br from-gray-800/50 to-gray-800/30 backdrop-blur-xl rounded-2xl border border-amber-500/20 overflow-hidden shadow-2xl shadow-amber-500/10">
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-800/30 backdrop-blur-xl rounded-2xl border border-cyan-800/20 overflow-hidden shadow-2xl shadow-cyan-800/10">
               {/* Header Section */}
-              <div className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border-b border-amber-500/20 p-8">
+              <div className="bg-gradient-to-r from-cyan-800/10 to-cyan-900/10 border-b border-cyan-800/20 p-8">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/25 flex-shrink-0">
+                  <div className="w-16 h-16 bg-gradient-to-br from-cyan-800 to-cyan-900 rounded-2xl flex items-center justify-center shadow-lg shadow-cyan-800/25 flex-shrink-0">
                     <Bot className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-300 to-yellow-300 bg-clip-text text-transparent mb-2">
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-700 to-cyan-600 bg-clip-text text-transparent mb-2">
                       Telegram Bot
                     </h1>
                     <p className="text-gray-400">
@@ -244,7 +244,7 @@ const TgConfigPage: React.FC = () => {
               </div>
 
               {/* Step Guide */}
-              <div className="p-6 border-b border-amber-500/10">
+              <div className="p-6 border-b border-cyan-800/10">
                 <StepGuide />
               </div>
 
@@ -274,8 +274,8 @@ const TgConfigPage: React.FC = () => {
               <form onSubmit={handleSubmit} className="p-8 space-y-6">
                 {/* Chat ID Field */}
                 <div className="space-y-3">
-                  <label className="flex items-center gap-2 text-sm font-semibold text-amber-200">
-                    <Hash className="w-5 h-5 text-amber-400" />
+                  <label className="flex items-center gap-2 text-sm font-semibold text-cyan-600">
+                    <Hash className="w-5 h-5 text-cyan-800" />
                     Chat ID
                   </label>
                   <div className="relative group">
@@ -285,15 +285,15 @@ const TgConfigPage: React.FC = () => {
                       value={formData.chat_id}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-4 bg-gray-900/50 border-2 border-amber-500/20 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:border-amber-500/50 focus:ring-4 focus:ring-amber-500/10 disabled:bg-gray-800/50 disabled:text-gray-500 transition-all duration-300"
+                      className="w-full px-4 py-4 bg-gray-900/50 border-2 border-cyan-800/20 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:border-cyan-800/50 focus:ring-4 focus:ring-cyan-800/10 disabled:bg-gray-800/50 disabled:text-gray-500 transition-all duration-300"
                       placeholder="1234567890"
                       disabled={loading}
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                      <Hash className="w-5 h-5 text-amber-600" />
+                      <Hash className="w-5 h-5 text-cyan-900" />
                     </div>
                   </div>
-                  <p className="text-xs text-amber-500/80 flex items-center gap-2">
+                  <p className="text-xs text-cyan-800/80 flex items-center gap-2">
                     <Sparkles className="w-3 h-3" />
                     Your unique Telegram chat identifier from @userinfobot
                   </p>
@@ -301,8 +301,8 @@ const TgConfigPage: React.FC = () => {
 
                 {/* Bot Token Field */}
                 <div className="space-y-3">
-                  <label className="flex items-center gap-2 text-sm font-semibold text-amber-200">
-                    <Key className="w-5 h-5 text-amber-400" />
+                  <label className="flex items-center gap-2 text-sm font-semibold text-cyan-600">
+                    <Key className="w-5 h-5 text-cyan-800" />
                     Bot Token
                   </label>
                   <div className="relative group">
@@ -312,7 +312,7 @@ const TgConfigPage: React.FC = () => {
                       value={formData.bot_token}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-4 pr-12 bg-gray-900/50 border-2 border-amber-500/20 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:border-amber-500/50 focus:ring-4 focus:ring-amber-500/10 disabled:bg-gray-800/50 disabled:text-gray-500 transition-all duration-300 font-mono text-sm"
+                      className="w-full px-4 py-4 pr-12 bg-gray-900/50 border-2 border-cyan-800/20 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:border-cyan-800/50 focus:ring-4 focus:ring-cyan-800/10 disabled:bg-gray-800/50 disabled:text-gray-500 transition-all duration-300 font-mono text-sm"
                       placeholder="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz"
                       disabled={loading}
                     />
@@ -320,14 +320,14 @@ const TgConfigPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setShowToken(!showToken)}
-                        className="p-1 text-amber-600 hover:text-amber-400 transition-colors"
+                        className="p-1 text-cyan-900 hover:text-cyan-800 transition-colors"
                         tabIndex={-1}
                       >
                         {showToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
                   </div>
-                  <p className="text-xs text-amber-500/80 flex items-center gap-2">
+                  <p className="text-xs text-cyan-800/80 flex items-center gap-2">
                     <Shield className="w-3 h-3" />
                     Secure token from @BotFather - keep this safe!
                   </p>
@@ -338,7 +338,7 @@ const TgConfigPage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={loading || !formData.chat_id || !formData.bot_token || (isEditing && !hasChanges)}
-                    className="flex-1 flex items-center justify-center gap-3 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-gray-900 font-bold py-4 px-8 rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-[1.02] group"
+                    className="flex-1 flex items-center justify-center gap-3 bg-gradient-to-r from-cyan-800 to-cyan-900 hover:from-cyan-900 hover:to-yellow-700 text-gray-900 font-bold py-4 px-8 rounded-xl focus:outline-none focus:ring-4 focus:ring-cyan-800/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-cyan-800/25 hover:shadow-cyan-800/40 hover:scale-[1.02] group"
                   >
                     {loading ? (
                       <>
@@ -360,7 +360,7 @@ const TgConfigPage: React.FC = () => {
                       type="button"
                       onClick={() => setDeleteConfirm(true)}
                       disabled={loading}
-                      className="sm:w-auto flex items-center justify-center gap-3 border-2 border-amber-500/30 hover:border-amber-500 hover:bg-amber-500/10 text-amber-400 font-semibold py-4 px-6 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 hover:text-amber-300 hover:scale-[1.02]"
+                      className="sm:w-auto flex items-center justify-center gap-3 border-2 border-cyan-800/30 hover:border-cyan-800 hover:bg-cyan-800/10 text-cyan-800 font-semibold py-4 px-6 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-800/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 hover:text-cyan-700 hover:scale-[1.02]"
                     >
                       <Trash2 className="w-5 h-5" />
                       <span>Delete</span>
@@ -370,11 +370,11 @@ const TgConfigPage: React.FC = () => {
 
                 {/* Change Indicator */}
                 {isEditing && hasChanges && (
-                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex items-center gap-3 animate-pulse">
-                    <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
+                  <div className="bg-cyan-800/10 border border-cyan-800/30 rounded-xl p-4 flex items-center gap-3 animate-pulse">
+                    <AlertCircle className="w-5 h-5 text-cyan-800 flex-shrink-0" />
                     <div>
-                      <p className="text-sm font-medium text-amber-300">Unsaved Changes</p>
-                      <p className="text-xs text-amber-500/80">Click update to save your changes</p>
+                      <p className="text-sm font-medium text-cyan-700">Unsaved Changes</p>
+                      <p className="text-xs text-cyan-800/80">Click update to save your changes</p>
                     </div>
                   </div>
                 )}
@@ -383,10 +383,10 @@ const TgConfigPage: React.FC = () => {
 
             {/* Test Notification Section */}
             {config && (
-              <div className="mt-6 bg-gradient-to-br from-gray-800/50 to-gray-800/30 backdrop-blur-xl rounded-2xl border border-amber-500/20 p-6">
+              <div className="mt-6 bg-gradient-to-br from-gray-800/50 to-gray-800/30 backdrop-blur-xl rounded-2xl border border-cyan-800/20 p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <TestTube className="w-6 h-6 text-amber-400" />
-                  <h3 className="text-lg font-semibold text-amber-200">Test Configuration</h3>
+                  <TestTube className="w-6 h-6 text-cyan-800" />
+                  <h3 className="text-lg font-semibold text-cyan-600">Test Configuration</h3>
                 </div>
                 <p className="text-gray-400 text-sm mb-4">
                   Send a test notification to verify your bot is working correctly
@@ -394,17 +394,17 @@ const TgConfigPage: React.FC = () => {
                 <button 
                   onClick={handleTestNotification}
                   disabled={testLoading}
-                  className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 hover:border-amber-500/50 rounded-xl py-4 px-6 transition-all duration-300 group hover:shadow-lg hover:shadow-amber-500/10 disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-cyan-800/10 to-cyan-900/10 border border-cyan-800/20 hover:border-cyan-800/50 rounded-xl py-4 px-6 transition-all duration-300 group hover:shadow-lg hover:shadow-cyan-800/10 disabled:opacity-50"
                 >
                   {testLoading ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-amber-500/30 border-t-amber-400 rounded-full animate-spin" />
-                      <span className="text-amber-400 font-medium">Sending Test...</span>
+                      <div className="w-5 h-5 border-2 border-cyan-800/30 border-t-cyan-800 rounded-full animate-spin" />
+                      <span className="text-cyan-800 font-medium">Sending Test...</span>
                     </>
                   ) : (
                     <>
-                      <Send className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
-                      <span className="text-amber-400 font-medium">Send Test Notification</span>
+                      <Send className="w-5 h-5 text-cyan-800 group-hover:scale-110 transition-transform" />
+                      <span className="text-cyan-800 font-medium">Send Test Notification</span>
                     </>
                   )}
                 </button>
@@ -415,60 +415,60 @@ const TgConfigPage: React.FC = () => {
           {/* Right Column - Current Configuration */}
           <div className="lg:col-span-1">
             {config && (
-              <div className="bg-gradient-to-br from-gray-800/50 to-gray-800/30 backdrop-blur-xl rounded-2xl border border-amber-500/20 p-6 sticky top-6">
+              <div className="bg-gradient-to-br from-gray-800/50 to-gray-800/30 backdrop-blur-xl rounded-2xl border border-cyan-800/20 p-6 sticky top-6">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-yellow-500 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-cyan-800 to-cyan-900 rounded-xl flex items-center justify-center">
                     <CheckCircle className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-amber-200">Active Config</h2>
-                    <p className="text-xs text-amber-500/80">Live Configuration</p>
+                    <h2 className="text-xl font-bold text-cyan-600">Active Config</h2>
+                    <p className="text-xs text-cyan-800/80">Live Configuration</p>
                   </div>
                 </div>
                 
                 <div className="space-y-4">
                   {/* Chat ID Display */}
-                  <div className="bg-amber-500/5 rounded-xl p-4 border border-amber-500/10">
+                  <div className="bg-cyan-800/5 rounded-xl p-4 border border-cyan-800/10">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <Hash className="w-4 h-4 text-amber-400" />
-                        <span className="text-xs font-medium text-amber-500/80">Chat ID</span>
+                        <Hash className="w-4 h-4 text-cyan-800" />
+                        <span className="text-xs font-medium text-cyan-800/80">Chat ID</span>
                       </div>
                       <button
                         onClick={() => copyToClipboard(config.chat_id, 'chat_id')}
-                        className="p-1 text-amber-600 hover:text-amber-400 transition-colors"
+                        className="p-1 text-cyan-900 hover:text-cyan-800 transition-colors"
                       >
                         {copiedField === 'chat_id' ? <CheckCheck className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                       </button>
                     </div>
-                    <p className="text-sm font-mono text-amber-200 truncate">{config.chat_id}</p>
+                    <p className="text-sm font-mono text-cyan-600 truncate">{config.chat_id}</p>
                   </div>
 
                   {/* Bot Token Display */}
-                  <div className="bg-amber-500/5 rounded-xl p-4 border border-amber-500/10">
+                  <div className="bg-cyan-800/5 rounded-xl p-4 border border-cyan-800/10">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <Key className="w-4 h-4 text-amber-400" />
-                        <span className="text-xs font-medium text-amber-500/80">Bot Token</span>
+                        <Key className="w-4 h-4 text-cyan-800" />
+                        <span className="text-xs font-medium text-cyan-800/80">Bot Token</span>
                       </div>
                       <button
                         onClick={() => copyToClipboard(config.bot_token, 'bot_token')}
-                        className="p-1 text-amber-600 hover:text-amber-400 transition-colors"
+                        className="p-1 text-cyan-900 hover:text-cyan-800 transition-colors"
                       >
                         {copiedField === 'bot_token' ? <CheckCheck className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                       </button>
                     </div>
-                    <p className="text-sm font-mono text-amber-200 truncate">{config.bot_token}</p>
+                    <p className="text-sm font-mono text-cyan-600 truncate">{config.bot_token}</p>
                   </div>
 
                   {/* Timestamps */}
-                  <div className="space-y-3 pt-4 border-t border-amber-500/10">
+                  <div className="space-y-3 pt-4 border-t border-cyan-800/10">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-amber-400" />
-                        <span className="text-xs text-amber-500/80">Created</span>
+                        <Clock className="w-4 h-4 text-cyan-800" />
+                        <span className="text-xs text-cyan-800/80">Created</span>
                       </div>
-                      <span className="text-xs text-amber-200">
+                      <span className="text-xs text-cyan-600">
                         {new Date(config.created_at).toLocaleDateString()}
                       </span>
                     </div>
@@ -476,10 +476,10 @@ const TgConfigPage: React.FC = () => {
                     {config.updated_at && (
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-amber-400" />
-                          <span className="text-xs text-amber-500/80">Updated</span>
+                          <Clock className="w-4 h-4 text-cyan-800" />
+                          <span className="text-xs text-cyan-800/80">Updated</span>
                         </div>
-                        <span className="text-xs text-amber-200">
+                        <span className="text-xs text-cyan-600">
                           {new Date(config.updated_at).toLocaleDateString()}
                         </span>
                       </div>
@@ -487,8 +487,8 @@ const TgConfigPage: React.FC = () => {
                   </div>
 
                   {/* Security Badge */}
-                  <div className="pt-4 border-t border-amber-500/10">
-                    <div className="flex items-center gap-2 text-xs text-amber-500/70">
+                  <div className="pt-4 border-t border-cyan-800/10">
+                    <div className="flex items-center gap-2 text-xs text-cyan-800/70">
                       <Shield className="w-4 h-4" />
                       <span>Your credentials are securely encrypted</span>
                     </div>
@@ -503,13 +503,13 @@ const TgConfigPage: React.FC = () => {
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in">
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-amber-500/20 p-6 max-w-md w-full shadow-2xl shadow-amber-500/10 animate-in zoom-in-95">
+          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-cyan-800/20 p-6 max-w-md w-full shadow-2xl shadow-cyan-800/10 animate-in zoom-in-95">
             <div className="flex items-start gap-4 mb-4">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center flex-shrink-0 border border-amber-500/30">
-                <AlertCircle className="w-6 h-6 text-amber-400" />
+              <div className="w-12 h-12 bg-cyan-800/10 rounded-xl flex items-center justify-center flex-shrink-0 border border-cyan-800/30">
+                <AlertCircle className="w-6 h-6 text-cyan-800" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-amber-200 mb-2">Delete Configuration?</h3>
+                <h3 className="text-lg font-semibold text-cyan-600 mb-2">Delete Configuration?</h3>
                 <p className="text-sm text-amber-100/70">
                   This will permanently remove your Telegram bot configuration and stop all notifications.
                 </p>
@@ -526,7 +526,7 @@ const TgConfigPage: React.FC = () => {
               <button
                 onClick={handleDelete}
                 disabled={loading}
-                className="flex-1 px-4 py-3 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-gray-900 font-bold rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40"
+                className="flex-1 px-4 py-3 bg-gradient-to-r from-cyan-800 to-cyan-900 hover:from-cyan-900 hover:to-yellow-700 text-gray-900 font-bold rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-cyan-800/25 hover:shadow-cyan-800/40"
               >
                 {loading ? 'Deleting...' : 'Delete Configuration'}
               </button>

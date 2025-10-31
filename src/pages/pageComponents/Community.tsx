@@ -49,7 +49,7 @@ const CommunityPage = () => {
       icon: TrendingUp,
       title: "AI-Powered Signals",
       description: "Advanced machine learning algorithms analyze market patterns, volume spikes, and sentiment data 24/7 to deliver high-probability trading signals with detailed entry/exit points and risk-reward ratios.",
-      color: "from-amber-400 to-yellow-500",
+      color: "",
       badge: "85% Win Rate",
       details: [
         "Multi-timeframe analysis",
@@ -61,7 +61,7 @@ const CommunityPage = () => {
       icon: Shield,
       title: "Risk Protection",
       description: "Real-time risk alerts with automated stop-loss recommendations, position sizing calculators, and volatility-adjusted alerts to protect your capital during volatile market conditions.",
-      color: "from-orange-400 to-amber-500",
+      color: "",
       badge: "Auto-Alerts",
       details: [
         "Volatility-based stops",
@@ -73,7 +73,7 @@ const CommunityPage = () => {
       icon: Zap,
       title: "Lightning Fast",
       description: "Signals delivered in under 30 seconds via Telegram and push notifications, giving you the competitive edge in fast-moving crypto markets with low-latency execution guidance.",
-      color: "from-yellow-400 to-orange-500",
+      color: "",
       badge: "<30s Delivery",
       details: [
         "Low-latency servers",
@@ -85,7 +85,7 @@ const CommunityPage = () => {
       icon: Users,
       title: "Elite Network",
       description: "Connect with verified traders making 6-7 figures annually through private channels, live trading sessions, and collaborative strategy development in a supportive environment.",
-      color: "from-amber-500 to-gold-500",
+      color: "",
       badge: "12.5K+ Members",
       details: [
         "Verified traders only",
@@ -252,42 +252,60 @@ const CommunityPage = () => {
       title: "Join Instantly",
       description: "Click join and get immediate access to all channels and resources. No waiting, no hassle.",
       icon: Users2,
-      color: "from-amber-400 to-yellow-500"
+      color: ""
     },
     {
       step: "2",
       title: "Receive Signals",
       description: "Get AI-powered alerts with entry points, targets, and stops delivered straight to your phone.",
       icon: TrendingUp,
-      color: "from-orange-400 to-amber-500"
+      color: ""
     },
     {
       step: "3",
       title: "Connect & Learn",
       description: "Engage with experts, share trades, and refine your skills in live sessions and discussions.",
       icon: Lightbulb,
-      color: "from-yellow-400 to-orange-500"
+      color: ""
     },
     {
       step: "4",
       title: "Scale Profits",
       description: "Track performance, adjust strategies, and grow your portfolio with community-backed insights.",
       icon: ChartLine,
-      color: "from-amber-500 to-gold-500"
+      color: ""
     }
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 relative overflow-hidden">
-      {/* Enhanced Background */}
+      {/* Background Video */}
+      <div className="absolute inset-0 w-full h-full">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+          poster=""
+        >
+          <source src="" type="video/mp4" />
+          {/* Fallback gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-cyan-900/20 to-gray-900"></div>
+        </video>
+        {/* Video overlay */}
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-[1px]"></div>
+      </div>
+
+      {/* Enhanced Background Elements */}
       <div className="absolute inset-0">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-yellow-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-orange-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-cyan-900/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
       
-      {/* Animated Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(251,191,36,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(251,191,36,0.05)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
+      {/* Subtle Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(251,191,36,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(251,191,36,0.03)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Social Proof Ticker */}
@@ -303,7 +321,7 @@ const CommunityPage = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 50 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400 font-semibold backdrop-blur-sm"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-500/10 border border-cyan-500/20 rounded-full text-cyan-700 font-medium backdrop-blur-sm tracking-wide"
             >
               <Activity className="w-4 h-4 animate-pulse" />
               {socialProof[currentProof]}
@@ -320,29 +338,29 @@ const CommunityPage = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 text-amber-300 font-bold mb-8 backdrop-blur-xl shadow-2xl shadow-amber-500/20"
+            className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-cyan-500/15 to-cyan-900/15 border border-cyan-500/25 text-cyan-700 font-medium mb-8 backdrop-blur-xl shadow-2xl shadow-cyan-500/10 tracking-wider"
           >
             <div className="relative">
-              <div className="w-2 h-2 bg-amber-400 rounded-full animate-ping absolute"></div>
-              <div className="w-2 h-2 bg-amber-400 rounded-full"></div>
+              <div className="w-2 h-2 bg-cyan-700 rounded-full animate-ping absolute"></div>
+              <div className="w-2 h-2 bg-cyan-700 rounded-full"></div>
             </div>
             <Sparkles className="w-4 h-4" />
-            JOIN 12,500+ ELITE TRADERS
+            JOIN 12,500+ PROFESSIONAL TRADERS
           </motion.div>
 
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-4xl sm:text-6xl lg:text-7xl font-black mb-6 leading-tight"
+            className="text-4xl sm:text-6xl lg:text-7xl font-light mb-6 leading-tigh text-slate-600 tracking-tight"
           >
-            Trade Smarter With
+            Elevate Your Trading With
             <motion.span 
-              className="block bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400 bg-clip-text text-transparent"
+              className="block bg-gradient-to-r from-cyan-700 via-cyan-700 to-cyan-700 bg-clip-text text-transparent font-normal"
               animate={{ backgroundPosition: ['0%', '100%', '0%'] }}
               transition={{ duration: 5, repeat: Infinity }}
             >
-              The Best Community
+              Our Professional Network
             </motion.span>
           </motion.h1>
           
@@ -350,12 +368,12 @@ const CommunityPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-lg sm:text-xl lg:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed"
+            className="text-lg sm:text-xl lg:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed font-light tracking-wide"
           >
-            Stop trading alone. Join thousands of traders receiving 
-            <span className="text-amber-400 font-bold"> AI-powered signals</span>, 
-            <span className="text-orange-400 font-bold"> expert analysis</span>, and 
-            <span className="text-yellow-400 font-bold"> real-time support</span>.
+            Transition from solitary trading to collaborative success. Join thousands of professional traders receiving 
+            <span className="text-cyan-700 font-normal"> institutional-grade signals</span>, 
+            <span className="text-cyan-800 font-normal"> expert market analysis</span>, and 
+            <span className="text-cyan-900 font-normal"> comprehensive support systems</span>.
           </motion.p>
 
           {/* Stats Grid */}
@@ -373,14 +391,14 @@ const CommunityPage = () => {
                 whileHover={{ scale: 1.05, y: -5 }}
                 className="relative group"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-yellow-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative p-6 bg-gray-800/40 backdrop-blur-xl rounded-2xl border border-gray-700/50 group-hover:border-amber-500/50 transition-all duration-300">
-                  <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-amber-400 to-yellow-300 mb-2">
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/15 to-cyan-900/15 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative p-6 bg-gray-800/30 backdrop-blur-xl rounded-2xl border border-gray-700/30 group-hover:border-cyan-500/30 transition-all duration-300">
+                  <div className="text-3xl font-light text-transparent bg-clip-text bg-gradient-to-br from-cyan-700 to-cyan-700 mb-2 tracking-tight">
                     {stat.value}
                   </div>
-                  <div className="text-gray-200 font-bold text-sm mb-1">{stat.label}</div>
-                  <div className="text-gray-500 text-xs mb-2">{stat.description}</div>
-                  <div className="text-amber-400 text-xs font-semibold flex items-center justify-center gap-1">
+                  <div className="text-gray-200 font-medium text-sm mb-1 tracking-wide">{stat.label}</div>
+                  <div className="text-gray-400 text-xs mb-2 font-light tracking-wide">{stat.description}</div>
+                  <div className="text-cyan-700 text-xs font-medium flex items-center justify-center gap-1 tracking-wide">
                     <TrendingUp className="w-3 h-3" />
                     {stat.trend}
                   </div>
@@ -402,15 +420,15 @@ const CommunityPage = () => {
               rel="noopener noreferrer"
               className="group relative w-full sm:w-auto"
             >
-              <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-2xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity"></div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-cyan-900 rounded-2xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity"></div>
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="relative px-8 sm:px-12 py-5 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-2xl font-bold text-lg sm:text-xl text-white shadow-2xl"
+                className="relative px-8 sm:px-12 py-5 bg-gradient-to-r from-cyan-500 to-cyan-900 rounded-2xl font-medium text-lg sm:text-xl text-white shadow-2xl backdrop-blur-sm"
               >
-                <span className="flex items-center justify-center gap-3">
+                <span className="flex items-center justify-center gap-3 tracking-wide">
                   <MessageCircle className="w-6 h-6" />
-                  Join Free on Telegram
+                  Join Professional Network
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </motion.div>
@@ -419,10 +437,10 @@ const CommunityPage = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full sm:w-auto px-8 py-5 bg-gray-800/80 border-2 border-gray-600/50 rounded-2xl font-bold text-lg text-white hover:border-amber-500/50 hover:bg-gray-800 transition-all duration-300 backdrop-blur-xl"
+              className="w-full sm:w-auto px-8 py-5 bg-gray-800/50 border-2 border-gray-600/30 rounded-2xl font-medium text-lg text-white hover:border-cyan-500/30 hover:bg-gray-800/60 transition-all duration-300 backdrop-blur-xl tracking-wide"
             >
               <Play className="w-5 h-5 inline mr-2" />
-              Watch Demo Video
+              View Platform Overview
             </motion.button>
           </motion.div>
 
@@ -430,20 +448,20 @@ const CommunityPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
-            className="mt-6 text-gray-400 text-sm flex items-center justify-center gap-2 flex-wrap"
+            className="mt-6 text-gray-400 text-sm flex items-center justify-center gap-2 flex-wrap font-light tracking-wide"
           >
-            <CheckCircle2 className="w-4 h-4 text-amber-400" />
-            <span>Free forever</span>
-            <span className="text-gray-600">•</span>
-            <CheckCircle2 className="w-4 h-4 text-amber-400" />
-            <span>No credit card needed</span>
-            <span className="text-gray-600">•</span>
-            <CheckCircle2 className="w-4 h-4 text-amber-400" />
-            <span>Join in 30 seconds</span>
+            <CheckCircle2 className="w-4 h-4 text-cyan-700" />
+            <span>Complimentary access</span>
+            <span className="text-gray-500">•</span>
+            <CheckCircle2 className="w-4 h-4 text-cyan-700" />
+            <span>No commitment required</span>
+            <span className="text-gray-500">•</span>
+            <CheckCircle2 className="w-4 h-4 text-cyan-700" />
+            <span>Immediate onboarding</span>
           </motion.p>
         </motion.div>
 
-        {/* How It Works Section - New Addition */}
+        {/* How It Works Section */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -456,17 +474,17 @@ const CommunityPage = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl sm:text-5xl font-black text-white mb-4">
-                How It Works – Simple as 1-2-3-4
+              <h2 className="text-3xl sm:text-5xl font-light text-white mb-4 tracking-tight">
+                Operational Framework
               </h2>
-              <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                Get started in minutes and start seeing results immediately
+              <p className="text-xl text-gray-300 max-w-2xl mx-auto font-light tracking-wide leading-relaxed">
+                Streamlined four-phase methodology designed for immediate integration and sustainable growth
               </p>
             </motion.div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
-            <div className="absolute left-1/2 top-1/4 w-full h-px bg-gradient-to-r from-amber-500/20 to-transparent transform -translate-x-1/2"></div>
+            <div className="absolute left-1/2 top-1/4 w-full h-px bg-gradient-to-r from-cyan-500/15 to-transparent transform -translate-x-1/2"></div>
             {howItWorksSteps.map((step, index) => {
               const Icon = step.icon;
               return (
@@ -479,18 +497,18 @@ const CommunityPage = () => {
                   whileHover={{ y: -8, scale: 1.02 }}
                   className="group relative"
                 >
-                  <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/50 to-yellow-500/50 rounded-3xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <div className="relative h-full bg-gray-800/60 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/50 group-hover:border-amber-500/50 transition-all duration-300 text-center">
-                    <div className={`inline-flex p-3 rounded-2xl bg-gradient-to-br ${step.color} shadow-2xl mb-4 group-hover:scale-110 transition-transform duration-300 mx-auto`}>
+                  <div className="absolute -inset-0.5 bg-gradient-to-br from-cyan-500/30 to-cyan-900/30 rounded-3xl blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
+                  <div className="relative h-full bg-gray-800/40 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/30 group-hover:border-cyan-500/30 transition-all duration-300 text-center">
+                    <div className={`inline-flex p-3 rounded-2xl bg-gradient-to-br ${step.color} shadow-2xl mb-4 group-hover:scale-105 transition-transform duration-300 mx-auto backdrop-blur-sm`}>
                       <Icon className="w-6 h-6 text-white" />
                     </div>
-                    <div className="text-2xl font-black text-amber-400 mb-2">{step.step}</div>
-                    <h3 className="text-xl font-black text-white mb-3">{step.title}</h3>
-                    <p className="text-gray-400 leading-relaxed text-sm mb-4">{step.description}</p>
-                    <ul className="text-xs text-gray-500 space-y-1">
+                    <div className="text-2xl font-light text-cyan-700 mb-2 tracking-tight">{step.step}</div>
+                    <h3 className="text-xl font-normal text-white mb-3 tracking-wide">{step.title}</h3>
+                    <p className="text-gray-300 leading-relaxed text-sm mb-4 font-light tracking-wide">{step.description}</p>
+                    <ul className="text-xs text-gray-400 space-y-1 font-light">
                       {features[0].details.slice(0,2).map((detail, dIndex) => (
-                        <li key={dIndex} className="flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3 text-amber-400" />
+                        <li key={dIndex} className="flex items-center gap-1 justify-center">
+                          <CheckCircle2 className="w-3 h-3 text-cyan-700" />
                           {detail}
                         </li>
                       ))}
@@ -515,14 +533,14 @@ const CommunityPage = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl sm:text-5xl font-black text-white mb-4">
-                Everything You Need to
-                <span className="block bg-gradient-to-r from-amber-400 to-yellow-400 bg-clip-text text-transparent">
-                  Win Consistently
+              <h2 className="text-3xl sm:text-5xl font-light text-white mb-4 tracking-tight">
+                Comprehensive Trading Infrastructure
+                <span className="block bg-gradient-to-r from-cyan-700 to-cyan-700 bg-clip-text text-transparent font-normal mt-2">
+                  For Consistent Performance
                 </span>
               </h2>
-              <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                Professional-grade tools and insights, accessible to everyone – with detailed breakdowns
+              <p className="text-xl text-gray-300 max-w-2xl mx-auto font-light tracking-wide leading-relaxed">
+                Institutional-grade tools and analytical frameworks, democratized for individual traders seeking professional outcomes
               </p>
             </motion.div>
           </div>
@@ -540,24 +558,24 @@ const CommunityPage = () => {
                   whileHover={{ y: -8, scale: 1.02 }}
                   className="group relative"
                 >
-                  <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/50 to-yellow-500/50 rounded-3xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <div className="relative h-full bg-gray-800/60 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/50 group-hover:border-amber-500/50 transition-all duration-300">
+                  <div className="absolute -inset-0.5 bg-gradient-to-br from-cyan-500/30 to-cyan-900/30 rounded-3xl blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
+                  <div className="relative h-full bg-gray-800/40 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/30 group-hover:border-cyan-500/30 transition-all duration-300">
                     <div className="absolute top-4 right-4">
-                      <span className="px-3 py-1 bg-amber-500/20 border border-amber-500/30 rounded-full text-amber-400 text-xs font-bold">
+                      <span className="px-3 py-1 bg-cyan-500/15 border border-cyan-500/25 rounded-full text-cyan-700 text-xs font-medium tracking-wide">
                         {feature.badge}
                       </span>
                     </div>
                     
-                    <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${feature.color} shadow-2xl mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                    <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${feature.color} shadow-2xl mb-6 group-hover:scale-105 transition-transform duration-300 backdrop-blur-sm`}>
                       <Icon className="w-8 h-8 text-white" />
                     </div>
                     
-                    <h3 className="text-xl font-black text-white mb-3">{feature.title}</h3>
-                    <p className="text-gray-400 leading-relaxed text-sm mb-4">{feature.description}</p>
-                    <ul className="text-xs text-gray-500 space-y-1">
+                    <h3 className="text-xl font-normal text-white mb-3 tracking-wide">{feature.title}</h3>
+                    <p className="text-gray-300 leading-relaxed text-sm mb-4 font-light tracking-wide">{feature.description}</p>
+                    <ul className="text-xs text-gray-400 space-y-1 font-light">
                       {feature.details.map((detail, dIndex) => (
                         <li key={dIndex} className="flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3 text-amber-400" />
+                          <CheckCircle2 className="w-3 h-3 text-cyan-700" />
                           {detail}
                         </li>
                       ))}
@@ -576,16 +594,16 @@ const CommunityPage = () => {
           viewport={{ once: true }}
           className="mb-24"
         >
-          <div className="relative overflow-hidden bg-gradient-to-br from-amber-500/10 via-yellow-500/5 to-orange-500/10 rounded-3xl p-8 sm:p-12 border border-amber-500/20">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/20 rounded-full blur-3xl"></div>
+          <div className="relative overflow-hidden bg-gradient-to-br from-cyan-500/8 via-cyan-900/4 to-cyan-500/8 rounded-3xl p-8 sm:p-12 border border-cyan-500/15 backdrop-blur-xl">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl"></div>
             
             <div className="relative">
               <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
-                  Premium Benefits Included
+                <h2 className="text-3xl sm:text-4xl font-light text-white mb-4 tracking-tight">
+                  Comprehensive Member Benefits
                 </h2>
-                <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto">
-                  Get everything you need to become a consistently profitable trader – expanded access to tools and support
+                <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto font-light tracking-wide leading-relaxed">
+                  Access the complete suite of professional trading tools, educational resources, and community support systems
                 </p>
               </div>
 
@@ -602,19 +620,19 @@ const CommunityPage = () => {
                       whileHover={{ scale: 1.03 }}
                       className="relative group"
                     >
-                      <div className="h-full bg-gray-900/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 group-hover:border-amber-500/50 transition-all duration-300">
+                      <div className="h-full bg-gray-900/40 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/30 group-hover:border-cyan-500/30 transition-all duration-300">
                         <div className="flex items-start gap-4 mb-3">
-                          <div className="flex-shrink-0 p-3 bg-amber-500/20 rounded-xl group-hover:bg-amber-500/30 transition-colors">
-                            <Icon className="w-5 h-5 text-amber-400" />
+                          <div className="flex-shrink-0 p-3 bg-cyan-500/15 rounded-xl group-hover:bg-cyan-500/20 transition-colors backdrop-blur-sm">
+                            <Icon className="w-5 h-5 text-cyan-700" />
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <h3 className="text-lg font-bold text-white">{benefit.title}</h3>
-                              <span className="px-2 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded text-amber-400 text-xs font-bold">
+                              <h3 className="text-lg font-normal text-white tracking-wide">{benefit.title}</h3>
+                              <span className="px-2 py-0.5 bg-cyan-500/15 border border-cyan-500/25 rounded text-cyan-700 text-xs font-medium">
                                 {benefit.highlight}
                               </span>
                             </div>
-                            <p className="text-gray-400 text-sm leading-relaxed">{benefit.description}</p>
+                            <p className="text-gray-300 text-sm leading-relaxed font-light tracking-wide">{benefit.description}</p>
                           </div>
                         </div>
                       </div>
@@ -622,7 +640,7 @@ const CommunityPage = () => {
                   );
                 })}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 pt-8 border-t border-gray-700/50">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 pt-8 border-t border-gray-700/30">
                 {benefits.slice(4).map((benefit, index) => {
                   const Icon = benefit.icon;
                   return (
@@ -635,19 +653,19 @@ const CommunityPage = () => {
                       whileHover={{ scale: 1.03 }}
                       className="relative group"
                     >
-                      <div className="h-full bg-gray-900/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 group-hover:border-amber-500/50 transition-all duration-300">
+                      <div className="h-full bg-gray-900/40 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/30 group-hover:border-cyan-500/30 transition-all duration-300">
                         <div className="flex items-start gap-4 mb-3">
-                          <div className="flex-shrink-0 p-3 bg-amber-500/20 rounded-xl group-hover:bg-amber-500/30 transition-colors">
-                            <Icon className="w-5 h-5 text-amber-400" />
+                          <div className="flex-shrink-0 p-3 bg-cyan-500/15 rounded-xl group-hover:bg-cyan-500/20 transition-colors backdrop-blur-sm">
+                            <Icon className="w-5 h-5 text-cyan-700" />
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <h3 className="text-lg font-bold text-white">{benefit.title}</h3>
-                              <span className="px-2 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded text-amber-400 text-xs font-bold">
+                              <h3 className="text-lg font-normal text-white tracking-wide">{benefit.title}</h3>
+                              <span className="px-2 py-0.5 bg-cyan-500/15 border border-cyan-500/25 rounded text-cyan-700 text-xs font-medium">
                                 {benefit.highlight}
                               </span>
                             </div>
-                            <p className="text-gray-400 text-sm leading-relaxed">{benefit.description}</p>
+                            <p className="text-gray-300 text-sm leading-relaxed font-light tracking-wide">{benefit.description}</p>
                           </div>
                         </div>
                       </div>
@@ -667,11 +685,11 @@ const CommunityPage = () => {
           className="mb-24"
         >
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
-              Real Traders, Real Results
+            <h2 className="text-3xl sm:text-4xl font-light text-white mb-4 tracking-tight">
+              Verified Member Experiences
             </h2>
-            <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto">
-              Join thousands who've transformed their trading journey – hear their expanded stories
+            <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto font-light tracking-wide leading-relaxed">
+              Professional traders sharing their journey toward consistent profitability and sustainable growth
             </p>
           </div>
 
@@ -686,37 +704,37 @@ const CommunityPage = () => {
                 whileHover={{ y: -5 }}
                 className="group relative"
               >
-                <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/30 to-yellow-500/30 rounded-3xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative h-full bg-gray-800/60 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/50 group-hover:border-amber-500/50 transition-all duration-300">
+                <div className="absolute -inset-0.5 bg-gradient-to-br from-cyan-500/20 to-cyan-900/20 rounded-3xl blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
+                <div className="relative h-full bg-gray-800/40 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/30 group-hover:border-cyan-500/30 transition-all duration-300">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="relative">
-                      <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-full flex items-center justify-center shadow-lg">
-                        <span className="text-white font-bold text-xl">
+                      <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-cyan-900 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm">
+                        <span className="text-white font-medium text-xl">
                           {testimonial.name.charAt(0)}
                         </span>
                       </div>
                       {testimonial.verified && (
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center border-2 border-gray-800">
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center border-2 border-gray-800/50">
                           <CheckCircle2 className="w-3 h-3 text-white" />
                         </div>
                       )}
                     </div>
                     <div>
-                      <h3 className="font-bold text-white text-lg">{testimonial.name}</h3>
-                      <p className="text-gray-400 text-sm">{testimonial.role}</p>
+                      <h3 className="font-normal text-white text-lg tracking-wide">{testimonial.name}</h3>
+                      <p className="text-gray-400 text-sm font-light tracking-wide">{testimonial.role}</p>
                     </div>
                   </div>
                   
-                  <p className="text-gray-300 mb-6 leading-relaxed italic">"{testimonial.message}"</p>
+                  <p className="text-gray-300 mb-6 leading-relaxed italic font-light tracking-wide">"{testimonial.message}"</p>
                   
-                  <div className="flex items-center justify-between pt-6 border-t border-gray-700/50">
+                  <div className="flex items-center justify-between pt-6 border-t border-gray-700/30">
                     <div>
-                      <div className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-300">
+                      <div className="text-2xl font-light text-transparent bg-clip-text bg-gradient-to-r from-cyan-700 to-cyan-700 tracking-tight">
                         {testimonial.profit}
                       </div>
-                      <div className="text-gray-500 text-xs mt-1">{testimonial.timeframe}</div>
+                      <div className="text-gray-400 text-xs mt-1 font-light tracking-wide">{testimonial.timeframe}</div>
                     </div>
-                    <div className="flex text-yellow-400">
+                    <div className="flex text-cyan-900">
                       {[...Array(5)].map((_, i) => (
                         <Star key={i} className="w-4 h-4 fill-current" />
                       ))}
@@ -735,8 +753,8 @@ const CommunityPage = () => {
           viewport={{ once: true }}
           className="text-center"
         >
-          <div className="relative overflow-hidden bg-gradient-to-br from-amber-500/10 via-yellow-500/5 to-orange-500/10 rounded-3xl p-12 sm:p-16 border border-amber-500/20">
-            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.1),transparent_50%)]"></div>
+          <div className="relative overflow-hidden bg-gradient-to-br from-cyan-500/8 via-cyan-900/4 to-cyan-500/8 rounded-3xl p-12 sm:p-16 border border-cyan-500/15 backdrop-blur-xl">
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.08),transparent_50%)]"></div>
             
             <div className="relative">
               <motion.div
@@ -744,15 +762,15 @@ const CommunityPage = () => {
                 transition={{ duration: 2, repeat: Infinity }}
                 className="inline-block mb-6"
               >
-                <Sparkles className="w-16 h-16 text-amber-400" />
+                <Sparkles className="w-16 h-16 text-cyan-700" />
               </motion.div>
               
-              <h2 className="text-3xl sm:text-5xl font-black text-white mb-6">
-                Start Winning Today
+              <h2 className="text-3xl sm:text-5xl font-light text-white mb-6 tracking-tight">
+                Begin Your Professional Journey
               </h2>
-              <p className="text-lg sm:text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
-                Join <span className="text-amber-400 font-bold">{membersCount.toLocaleString()}+</span> traders 
-                who are already crushing it. Your future self will thank you – with expanded tools and endless support.
+              <p className="text-lg sm:text-xl text-gray-300 mb-10 max-w-2xl mx-auto font-light tracking-wide leading-relaxed">
+                Join our network of <span className="text-cyan-700 font-normal">{membersCount.toLocaleString()}+</span> professional traders 
+                achieving consistent results. Access institutional-grade tools within a supportive community framework.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-10">
@@ -762,15 +780,15 @@ const CommunityPage = () => {
                   rel="noopener noreferrer"
                   className="group relative w-full sm:w-auto"
                 >
-                  <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-2xl blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-cyan-900 rounded-2xl blur-xl opacity-50 group-hover:opacity-70 transition-opacity"></div>
                   <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="relative px-12 py-6 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-2xl font-bold text-xl text-white shadow-2xl"
+                    className="relative px-12 py-6 bg-gradient-to-r from-cyan-500 to-cyan-900 rounded-2xl font-medium text-xl text-white shadow-2xl backdrop-blur-sm"
                   >
-                    <span className="flex items-center justify-center gap-3">
+                    <span className="flex items-center justify-center gap-3 tracking-wide">
                       <MessageCircle className="w-6 h-6" />
-                      Join Free Now
+                      Join Professional Network
                       <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
                     </span>
                   </motion.div>
@@ -780,9 +798,9 @@ const CommunityPage = () => {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
                 {[
                   { icon: Target, text: "AI Signals" },
-                  { icon: Shield, text: "Risk Alerts" },
-                  { icon: Users, text: "Expert Support" },
-                  { icon: Lock, text: "100% Free" }
+                  { icon: Shield, text: "Risk Management" },
+                  { icon: Users, text: "Expert Community" },
+                  { icon: Lock, text: "Complimentary Access" }
                 ].map((item, index) => (
                   <motion.div 
                     key={index}
@@ -792,8 +810,8 @@ const CommunityPage = () => {
                     transition={{ delay: index * 0.1 }}
                     className="flex flex-col items-center gap-2 text-gray-300"
                   >
-                    <item.icon className="w-5 h-5 text-amber-400 animate-bounce" />
-                    <span className="text-sm font-semibold">{item.text}</span>
+                    <item.icon className="w-5 h-5 text-cyan-700 animate-bounce" />
+                    <span className="text-sm font-normal tracking-wide">{item.text}</span>
                   </motion.div>
                 ))}
               </div>

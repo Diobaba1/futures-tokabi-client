@@ -147,7 +147,7 @@ const HeroSection: React.FC = () => {
         >
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="inline-flex items-center px-6 py-3 rounded-full bg-gray-900/60 border border-emerald-500/30 text-emerald-200 text-sm font-light tracking-wide backdrop-blur-md cursor-default"
+            className="inline-flex items-center px-6 py-3 rounded-full bg-gray-900/60 border border-emerald-500/30 text-emerald-200 text-sm font-light tracking-wide backdrop-blur-md cursor-default mt-5"
           >
             <motion.div 
               animate={{ scale: [1, 1.1, 1] }}
@@ -180,7 +180,7 @@ const HeroSection: React.FC = () => {
               whileHover={{ scale: 1.01 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
-              TokaBi
+              Tokabi
             </motion.h1>
           </motion.div>
           
@@ -247,7 +247,7 @@ const HeroSection: React.FC = () => {
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="relative px-10 py-4 bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl font-medium text-lg text-gray-900 transition-all duration-300 shadow-lg shadow-amber-500/20 overflow-hidden"
+              className="relative px-10 py-4 bg-gradient-to-r  rounded-xl font-medium text-lg text-gray-200 transition-all duration-300 shadow-lg  overflow-hidden"
             >
               <span className="relative z-10 flex items-center gap-2 tracking-wide">
                 Start Trading

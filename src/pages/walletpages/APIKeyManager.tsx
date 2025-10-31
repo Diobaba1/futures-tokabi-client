@@ -153,7 +153,7 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
             onClick={() => setShowAddForm(true)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 font-bold rounded-xl hover:from-yellow-400 hover:to-yellow-500 transition-all duration-300 shadow-lg shadow-yellow-500/25 flex items-center justify-center space-x-3 mx-auto"
+            className="px-8 py-4 bg-gradient-to-r from-cyan-900 to-cyan-900 text-gray-900 font-bold rounded-xl hover:from-cyan-800 hover:to-cyan-900 transition-all duration-300 shadow-lg shadow-cyan-900/25 flex items-center justify-center space-x-3 mx-auto"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -177,7 +177,7 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
           >
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-white flex items-center">
-                <svg className="w-6 h-6 mr-2 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 mr-2 text-cyan-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
                 Add New API Key
@@ -205,7 +205,7 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
                     value={formData.label}
                     onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                     placeholder="e.g., Main Trading Account"
-                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all duration-200"
+                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/50 focus:border-cyan-900/50 transition-all duration-200"
                   />
                 </div>
 
@@ -215,7 +215,7 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
                     id="testnet"
                     checked={formData.testnet}
                     onChange={(e) => setFormData({ ...formData, testnet: e.target.checked })}
-                    className="w-4 h-4 text-yellow-500 bg-gray-700 border-gray-600 rounded focus:ring-yellow-500/50 focus:ring-2"
+                    className="w-4 h-4 text-cyan-900 bg-gray-700 border-gray-600 rounded focus:ring-cyan-900/50 focus:ring-2"
                   />
                   <label htmlFor="testnet" className="ml-2 text-sm text-gray-300">
                     Testnet/Sandbox Key
@@ -233,7 +233,7 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
                   value={formData.api_key}
                   onChange={(e) => setFormData({ ...formData, api_key: e.target.value })}
                   placeholder="Enter your Binance API Key"
-                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all duration-200 font-mono"
+                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/50 focus:border-cyan-900/50 transition-all duration-200 font-mono"
                 />
               </div>
 
@@ -247,7 +247,7 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
                   value={formData.api_secret}
                   onChange={(e) => setFormData({ ...formData, api_secret: e.target.value })}
                   placeholder="Enter your Binance API Secret"
-                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all duration-200 font-mono"
+                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/50 focus:border-cyan-900/50 transition-all duration-200 font-mono"
                 />
               </div>
 
@@ -266,7 +266,7 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
                   disabled={isAdding}
                   whileHover={{ scale: isAdding ? 1 : 1.02 }}
                   whileTap={{ scale: isAdding ? 1 : 0.98 }}
-                  className="flex-1 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 font-bold rounded-xl hover:from-yellow-400 hover:to-yellow-500 disabled:from-gray-600 disabled:to-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-yellow-500/25 flex items-center justify-center space-x-2"
+                  className="flex-1 py-4 bg-gradient-to-r from-cyan-900 to-cyan-900 text-gray-900 font-bold rounded-xl hover:from-cyan-800 hover:to-cyan-900 disabled:from-gray-600 disabled:to-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-cyan-900/25 flex items-center justify-center space-x-2"
                 >
                   {isAdding ? (
                     <>
@@ -348,7 +348,7 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
               onClick={() => setShowAddForm(true)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-4 py-2 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-xl hover:bg-yellow-500/20 hover:border-yellow-500/30 transition-all duration-200 flex items-center space-x-2 text-sm"
+              className="px-4 py-2 bg-cyan-900/10 border border-cyan-900/20 text-cyan-800 rounded-xl hover:bg-cyan-900/20 hover:border-cyan-900/30 transition-all duration-200 flex items-center space-x-2 text-sm"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -360,7 +360,7 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
 
         {isLoading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="w-8 h-8 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-cyan-900 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : apiKeys.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
@@ -373,7 +373,7 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
               onClick={() => setShowAddForm(true)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 font-bold rounded-xl hover:from-yellow-400 hover:to-yellow-500 transition-all duration-300 shadow-lg shadow-yellow-500/25 flex items-center justify-center space-x-2 mx-auto"
+              className="px-6 py-3 bg-gradient-to-r from-cyan-900 to-cyan-900 text-gray-900 font-bold rounded-xl hover:from-cyan-800 hover:to-cyan-900 transition-all duration-300 shadow-lg shadow-cyan-900/25 flex items-center justify-center space-x-2 mx-auto"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -406,16 +406,16 @@ const SecurityWarning: React.FC = () => {
     <motion.div
       initial={{ opacity: 0, height: 0 }}
       animate={{ opacity: 1, height: 'auto' }}
-      className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl"
+      className="mb-6 p-4 bg-cyan-900/10 border border-cyan-900/20 rounded-xl"
     >
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-3">
-          <svg className="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-cyan-800 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
           </svg>
           <div>
-            <h3 className="text-yellow-400 font-semibold">Security Notice</h3>
-            <p className="text-yellow-300/80 text-sm mt-1">
+            <h3 className="text-cyan-800 font-semibold">Security Notice</h3>
+            <p className="text-cyan-600/80 text-sm mt-1">
               Your API keys will be encrypted and stored securely. However, for security reasons:
             </p>
             
@@ -425,7 +425,7 @@ const SecurityWarning: React.FC = () => {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="mt-2 space-y-1 text-yellow-300/70 text-sm"
+                  className="mt-2 space-y-1 text-cyan-600/70 text-sm"
                 >
                   <li>• You will not be able to view your API secret after submission</li>
                   <li>• Ensure you have saved your API secret securely before adding</li>
@@ -439,7 +439,7 @@ const SecurityWarning: React.FC = () => {
         
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-yellow-400 hover:text-yellow-300 transition-colors duration-200 flex-shrink-0"
+          className="text-cyan-800 hover:text-cyan-600 transition-colors duration-200 flex-shrink-0"
         >
           <svg 
             className={`w-5 h-5 transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
@@ -467,7 +467,7 @@ const APIKeyCard: React.FC<APIKeyCardProps> = ({ apiKey, onDelete, isDeleting })
     switch (status) {
       case 'valid': return 'text-green-400 bg-green-400/10 border-green-400/20';
       case 'invalid': return 'text-red-400 bg-red-400/10 border-red-400/20';
-      default: return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
+      default: return 'text-cyan-800 bg-cyan-800/10 border-cyan-800/20';
     }
   };
 
@@ -611,9 +611,9 @@ const BinanceAPIInstructions: React.FC = () => {
                     </div>
                   ))}
                   
-                  <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                    <p className="text-yellow-400 text-sm font-semibold">⚠️ Important Security Notes:</p>
-                    <ul className="text-yellow-300/70 text-sm mt-1 space-y-1">
+                  <div className="mt-4 p-3 bg-cyan-900/10 border border-cyan-900/20 rounded-lg">
+                    <p className="text-cyan-800 text-sm font-semibold">⚠️ Important Security Notes:</p>
+                    <ul className="text-cyan-600/70 text-sm mt-1 space-y-1">
                       <li>• Never enable "Withdraw" permission for trading bots</li>
                       <li>• Use IP whitelisting for enhanced security</li>
                       <li>• Store your API Secret securely - you won't see it again</li>

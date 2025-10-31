@@ -42,7 +42,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           
           <div className="flex items-center space-x-3">
             <div className="text-right">
-              <div className="text-white text-sm font-light bg-gradient-to-r from-yellow-400 to-blue-400 bg-clip-text text-transparent">
+              <div className="text-white text-sm font-light bg-gradient-to-r from-cyan-800 to-blue-400 bg-clip-text text-transparent">
                 TOKABI
               </div>
               <div className="text-gray-400 text-xs font-light">Algorithmic Trading</div>
@@ -86,7 +86,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               <RefreshCw className="w-4 h-4" />
               <span>Refresh</span>
             </button>
-            <button className="px-4 py-2 bg-gradient-to-r from-yellow-500/10 to-blue-500/10 border border-yellow-500/20 text-yellow-400 rounded-lg hover:bg-yellow-500/20 transition-all duration-200 flex items-center space-x-2 text-sm font-medium">
+            <button className="px-4 py-2 bg-gradient-to-r from-cyan-900/10 to-blue-500/10 border border-cyan-900/20 text-cyan-800 rounded-lg hover:bg-cyan-900/20 transition-all duration-200 flex items-center space-x-2 text-sm font-medium">
               <Plus className="w-4 h-4" />
               <span>New Model</span>
             </button>
@@ -112,7 +112,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               {[
                 { label: 'Portfolio Value', value: '$124,567', change: '+2.4%', icon: TrendingUp, color: 'text-emerald-400' },
-                { label: 'Active Models', value: '3/5', change: 'Running', icon: Activity, color: 'text-yellow-400' },
+                { label: 'Active Models', value: '3/5', change: 'Running', icon: Activity, color: 'text-cyan-800' },
                 { label: 'Win Rate', value: '87.3%', change: '+1.2%', icon: TrendingUp, color: 'text-blue-400' },
                 { label: 'Sharpe Ratio', value: '2.1', change: 'Optimal', icon: Activity, color: 'text-violet-400' },
               ].map((metric, index) => {

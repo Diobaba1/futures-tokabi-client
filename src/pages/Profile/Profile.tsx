@@ -106,7 +106,7 @@ const Profile: React.FC = () => {
     switch (status.toLowerCase()) {
       case 'valid': return 'text-green-400 bg-green-400/10 border-green-400/20';
       case 'invalid': return 'text-red-400 bg-red-400/10 border-red-400/20';
-      default: return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
+      default: return 'text-cyan-800 bg-cyan-800/10 border-cyan-800/20';
     }
   };
 
@@ -123,7 +123,7 @@ const Profile: React.FC = () => {
       <div className="max-w-4xl mx-auto p-6">
         <div className="flex justify-center items-center min-h-96">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="w-12 h-12 border-4 border-cyan-900 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-gray-400">Loading profile...</p>
           </div>
         </div>
@@ -191,7 +191,7 @@ const Profile: React.FC = () => {
             onClick={() => setActiveTab('profile')}
             className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
               activeTab === 'profile'
-                ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
+                ? 'bg-cyan-900/10 text-cyan-800 border border-cyan-900/20'
                 : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
             }`}
           >
@@ -206,7 +206,7 @@ const Profile: React.FC = () => {
             onClick={() => setActiveTab('api-keys')}
             className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
               activeTab === 'api-keys'
-                ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
+                ? 'bg-cyan-900/10 text-cyan-800 border border-cyan-900/20'
                 : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
             }`}
           >
@@ -288,7 +288,7 @@ const Profile: React.FC = () => {
                   className={`px-6 py-2 font-semibold rounded-xl transition-all duration-200 ${
                     user?.is_subscribed
                       ? 'bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20'
-                      : 'bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/20'
+                      : 'bg-cyan-900/10 border border-cyan-900/20 text-cyan-800 hover:bg-cyan-900/20'
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {updating ? (
@@ -323,7 +323,7 @@ const Profile: React.FC = () => {
                 onClick={() => setShowAddForm(true)}
                 className="w-full p-6 bg-gray-800/50 border border-gray-700/50 rounded-2xl hover:border-gray-600/50 transition-all duration-200 group"
               >
-                <div className="flex items-center justify-center space-x-3 text-gray-400 group-hover:text-yellow-400">
+                <div className="flex items-center justify-center space-x-3 text-gray-400 group-hover:text-cyan-800">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
@@ -363,7 +363,7 @@ const Profile: React.FC = () => {
                         value={newKey.label}
                         onChange={(e) => setNewKey({ ...newKey, label: e.target.value })}
                         placeholder="e.g., Binance Main Account"
-                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all duration-200"
+                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/50 focus:border-cyan-900/50 transition-all duration-200"
                       />
                     </div>
 
@@ -373,7 +373,7 @@ const Profile: React.FC = () => {
                         id="testnet"
                         checked={newKey.testnet}
                         onChange={(e) => setNewKey({ ...newKey, testnet: e.target.checked })}
-                        className="w-4 h-4 text-yellow-500 bg-gray-700 border-gray-600 rounded focus:ring-yellow-500/50 focus:ring-2"
+                        className="w-4 h-4 text-cyan-900 bg-gray-700 border-gray-600 rounded focus:ring-cyan-900/50 focus:ring-2"
                       />
                       <label htmlFor="testnet" className="ml-2 text-sm text-gray-300">
                         Testnet/Sandbox Key
@@ -390,7 +390,7 @@ const Profile: React.FC = () => {
                         value={newKey.api_key}
                         onChange={(e) => setNewKey({ ...newKey, api_key: e.target.value })}
                         placeholder="Enter your API Key"
-                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all duration-200 font-mono"
+                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/50 focus:border-cyan-900/50 transition-all duration-200 font-mono"
                       />
                     </div>
 
@@ -404,7 +404,7 @@ const Profile: React.FC = () => {
                         value={newKey.api_secret}
                         onChange={(e) => setNewKey({ ...newKey, api_secret: e.target.value })}
                         placeholder="Enter your API Secret"
-                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all duration-200 font-mono"
+                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/50 focus:border-cyan-900/50 transition-all duration-200 font-mono"
                       />
                     </div>
 
@@ -423,7 +423,7 @@ const Profile: React.FC = () => {
                         disabled={updating}
                         whileHover={{ scale: updating ? 1 : 1.02 }}
                         whileTap={{ scale: updating ? 1 : 0.98 }}
-                        className="flex-1 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 font-bold rounded-xl hover:from-yellow-400 hover:to-yellow-500 disabled:from-gray-600 disabled:to-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-yellow-500/25"
+                        className="flex-1 py-3 bg-gradient-to-r from-cyan-900 to-cyan-900 text-gray-900 font-bold rounded-xl hover:from-cyan-800 hover:to-cyan-900 disabled:from-gray-600 disabled:to-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-cyan-900/25"
                       >
                         {updating ? 'Adding API Key...' : 'Add API Key'}
                       </motion.button>

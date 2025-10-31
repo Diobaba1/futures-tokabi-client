@@ -33,26 +33,41 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 relative overflow-hidden">
-      {/* Dark Background with subtle gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-900/20 to-gray-900"></div>
-      
-      {/* Animated Orbs */}
+      {/* Background Video */}
+      <div className="absolute inset-0 w-full h-full">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+          poster="https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"
+        >
+          <source src="https://res.cloudinary.com/deioo5lrm/video/upload/v1761910590/86786-594417043_spgl4w.mp4" type="video/mp4" />
+          {/* Fallback image if video doesn't load */}
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-900/20 to-gray-900"></div>
+        </video>
+        {/* Video overlay for better readability */}
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px]"></div>
+      </div>
+
+      {/* Animated Orbs - Reduced opacity to work with video */}
       <motion.div 
         animate={{ 
           scale: [1, 1.2, 1],
-          opacity: [0.1, 0.15, 0.1]
+          opacity: [0.05, 0.08, 0.05]
         }}
         transition={{ 
           duration: 6,
           repeat: Infinity,
           repeatType: "reverse"
         }}
-        className="absolute top-10 left-10 w-64 h-64 bg-yellow-600 rounded-full mix-blend-multiply filter blur-xl opacity-10"
+        className="absolute top-10 left-10 w-64 h-64 bg-yellow-600 rounded-full mix-blend-soft-light filter blur-xl"
       />
       <motion.div 
         animate={{ 
           scale: [1.2, 1, 1.2],
-          opacity: [0.15, 0.1, 0.15]
+          opacity: [0.08, 0.05, 0.08]
         }}
         transition={{ 
           duration: 8,
@@ -60,12 +75,12 @@ const Login: React.FC = () => {
           repeatType: "reverse",
           delay: 2
         }}
-        className="absolute top-10 right-10 w-64 h-64 bg-green-600 rounded-full mix-blend-multiply filter blur-xl opacity-10"
+        className="absolute top-10 right-10 w-64 h-64 bg-green-600 rounded-full mix-blend-soft-light filter blur-xl"
       />
       <motion.div 
         animate={{ 
           scale: [1, 1.3, 1],
-          opacity: [0.1, 0.2, 0.1]
+          opacity: [0.05, 0.1, 0.05]
         }}
         transition={{ 
           duration: 10,
@@ -73,11 +88,11 @@ const Login: React.FC = () => {
           repeatType: "reverse",
           delay: 4
         }}
-        className="absolute bottom-10 left-20 w-64 h-64 bg-blue-600 rounded-full mix-blend-multiply filter blur-xl opacity-10"
+        className="absolute bottom-10 left-20 w-64 h-64 bg-blue-600 rounded-full mix-blend-soft-light filter blur-xl"
       />
 
-      {/* Grid Pattern Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
+      {/* Subtle Grid Pattern Overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
 
       <div className="max-w-md w-full space-y-8 relative z-10 px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -87,16 +102,21 @@ const Login: React.FC = () => {
           transition={{ duration: 0.6 }}
           className="text-center"
         >
-          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-yellow-500 to-green-500 rounded-2xl flex items-center justify-center shadow-lg mb-4">
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ duration: 0.8, type: "spring" }}
+            className="mx-auto w-16 h-16 bg-gradient-to-r  rounded-2xl flex items-center justify-center shadow-lg mb-6"
+          >
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
-          </div>
-          <h2 className="text-3xl font-bold text-white">
+          </motion.div>
+          <h2 className="text-4xl font-light tracking-tight text-white mb-3">
             Welcome Back
           </h2>
-          <p className="mt-2 text-gray-300 text-sm">
-            Sign in to your Tokabi account
+          <p className="text-gray-300 text-base font-normal leading-relaxed">
+            Sign in to access your Tokabi dashboard and continue your journey
           </p>
         </motion.div>
 
@@ -105,7 +125,7 @@ const Login: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="mt-8 space-y-6 bg-gray-800/80 backdrop-blur-sm border border-gray-700/50 rounded-2xl shadow-2xl p-8"
+          className="mt-8 space-y-6 bg-gray-800/60 backdrop-blur-lg border border-gray-700/30 rounded-2xl shadow-2xl p-8"
           onSubmit={handleSubmit}
         >
           <div className="space-y-5">
@@ -123,11 +143,11 @@ const Login: React.FC = () => {
               </div>
               <input
                 type="email"
-                placeholder="Email Address"
+                placeholder="Enter your email address"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
-                className="block w-full pl-10 pr-4 py-3.5 bg-gray-700/50 border border-gray-600/50 rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
+                className="block w-full pl-10 pr-4 py-3.5 bg-gray-700/30 border border-gray-600/30 rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-transparent transition-all duration-200 backdrop-blur-sm font-light"
               />
             </motion.div>
 
@@ -145,11 +165,11 @@ const Login: React.FC = () => {
               </div>
               <input
                 type="password"
-                placeholder="Password"
+                placeholder="Enter your password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
-                className="block w-full pl-10 pr-4 py-3.5 bg-gray-700/50 border border-gray-600/50 rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
+                className="block w-full pl-10 pr-4 py-3.5 bg-gray-700/30 border border-gray-600/30 rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200 backdrop-blur-sm font-light"
               />
             </motion.div>
           </div>
@@ -166,16 +186,16 @@ const Login: React.FC = () => {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
-                className="h-4 w-4 text-yellow-500 focus:ring-yellow-500 border-gray-600 rounded bg-gray-700"
+                className="h-4 w-4 text-yellow-900 focus:ring-cyan-900 border-gray-600 rounded bg-gray-700/50"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300">
-                Remember me
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300 font-light">
+                Keep me signed in
               </label>
             </div>
 
             <div className="text-sm">
-              <a href="/forgot-password" className="text-yellow-400 hover:text-yellow-300 transition-colors duration-200 font-medium">
-                Forgot password?
+              <a href="/forgot-password" className="text-cyan-800 hover:text-cyan-900 transition-colors duration-200 font-normal">
+                Forgot your password?
               </a>
             </div>
           </motion.div>
@@ -187,7 +207,7 @@ const Login: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.5 }}
             type="submit"
             disabled={isLoading}
-            className="group relative w-full py-4 px-4 border border-transparent text-sm font-bold rounded-xl text-gray-900 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-yellow-500/25"
+            className="group relative w-full py-4 px-4 border border-transparent text-base font-medium rounded-xl text-gray-900 bg-gradient-to-r from-cyan-800 to-cyan-900 hover:from-cyan-900 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-900 disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-cyan-900/25"
           >
             <span className="relative z-10 flex items-center justify-center">
               {isLoading ? (
@@ -199,7 +219,7 @@ const Login: React.FC = () => {
                   Signing in...
                 </>
               ) : (
-                'Sign In to Dashboard'
+                'Access Dashboard'
               )}
             </span>
           </motion.button>
@@ -212,10 +232,10 @@ const Login: React.FC = () => {
             className="relative"
           >
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-600/50"></div>
+              <div className="w-full border-t border-gray-600/30"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-800 text-gray-400">New to Tokabi?</span>
+              <span className="px-3 bg-gray-800/60 text-gray-400 font-light">New to our platform?</span>
             </div>
           </motion.div>
 
@@ -228,9 +248,9 @@ const Login: React.FC = () => {
           >
             <Link 
               to="/register" 
-              className="inline-flex items-center px-6 py-3 border border-gray-600 text-sm font-semibold rounded-xl text-gray-300 bg-gray-700/50 hover:bg-gray-700 hover:text-white transition-all duration-200 hover:border-gray-500"
+              className="inline-flex items-center px-6 py-3 border border-gray-600/50 text-base font-normal rounded-xl text-gray-300 bg-gray-700/30 hover:bg-gray-700/50 hover:text-white transition-all duration-200 hover:border-gray-500/50 backdrop-blur-sm"
             >
-              Create your Tokabi account
+              Create new account
               <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
@@ -245,11 +265,11 @@ const Login: React.FC = () => {
           transition={{ duration: 0.6, delay: 0.8 }}
           className="text-center"
         >
-          <p className="text-gray-400 text-xs flex items-center justify-center space-x-2">
+          <p className="text-gray-400 text-xs font-light flex items-center justify-center space-x-2">
             <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
-            <span>Your data is secured with bank-level encryption</span>
+            <span>Enterprise-grade security & encryption</span>
           </p>
         </motion.div>
       </div>
