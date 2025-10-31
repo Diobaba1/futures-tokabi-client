@@ -13,7 +13,14 @@ import {
   Settings,
   HelpCircle,
   LogOut,
-  Bell
+  Bell,
+  TrendingUp,
+  Cpu,
+  Activity,
+  Database,
+  User,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 interface DashboardMenuProps {
@@ -48,21 +55,20 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
           name: 'Dashboard', 
           href: '/dashboard', 
           icon: BarChart3,
-          description: 'Trading overview & analytics'
+          description: 'Portfolio overview & analytics'
         },
         { 
           name: 'Live Trading', 
           href: '/dashboard/trading', 
-          icon: Zap,
+          icon: Activity,
           description: 'Real-time execution'
         },
         { 
           name: 'AI Signals', 
           href: '/dashboard/signals', 
-          icon: Zap,
-          description: 'AI consensus Signals'
+          icon: Cpu,
+          description: 'Machine learning insights'
         },
-        ///dashboard/notifications
       ]
     },
     {
@@ -72,13 +78,19 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
           name: 'Reports', 
           href: '/dashboard/reports', 
           icon: FileText,
-          description: 'Detailed analysis'
+          description: 'Performance analysis'
         },
         { 
           name: 'Risk Metrics', 
           href: '/dashboard/risk', 
           icon: Shield,
           description: 'Risk management'
+        },
+        { 
+          name: 'Market Data', 
+          href: '/dashboard/market-data', 
+          icon: Database,
+          description: 'Real-time feeds'
         },
       ]
     },
@@ -91,19 +103,17 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
           icon: Key,
           description: 'Exchange connections'
         },
-
         { 
-          name: 'Notfication', 
+          name: 'Notifications', 
           href: '/dashboard/notifications', 
           icon: Bell,
-          description: 'Exchange connections'
+          description: 'Alerts & updates'
         },
-
         { 
           name: 'Billing', 
           href: '/dashboard/billing', 
           icon: CreditCard,
-          description: 'Subscription & plans'
+          description: 'Subscription & billing'
         },
         { 
           name: 'Settings', 
@@ -116,12 +126,12 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
   ];
 
   const quickStats = [
-    { label: 'Daily P&L', value: '+2.4%', color: 'text-green-400' },
-    { label: 'Active Bots', value: '3/5', color: 'text-yellow-400' },
-    { label: 'Win Rate', value: '87.3%', color: 'text-blue-400' },
+    { label: 'Daily P&L', value: '+2.4%', color: 'text-yellow-400' },
+    { label: 'Active Models', value: '3/5', color: 'text-yellow-400' },
+    { label: 'Win Rate', value: '87.3%', color: 'text-yellow-400' },
   ];
 
-  const handleConnectWallet = () => {
+  const handleConnectExchange = () => {
     navigate("/dashboard/api-key");
   };
 
@@ -147,6 +157,10 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
     return user?.full_name || 'User';
   };
 
+  const getUserEmail = () => {
+    return user?.email || 'user@example.com';
+  };
+
   return (
     <>
       {/* Overlay */}
@@ -167,24 +181,24 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
         initial={{ x: '-100%' }}
         animate={{ x: isOpen ? 0 : '-100%' }}
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className={`fixed top-0 left-0 h-full bg-gray-900 border-r border-gray-800/50 z-50 flex flex-col ${
+        className={`fixed top-0 left-0 h-full bg-gray-900/95 backdrop-blur-xl border-r border-gray-800/30 z-50 flex flex-col ${
           isCollapsed ? 'w-20' : 'w-80'
         } transition-all duration-300 ease-in-out`}
       >
         {/* Header */}
-        <div className={`p-6 border-b border-gray-800/50 ${isCollapsed ? 'px-4' : ''}`}>
+        <div className={`p-6 border-b border-gray-800/30 ${isCollapsed ? 'px-4' : ''}`}>
           <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} mb-6`}>
             <Link 
               to="/dashboard" 
               className={`flex items-center group ${isCollapsed ? 'justify-center' : 'space-x-3'}`}
             >
-              <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/25">
-                <span className="text-gray-900 font-bold text-lg">T</span>
+              <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/25">
+                <TrendingUp className="w-5 h-5 text-white" />
               </div>
               {!isCollapsed && (
                 <div className="flex flex-col">
-                  <span className="text-white font-bold text-xl">TOKABI</span>
-                  <span className="text-yellow-400 text-xs font-medium">DASHBOARD</span>
+                  <span className="text-white font-light text-xl">TOKABI</span>
+                  <span className="text-yellow-400 text-xs font-medium tracking-wider">DASHBOARD</span>
                 </div>
               )}
             </Link>
@@ -192,9 +206,9 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
             {!isCollapsed && (
               <button
                 onClick={onClose}
-                className="p-2 rounded-lg bg-gray-800/50 border border-gray-700/50 text-gray-400 hover:text-white transition-colors duration-200 lg:hidden"
+                className="p-2 rounded-lg bg-gray-800/30 border border-gray-700/30 text-gray-400 hover:text-white transition-colors duration-200 lg:hidden"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -210,34 +224,30 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="text-center p-2 bg-gray-800/30 rounded-lg border border-gray-700/30 hover:border-gray-600/50 transition-colors duration-200"
+                  className="text-center p-2 bg-gray-800/20 rounded-lg border border-gray-700/30 hover:border-gray-600/50 transition-colors duration-200"
                 >
-                  <div className={`text-sm font-bold ${stat.color}`}>{stat.value}</div>
-                  <div className="text-xs text-gray-400">{stat.label}</div>
+                  <div className={`text-sm font-semibold ${stat.color}`}>{stat.value}</div>
+                  <div className="text-xs text-gray-400 font-light">{stat.label}</div>
                 </motion.div>
               ))}
             </div>
           )}
 
-          {/* Connect Wallet Button */}
+          {/* Connect Exchange Button */}
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={handleConnectWallet}
-            className={`w-full py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-xl hover:from-green-400 hover:to-green-500 transition-all duration-300 shadow-lg shadow-green-500/25 flex items-center justify-center ${
-              isCollapsed ? 'px-2' : 'space-x-2'
+            onClick={handleConnectExchange}
+            className={`w-full py-3 bg-gradient-to-r from-yellow-500 to-yellow-500 text-white font-medium rounded-lg hover:from-yellow-400 hover:to-yellow-400 transition-all duration-300 shadow-lg shadow-yellow-500/25 flex items-center justify-center ${
+              isCollapsed ? 'px-2' : 'space-x-2 text-sm'
             }`}
           >
             {isCollapsed ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
+              <Key className="w-4 h-4" />
             ) : (
               <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                <span>Connect Wallet</span>
+                <Key className="w-4 h-4" />
+                <span>Connect Exchange</span>
               </>
             )}
           </motion.button>
@@ -254,7 +264,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                 transition={{ delay: categoryIndex * 0.1 }}
               >
                 {!isCollapsed && (
-                  <h3 className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-3 px-2">
+                  <h3 className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-3 px-2 font-light">
                     {category.category}
                   </h3>
                 )}
@@ -267,22 +277,22 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                         key={item.name}
                         whileHover={{ x: isCollapsed ? 0 : 4 }}
                         onClick={() => handleNavigation(item.href)}
-                        className={`w-full text-left rounded-xl transition-all duration-200 group border ${
+                        className={`w-full text-left rounded-lg transition-all duration-200 group border ${
                           isCollapsed ? 'p-3 justify-center' : 'p-3'
                         } ${
                           isActive
                             ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400 shadow-lg shadow-yellow-500/10'
-                            : 'text-gray-300 hover:bg-gray-800/50 hover:text-white border-transparent hover:border-gray-700/50'
+                            : 'text-gray-300 hover:bg-gray-800/30 hover:text-white border-transparent hover:border-gray-700/30'
                         }`}
                       >
                         <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
                           <Icon className={`transition-transform duration-200 group-hover:scale-110 ${
-                            isCollapsed ? 'w-5 h-5' : 'w-5 h-5'
+                            isCollapsed ? 'w-4 h-4' : 'w-4 h-4'
                           }`} />
                           {!isCollapsed && (
                             <div className="flex-1 min-w-0">
-                              <div className="font-semibold text-sm">{item.name}</div>
-                              <div className={`text-xs transition-colors duration-200 ${
+                              <div className="font-medium text-sm">{item.name}</div>
+                              <div className={`text-xs transition-colors duration-200 font-light ${
                                 isActive ? 'text-yellow-300/70' : 'text-gray-400 group-hover:text-gray-300'
                               }`}>
                                 {item.description}
@@ -292,7 +302,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                           {!isCollapsed && isActive && (
                             <motion.div
                               layoutId="activeMenuIndicator"
-                              className="w-2 h-2 bg-yellow-400 rounded-full shadow-lg shadow-yellow-400/50"
+                              className="w-1.5 h-1.5 bg-yellow-400 rounded-full shadow-lg shadow-yellow-400/50"
                             />
                           )}
                         </div>
@@ -312,23 +322,23 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
         </div>
 
         {/* Footer */}
-        <div className={`p-4 border-t border-gray-800/50 ${isCollapsed ? 'px-2' : ''}`}>
+        <div className={`p-4 border-t border-gray-800/30 ${isCollapsed ? 'px-2' : ''}`}>
           <div className="space-y-3">
             {/* User Profile */}
-            <div className={`flex items-center rounded-lg bg-gray-800/30 border border-gray-700/30 ${
+            <div className={`flex items-center rounded-lg bg-gray-800/20 border border-gray-700/30 ${
               isCollapsed ? 'p-2 justify-center' : 'p-3 space-x-3'
             }`}>
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-bold">{getUserInitial()}</span>
+              <div className="w-8 h-8 bg-gradient-to-br from-yellow-500 to-yellow-500 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 text-white" />
               </div>
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
-                  <div className="text-white text-sm font-semibold truncate">{getUserName()}</div>
-                  <div className="text-gray-400 text-xs truncate">Pro Plan</div>
+                  <div className="text-white text-sm font-medium truncate">{getUserName()}</div>
+                  <div className="text-gray-400 text-xs font-light truncate">{getUserEmail()}</div>
                 </div>
               )}
               {!isCollapsed && (
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
               )}
             </div>
 
@@ -369,19 +379,14 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
             <div className="hidden lg:block pt-2 border-t border-gray-800/30">
               <button
                 onClick={onToggleCollapse}
-                className="w-full p-2 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200 flex items-center justify-center"
+                className="w-full p-2 text-gray-400 hover:text-white hover:bg-gray-800/30 rounded-lg transition-all duration-200 flex items-center justify-center"
                 title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
               >
-                <svg 
-                  className={`w-4 h-4 transform transition-transform duration-300 ${
-                    isCollapsed ? 'rotate-180' : ''
-                  }`}
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                </svg>
+                {isCollapsed ? (
+                  <ChevronRight className="w-4 h-4" />
+                ) : (
+                  <ChevronLeft className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>
@@ -392,21 +397,21 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
       <div className={`hidden lg:flex lg:flex-shrink-0 lg:flex-col lg:fixed lg:inset-y-0 lg:z-30 transition-all duration-300 ease-in-out ${
         isCollapsed ? 'lg:w-20' : 'lg:w-80'
       }`}>
-        <div className="flex-1 flex flex-col min-h-0 bg-gray-900 border-r border-gray-800/50 backdrop-blur-sm">
+        <div className="flex-1 flex flex-col min-h-0 bg-gray-900/95 backdrop-blur-xl border-r border-gray-800/30">
           {/* Same content as mobile menu but always visible */}
           {/* Header */}
-          <div className={`p-6 border-b border-gray-800/50 ${isCollapsed ? 'px-4' : ''}`}>
+          <div className={`p-6 border-b border-gray-800/30 ${isCollapsed ? 'px-4' : ''}`}>
             <Link 
               to="/dashboard" 
               className={`flex items-center group ${isCollapsed ? 'justify-center' : 'space-x-3'}`}
             >
-              <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/25">
-                <span className="text-gray-900 font-bold text-lg">T</span>
+              <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/25">
+                <TrendingUp className="w-5 h-5 text-white" />
               </div>
               {!isCollapsed && (
                 <div className="flex flex-col">
-                  <span className="text-white font-bold text-xl">TOKABI</span>
-                  <span className="text-yellow-400 text-xs font-medium">DASHBOARD</span>
+                  <span className="text-white font-light text-xl">TOKABI</span>
+                  <span className="text-yellow-400 text-xs font-medium tracking-wider">DASHBOARD</span>
                 </div>
               )}
             </Link>
@@ -417,34 +422,30 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                 {quickStats.map((stat, index) => (
                   <div
                     key={stat.label}
-                    className="text-center p-2 bg-gray-800/30 rounded-lg border border-gray-700/30 hover:border-gray-600/50 transition-colors duration-200"
+                    className="text-center p-2 bg-gray-800/20 rounded-lg border border-gray-700/30 hover:border-gray-600/50 transition-colors duration-200"
                   >
-                    <div className={`text-sm font-bold ${stat.color}`}>{stat.value}</div>
-                    <div className="text-xs text-gray-400">{stat.label}</div>
+                    <div className={`text-sm font-semibold ${stat.color}`}>{stat.value}</div>
+                    <div className="text-xs text-gray-400 font-light">{stat.label}</div>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Connect Wallet Button */}
+            {/* Connect Exchange Button */}
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={handleConnectWallet}
-              className={`w-full py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-xl hover:from-green-400 hover:to-green-500 transition-all duration-300 shadow-lg shadow-green-500/25 flex items-center justify-center ${
-                isCollapsed ? 'px-2' : 'space-x-2'
+              onClick={handleConnectExchange}
+              className={`w-full py-3 bg-gradient-to-r from-yellow-500 to-yellow-500 text-white font-medium rounded-lg hover:from-yellow-400 hover:to-yellow-400 transition-all duration-300 shadow-lg shadow-yellow-500/25 flex items-center justify-center ${
+                isCollapsed ? 'px-2' : 'space-x-2 text-sm'
               }`}
             >
               {isCollapsed ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
+                <Key className="w-4 h-4" />
               ) : (
                 <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                  <span>Connect Wallet</span>
+                  <Key className="w-4 h-4" />
+                  <span>Connect Exchange</span>
                 </>
               )}
             </motion.button>
@@ -456,7 +457,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
               {menuItems.map((category) => (
                 <div key={category.category}>
                   {!isCollapsed && (
-                    <h3 className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-3 px-2">
+                    <h3 className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-3 px-2 font-light">
                       {category.category}
                     </h3>
                   )}
@@ -469,22 +470,22 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                           key={item.name}
                           whileHover={{ x: isCollapsed ? 0 : 4 }}
                           onClick={() => handleNavigation(item.href)}
-                          className={`w-full text-left rounded-xl transition-all duration-200 group border ${
+                          className={`w-full text-left rounded-lg transition-all duration-200 group border ${
                             isCollapsed ? 'p-3 justify-center' : 'p-3'
                           } ${
                             isActive
                               ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400 shadow-lg shadow-yellow-500/10'
-                              : 'text-gray-300 hover:bg-gray-800/50 hover:text-white border-transparent hover:border-gray-700/50'
+                              : 'text-gray-300 hover:bg-gray-800/30 hover:text-white border-transparent hover:border-gray-700/30'
                           }`}
                         >
                           <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
                             <Icon className={`transition-transform duration-200 group-hover:scale-110 ${
-                              isCollapsed ? 'w-5 h-5' : 'w-5 h-5'
+                              isCollapsed ? 'w-4 h-4' : 'w-4 h-4'
                             }`} />
                             {!isCollapsed && (
                               <div className="flex-1 min-w-0">
-                                <div className="font-semibold text-sm">{item.name}</div>
-                                <div className={`text-xs transition-colors duration-200 ${
+                                <div className="font-medium text-sm">{item.name}</div>
+                                <div className={`text-xs transition-colors duration-200 font-light ${
                                   isActive ? 'text-yellow-300/70' : 'text-gray-400 group-hover:text-gray-300'
                                 }`}>
                                   {item.description}
@@ -494,7 +495,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                             {!isCollapsed && isActive && (
                               <motion.div
                                 layoutId="activeMenuIndicator"
-                                className="w-2 h-2 bg-yellow-400 rounded-full shadow-lg shadow-yellow-400/50"
+                                className="w-1.5 h-1.5 bg-yellow-400 rounded-full shadow-lg shadow-yellow-400/50"
                               />
                             )}
                           </div>
@@ -514,23 +515,23 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
           </div>
 
           {/* Footer */}
-          <div className={`p-4 border-t border-gray-800/50 ${isCollapsed ? 'px-2' : ''}`}>
+          <div className={`p-4 border-t border-gray-800/30 ${isCollapsed ? 'px-2' : ''}`}>
             <div className="space-y-3">
               {/* User Profile */}
-              <div className={`flex items-center rounded-lg bg-gray-800/30 border border-gray-700/30 ${
+              <div className={`flex items-center rounded-lg bg-gray-800/20 border border-gray-700/30 ${
                 isCollapsed ? 'p-2 justify-center' : 'p-3 space-x-3'
               }`}>
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">{getUserInitial()}</span>
+                <div className="w-8 h-8 bg-gradient-to-br from-yellow-500 to-yellow-500 rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-white" />
                 </div>
                 {!isCollapsed && (
                   <div className="flex-1 min-w-0">
-                    <div className="text-white text-sm font-semibold truncate">{getUserName()}</div>
-                    <div className="text-gray-400 text-xs truncate">Pro Plan</div>
+                    <div className="text-white text-sm font-medium truncate">{getUserName()}</div>
+                    <div className="text-gray-400 text-xs font-light truncate">{getUserEmail()}</div>
                   </div>
                 )}
                 {!isCollapsed && (
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
                 )}
               </div>
 
@@ -568,19 +569,14 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
               <div className="pt-2 border-t border-gray-800/30">
                 <button
                   onClick={onToggleCollapse}
-                  className="w-full p-2 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200 flex items-center justify-center"
+                  className="w-full p-2 text-gray-400 hover:text-white hover:bg-gray-800/30 rounded-lg transition-all duration-200 flex items-center justify-center"
                   title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                 >
-                  <svg 
-                    className={`w-4 h-4 transform transition-transform duration-300 ${
-                      isCollapsed ? 'rotate-180' : ''
-                    }`}
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                  </svg>
+                  {isCollapsed ? (
+                    <ChevronRight className="w-4 h-4" />
+                  ) : (
+                    <ChevronLeft className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
@@ -601,9 +597,9 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onOpen}
-              className="p-2 rounded-xl bg-gray-800/80 backdrop-blur-sm border border-gray-700/50 text-gray-300 hover:text-white transition-all duration-200 shadow-lg"
+              className="p-2 rounded-lg bg-gray-800/80 backdrop-blur-sm border border-gray-700/30 text-gray-300 hover:text-white transition-all duration-200 shadow-lg"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </motion.button>

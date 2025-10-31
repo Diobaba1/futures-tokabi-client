@@ -3,6 +3,17 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
+// Import Lucide React icons for more professional look
+import { 
+  UserCheck, 
+  Wallet, 
+  BarChart3,
+  Shield,
+  Cpu,
+  Zap,
+  Settings
+} from 'lucide-react';
+
 const HowItWorks: React.FC = () => {
   const [ref, inView] = useInView({
     threshold: 0.1,
@@ -12,47 +23,56 @@ const HowItWorks: React.FC = () => {
   const steps = [
     {
       step: '01',
-      title: 'Register & Choose Plan',
-      description: 'Create your account and select a trading plan that matches your capital and risk tolerance.',
-      icon: '👤',
-      gradient: 'from-yellow-500 to-yellow-600',
-      color: 'text-yellow-400'
+      title: 'Account Setup',
+      description: 'Create your institutional account with advanced security protocols and compliance verification.',
+      icon: UserCheck,
+      gradient: '',
+      color: 'text-cyan-400',
+      bgColor: 'bg-cyan-500/10',
+      borderColor: 'border-cyan-500/20'
     },
     {
       step: '02',
-      title: 'Secure API Connection',
-      description: 'Connect your Binance account with encrypted API keys. We never store your funds.',
-      icon: '🔑',
-      gradient: 'from-green-500 to-green-600',
-      color: 'text-green-400'
+      title: 'Secure Integration',
+      description: 'Connect your exchange accounts with encrypted API keys and institutional-grade security measures.',
+      icon: Shield,
+      gradient: '',
+      color: 'text-emerald-400',
+      bgColor: 'bg-emerald-500/10',
+      borderColor: 'border-emerald-500/20'
     },
     {
       step: '03',
-      title: 'Fund Your Account',
-      description: 'Deposit funds to your Binance wallet. Our AI will trade with proper risk management.',
-      icon: '💰',
-      gradient: 'from-blue-500 to-blue-600',
-      color: 'text-blue-400'
+      title: 'Capital Allocation',
+      description: 'Deposit funds to your secured trading accounts with real-time risk assessment and monitoring.',
+      icon: Wallet,
+      gradient: '',
+      color: 'text-blue-400',
+      bgColor: 'bg-blue-500/10',
+      borderColor: 'border-blue-500/20'
     },
     {
       step: '04',
-      title: 'AI Starts Trading',
-      description: 'Our AI analyzes markets 24/7 and executes trades with 87.3% accuracy.',
-      icon: '🤖',
-      gradient: 'from-purple-500 to-purple-600',
-      color: 'text-purple-400'
+      title: 'AI Deployment',
+      description: 'Deploy our advanced machine learning models with real-time market analysis and strategy optimization.',
+      icon: Cpu,
+      gradient: '',
+      color: 'text-violet-400',
+      bgColor: 'bg-violet-500/10',
+      borderColor: 'border-violet-500/20'
     },
     {
       step: '05',
-      title: 'Monitor & Withdraw',
-      description: 'Track performance in real-time and withdraw profits anytime from your Binance account.',
-      icon: '📊',
-      gradient: 'from-cyan-500 to-cyan-600',
-      color: 'text-cyan-400'
+      title: 'Performance Monitoring',
+      description: 'Track real-time performance analytics, risk metrics, and portfolio optimization insights.',
+      icon: BarChart3,
+      gradient: '',
+      color: 'text-amber-400',
+      bgColor: 'bg-amber-500/10',
+      borderColor: 'border-amber-500/20'
     }
   ];
 
-  // Properly typed variants for Framer Motion
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -64,25 +84,25 @@ const HowItWorks: React.FC = () => {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 50 },
+    hidden: { opacity: 0, y: 40 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.6,
+        duration: 0.8,
         ease: "easeOut" as const
       }
     }
   };
 
   const iconVariants = {
-    hidden: { scale: 0, rotate: -180 },
+    hidden: { scale: 0, opacity: 0 },
     visible: {
       scale: 1,
-      rotate: 0,
+      opacity: 1,
       transition: {
         type: "spring" as const,
-        stiffness: 200,
+        stiffness: 150,
         damping: 15,
         duration: 0.8
       }
@@ -94,23 +114,51 @@ const HowItWorks: React.FC = () => {
     visible: {
       scaleX: 1,
       transition: {
-        duration: 1.5,
-        delay: 0.5
+        duration: 2,
+        ease: "easeOut" as const
+      }
+    }
+  };
+
+  const progressVariants = {
+    hidden: { width: 0 },
+    visible: {
+      width: '100%',
+      transition: {
+        delay: 1,
+        duration: 1,
+        ease: "easeOut" as const
+      }
+    }
+  };
+
+  const dotVariants = {
+    hidden: { opacity: 0, scale: 0 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        delay: 1.5,
+        duration: 0.5,
+        ease: "easeOut" as const
       }
     }
   };
 
   return (
-    <section id="how-it-works" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900 relative overflow-hidden">
+    <section id="how-it-works" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-950 relative overflow-hidden">
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-900/20 to-gray-900"></div>
-      <div className="absolute top-0 left-0 w-72 h-72 bg-yellow-500/5 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-green-500/5 rounded-full blur-3xl"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/10 to-gray-950"></div>
+      
+      {/* Subtle Background Orbs */}
+      <div className="absolute top-20 left-10 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
       
       {/* Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:80px_80px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
 
       <div className="max-w-7xl mx-auto relative z-10">
+        {/* Section Header */}
         <motion.div
           ref={ref}
           initial="hidden"
@@ -120,31 +168,37 @@ const HowItWorks: React.FC = () => {
         >
           <motion.div
             variants={itemVariants}
-            className="inline-flex items-center px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-sm font-semibold mb-6"
+            className="inline-flex items-center px-4 py-2 rounded-full bg-gray-800/60 border border-gray-700/50 text-gray-300 text-sm font-light tracking-wider mb-8 backdrop-blur-sm"
           >
-            <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-            SIMPLE PROCESS
+            <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full mr-2"></div>
+            PROCESS OVERVIEW
           </motion.div>
           
           <motion.h2
             variants={itemVariants}
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6"
+            className="text-3xl sm:text-4xl lg:text-5xl font-light mb-6 text-white"
           >
-            Start Trading in
-            <span className="block bg-gradient-to-r from-yellow-400 via-green-400 to-blue-400 bg-clip-text text-transparent">
-              5 Simple Steps
-            </span>
+            Institutional Onboarding
+            <motion.span 
+              className="block bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400 bg-clip-text text-transparent font-normal mt-2"
+              animate={{ backgroundPosition: ['0%', '100%', '0%'] }}
+              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              style={{ backgroundSize: '200% auto' }}
+            >
+              In Five Steps
+            </motion.span>
           </motion.h2>
           
           <motion.p
             variants={itemVariants}
-            className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed"
+            className="text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed font-light"
           >
-            Get started with institutional-grade AI trading in minutes. 
-            <span className="text-yellow-400 font-semibold"> No technical knowledge required.</span>
+            Streamlined integration process designed for professional traders and institutional clients 
+            seeking advanced algorithmic trading solutions.
           </motion.p>
         </motion.div>
         
+        {/* Steps Process */}
         <motion.div
           ref={ref}
           initial="hidden"
@@ -157,107 +211,174 @@ const HowItWorks: React.FC = () => {
             initial="hidden"
             animate={inView ? "visible" : "hidden"}
             variants={lineVariants}
-            className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-yellow-500/30 to-transparent transform -translate-y-1/2 origin-left"
+            className="hidden lg:block absolute top-24 left-10 right-10 h-0.5 bg-gradient-to-r from-cyan-500/20 via-blue-500/30 to-violet-500/20 transform origin-left rounded-full"
           />
           
           {/* Mobile Vertical Line */}
-          <div className="lg:hidden absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-yellow-500/30 to-transparent transform -translate-x-1/2"></div>
+          <div className="lg:hidden absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-cyan-500/20 via-blue-500/30 to-violet-500/20 transform rounded-full"></div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-6">
-            {steps.map((step, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                className="relative group"
-              >
-                {/* Step Number Background */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-4">
+            {steps.map((step, index) => {
+              const IconComponent = step.icon;
+              return (
                 <motion.div
-                  initial="hidden"
-                  animate={inView ? "visible" : "hidden"}
-                  variants={iconVariants}
-                  className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gradient-to-br from-gray-800 to-gray-900 border border-yellow-500/20 rounded-full flex items-center justify-center z-20 group-hover:scale-110 group-hover:border-yellow-500/40 transition-all duration-300"
-                >
-                  <span className="text-yellow-400 font-bold text-sm">{step.step}</span>
-                </motion.div>
-
-                {/* Main Card */}
-                <motion.div
-                  initial="hidden"
-                  animate={inView ? "visible" : "hidden"}
+                  key={index}
                   variants={itemVariants}
-                  whileHover={{ 
-                    y: -8,
-                    scale: 1.02,
-                    transition: { duration: 0.3 }
-                  }}
-                  className="relative bg-gray-800/40 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/50 group-hover:border-yellow-500/30 transition-all duration-300 h-full flex flex-col"
+                  className="relative group"
                 >
-                  {/* Gradient Top Bar */}
-                  <div className={`w-12 h-1 bg-gradient-to-r ${step.gradient} rounded-full mb-6 mx-auto`}></div>
-                  
-                  {/* Icon */}
+                  {/* Step Number */}
                   <motion.div
                     initial="hidden"
                     animate={inView ? "visible" : "hidden"}
                     variants={iconVariants}
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    className={`w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br ${step.gradient} flex items-center justify-center text-3xl shadow-lg`}
+                    className="absolute -top-2 lg:top-16 lg:-left-2 w-8 h-8 bg-gray-900 border border-gray-700 rounded-full flex items-center justify-center z-20 group-hover:border-cyan-400/50 transition-colors duration-300"
                   >
-                    {step.icon}
+                    <span className="text-cyan-400 font-medium text-xs">{step.step}</span>
                   </motion.div>
 
-                  {/* Content */}
-                  <div className="text-center flex-1">
-                    <div className={`text-sm font-bold ${step.color} mb-3 tracking-wider`}>
-                      STEP {step.step}
+                  {/* Main Card */}
+                  <motion.div
+                    initial="hidden"
+                    animate={inView ? "visible" : "hidden"}
+                    variants={itemVariants}
+                    whileHover={{ 
+                      y: -4,
+                    }}
+                    className={`relative ${step.bgColor} backdrop-blur-lg rounded-xl p-6 border ${step.borderColor} group-hover:border-opacity-50 transition-all duration-500 h-full flex flex-col`}
+                  >
+                    {/* Icon Container */}
+                    <motion.div
+                      initial="hidden"
+                      animate={inView ? "visible" : "hidden"}
+                      variants={iconVariants}
+                      whileHover={{ scale: 1.05 }}
+                      className={`w-14 h-14 mb-5 rounded-lg bg-gradient-to-br ${step.gradient} flex items-center justify-center shadow-lg`}
+                    >
+                      <IconComponent className="w-6 h-6 text-white" />
+                    </motion.div>
+
+                    {/* Content */}
+                    <div className="flex-1">
+                      <div className={`text-xs font-medium ${step.color} mb-3 tracking-widest uppercase`}>
+                        Step {step.step}
+                      </div>
+                      <h3 className="text-lg font-semibold text-white mb-3 leading-tight tracking-tight">
+                        {step.title}
+                      </h3>
+                      <p className="text-gray-400 text-sm leading-relaxed font-light">
+                        {step.description}
+                      </p>
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-4 leading-tight">
-                      {step.title}
-                    </h3>
-                    <p className="text-gray-300 leading-relaxed">
-                      {step.description}
-                    </p>
-                  </div>
 
-                  {/* Hover Effect */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                    {/* Progress Indicator */}
+                    <div className="mt-4 pt-4 border-t border-gray-700/30">
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span>Progress</span>
+                        <span>{step.step}/05</span>
+                      </div>
+                      <div className="w-full bg-gray-800 rounded-full h-1 mt-2">
+                        <motion.div 
+                          className={`h-1 rounded-full bg-gradient-to-r ${step.gradient}`}
+                          initial="hidden"
+                          animate={inView ? "visible" : "hidden"}
+                          variants={progressVariants}
+                          custom={index}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Connecting Dots */}
+                  {index < steps.length - 1 && (
+                    <>
+                      <motion.div 
+                        initial="hidden"
+                        animate={inView ? "visible" : "hidden"}
+                        variants={dotVariants}
+                        className="hidden lg:block absolute top-24 -right-2 w-3 h-3 bg-cyan-400 rounded-full border-2 border-gray-950 z-10"
+                      />
+                      <motion.div 
+                        initial="hidden"
+                        animate={inView ? "visible" : "hidden"}
+                        variants={dotVariants}
+                        className="lg:hidden absolute -bottom-4 left-6 w-3 h-3 bg-cyan-400 rounded-full border-2 border-gray-950 z-10 transform -translate-x-1/2"
+                      />
+                    </>
+                  )}
                 </motion.div>
-
-                {/* Connecting Dots */}
-                {index < steps.length - 1 && (
-                  <>
-                    <div className="hidden lg:block absolute top-1/2 -right-3 w-6 h-6 bg-yellow-500 rounded-full border-4 border-gray-900 z-10 transform -translate-y-1/2"></div>
-                    <div className="lg:hidden absolute -bottom-4 left-1/2 w-6 h-6 bg-yellow-500 rounded-full border-4 border-gray-900 z-10 transform -translate-x-1/2"></div>
-                  </>
-                )}
-              </motion.div>
-            ))}
+              );
+            })}
           </div>
         </motion.div>
 
-        {/* CTA Section */}
+        {/* Enhanced CTA Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.6, delay: 1 }}
-          className="text-center mt-16"
+          transition={{ duration: 0.8, delay: 1.5 }}
+          className="text-center mt-20"
         >
-          <div className="bg-gradient-to-r from-yellow-500/10 to-green-500/10 border border-yellow-500/20 rounded-2xl p-8 max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold text-white mb-4">
-              Ready to Start Your Trading Journey?
-            </h3>
-            <p className="text-gray-300 mb-6">
-              Join thousands of successful traders using our AI-powered platform.
+          <div className="bg-gray-800/30 backdrop-blur-lg border border-gray-700/50 rounded-2xl p-8 max-w-2xl mx-auto">
+            <div className="flex items-center justify-center mb-4">
+              <Zap className="w-6 h-6 text-cyan-400 mr-3" />
+              <h3 className="text-xl font-semibold text-white">
+                Ready to Deploy Advanced Trading?
+              </h3>
+            </div>
+            <p className="text-gray-300 mb-6 text-sm font-light max-w-md mx-auto">
+              Join institutional traders leveraging our AI-powered platform for consistent alpha generation.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 font-bold rounded-xl hover:from-yellow-400 hover:to-yellow-500 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-yellow-500/25">
-                Get Started Now
-              </button>
-              <button className="px-8 py-4 bg-gray-800 border border-gray-700 text-white font-semibold rounded-xl hover:bg-gray-700 transition-all duration-300">
-                Watch Demo
-              </button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium rounded-lg transition-all duration-300 shadow-lg shadow-cyan-500/25 flex items-center gap-2"
+              >
+                <UserCheck className="w-4 h-4" />
+                Begin Onboarding
+              </motion.button>
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-6 py-3 bg-gray-700/50 border border-gray-600/50 text-white font-medium rounded-lg hover:bg-gray-600/50 transition-all duration-300 flex items-center gap-2"
+              >
+                <Settings className="w-4 h-4" />
+                Technical Details
+              </motion.button>
             </div>
           </div>
+        </motion.div>
+
+        {/* Stats Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.8, delay: 2 }}
+          className="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-3xl mx-auto"
+        >
+          {[
+            { value: '5min', label: 'Average Setup', icon: Zap },
+            { value: '99.9%', label: 'Uptime', icon: Shield },
+            { value: '256-bit', label: 'Encryption', icon: Shield },
+            { value: '24/7', label: 'Support', icon: Cpu }
+          ].map((stat, index) => {
+            const StatIcon = stat.icon;
+            return (
+              <motion.div 
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 0.6, delay: 2.2 + index * 0.1 }}
+                className="text-center"
+              >
+                <div className="flex justify-center mb-2">
+                  <StatIcon className="w-5 h-5 text-cyan-400" />
+                </div>
+                <div className="text-2xl font-light text-white mb-1">{stat.value}</div>
+                <div className="text-xs text-gray-400 font-light tracking-wide">{stat.label}</div>
+              </motion.div>
+            );
+          })}
         </motion.div>
       </div>
     </section>

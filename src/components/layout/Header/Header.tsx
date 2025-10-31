@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, TrendingUp, Shield } from 'lucide-react';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -18,9 +19,21 @@ const Header: React.FC = () => {
 
   const navigation = [
     { name: 'Home', href: '/' },
-    { name: 'Community', href: '/community' },
-    { name: 'Features', href: '/features' },
+    { name: 'Features', href: '#features' },
+    { name: 'Security', href: '#security' },
+    { name: 'Pricing', href: '#pricing' },
   ];
+
+  const handleNavClick = (href: string) => {
+    if (href.startsWith('#')) {
+      // Handle smooth scroll for anchor links
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <>
@@ -31,23 +44,23 @@ const Header: React.FC = () => {
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
             ? 'bg-gray-900/95 backdrop-blur-xl border-b border-gray-800/50'
-            : 'bg-transparent'
+            : 'bg-gray-900/80 backdrop-blur-lg border-b border-gray-800/30'
         }`}
       >
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 lg:h-20">
             {/* Logo */}
             <motion.div
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.02 }}
               className="flex-shrink-0 flex items-center"
             >
               <Link to="/" className="flex items-center space-x-3 group">
-                <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/25 group-hover:shadow-yellow-500/40 transition-all duration-300">
-                  <span className="text-gray-900 font-bold text-lg">T</span>
+                <div className="w-10 h-10 bg-gradient-to-br rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/25 group-hover:shadow-cyan-500/40 transition-all duration-300">
+                  <TrendingUp className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-white font-bold text-xl tracking-tight">TOKABI</span>
-                  <span className="text-yellow-400 text-xs font-medium tracking-wider">ENTERPRISE</span>
+                  <span className="text-white font-light text-xl tracking-tight">TOKABI</span>
+                  <span className="text-cyan-400 text-xs font-medium tracking-wider">ALGORITHMIC TRADING</span>
                 </div>
               </Link>
             </motion.div>
@@ -55,62 +68,64 @@ const Header: React.FC = () => {
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-1">
               {navigation.map((item) => {
-                const isActive = location.pathname === item.href;
+                const isActive = location.pathname === item.href || 
+                                (location.hash === item.href && location.pathname === '/');
                 return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={`relative px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 ${
-                      isActive
-                        ? 'text-yellow-400'
-                        : 'text-gray-300 hover:text-white'
-                    }`}
-                  >
-                    {item.name}
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeIndicator"
-                        className="absolute inset-0 bg-yellow-500/10 border border-yellow-500/20 rounded-lg -z-10"
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                      />
-                    )}
-                  </Link>
+                  <motion.div key={item.name} whileHover={{ y: -1 }}>
+                    <button
+                      onClick={() => handleNavClick(item.href)}
+                      className={`relative px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
+                        isActive
+                          ? 'text-cyan-400'
+                          : 'text-gray-300 hover:text-white'
+                      }`}
+                    >
+                      {item.name}
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeIndicator"
+                          className="absolute inset-0 bg-cyan-500/10 border border-cyan-500/20 rounded-lg -z-10"
+                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        />
+                      )}
+                    </button>
+                  </motion.div>
                 );
               })}
             </div>
 
             {/* Desktop CTA Buttons */}
-            <div className="hidden lg:flex items-center space-x-4">
+            <div className="hidden lg:flex items-center space-x-3">
               <Link
                 to="/login"
-                className="px-6 py-2.5 text-gray-300 hover:text-white font-semibold text-sm transition-colors duration-200"
+                className="px-6 py-2.5 text-gray-300 hover:text-white font-medium text-sm transition-colors duration-200 hover:bg-gray-800/50 rounded-lg"
               >
-                Sign In
+                Client Login
               </Link>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Link
                   to="/register"
-                  className="px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 font-bold text-sm rounded-xl hover:from-yellow-400 hover:to-yellow-500 transition-all duration-300 shadow-lg shadow-yellow-500/25"
+                  className="px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-ywllo-500 text-white font-medium text-sm rounded-lg hover:from-yellow-400 hover:to-yellow-400 transition-all duration-300 shadow-lg shadow-yellow-500/25 flex items-center gap-2"
                 >
-                  Get Started
+                  <Shield className="w-4 h-4" />
+                  Start Institutional Trial
                 </Link>
               </motion.div>
             </div>
 
             {/* Mobile menu button */}
             <div className="lg:hidden">
-              <button
+              <motion.button
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="p-2 rounded-lg bg-gray-800/50 border border-gray-700/50 text-gray-300 hover:text-white transition-colors duration-200"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  {isMobileMenuOpen ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  )}
-                </svg>
-              </button>
+                {isMobileMenuOpen ? (
+                  <X className="w-5 h-5" />
+                ) : (
+                  <Menu className="w-5 h-5" />
+                )}
+              </motion.button>
             </div>
           </div>
         </nav>
@@ -125,39 +140,40 @@ const Header: React.FC = () => {
               transition={{ duration: 0.3 }}
               className="lg:hidden bg-gray-900/95 backdrop-blur-xl border-t border-gray-800/50"
             >
-              <div className="px-4 py-6 space-y-4">
+              <div className="px-4 py-6 space-y-2">
                 {navigation.map((item) => {
-                  const isActive = location.pathname === item.href;
+                  const isActive = location.pathname === item.href || 
+                                  (location.hash === item.href && location.pathname === '/');
                   return (
-                    <Link
+                    <motion.button
                       key={item.name}
-                      to={item.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`block px-4 py-3 rounded-xl font-semibold text-base transition-all duration-200 ${
+                      onClick={() => handleNavClick(item.href)}
+                      className={`block w-full text-left px-4 py-3 rounded-lg font-medium text-base transition-all duration-200 ${
                         isActive
-                          ? 'text-yellow-400 bg-yellow-500/10 border border-yellow-500/20'
+                          ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/20'
                           : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
                       }`}
                     >
                       {item.name}
-                    </Link>
+                    </motion.button>
                   );
                 })}
                 <div className="pt-4 border-t border-gray-800/50 space-y-3">
                   <Link
                     to="/login"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="block px-4 py-3 text-gray-300 hover:text-white font-semibold text-base text-center transition-colors duration-200"
+                    className="block w-full text-center px-4 py-3 text-gray-300 hover:text-white font-medium text-base transition-colors duration-200 hover:bg-gray-800/50 rounded-lg"
                   >
-                    Sign In
+                    Client Login
                   </Link>
                   <motion.div whileTap={{ scale: 0.95 }}>
                     <Link
                       to="/register"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="block px-4 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 font-bold text-base rounded-xl text-center hover:from-yellow-400 hover:to-yellow-500 transition-all duration-300 shadow-lg shadow-yellow-500/25"
+                      className="block w-full text-center px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium text-base rounded-lg hover:from-cyan-400 hover:to-blue-400 transition-all duration-300 shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2"
                     >
-                      Get Started
+                      <Shield className="w-4 h-4" />
+                      Start Trial
                     </Link>
                   </motion.div>
                 </div>
