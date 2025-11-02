@@ -62,9 +62,8 @@ const Header: React.FC = () => {
   ];
 
   const userMenuItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
-    { name: 'Account Settings', href: '/settings', icon: Settings },
-    { name: 'Institutional Portal', href: '/institutional', icon: Building },
+    { name: 'Portal', href: '/dashboard', icon: BarChart3 },
+    { name: 'Account Settings', href: '/dashboard/settings', icon: Settings },
   ];
 
   // Helper function to get display name from user data
