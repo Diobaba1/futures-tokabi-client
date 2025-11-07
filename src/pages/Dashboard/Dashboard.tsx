@@ -46,7 +46,7 @@ const Dashboard: React.FC = () => {
         
         <div className="space-y-8">
           <PortfolioAnalyticsComponent />
-          <SystemAnalyticsComponent />
+          {/* <SystemAnalyticsComponent /> */}
         </div>
       </div>
     </div>

@@ -180,7 +180,7 @@ const HeroSection: React.FC = () => {
               whileHover={{ scale: 1.01 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
-              Tokabi
+              TOKABI
             </motion.h1>
           </motion.div>
           
