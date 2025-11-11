@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { 
   BarChart3, 
-  Zap, 
   FileText, 
   Shield, 
   Key, 
@@ -20,7 +19,7 @@ import {
   Database,
   User,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 
 interface DashboardMenuProps {
@@ -56,6 +55,12 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
           href: '/dashboard', 
           icon: BarChart3,
           description: 'Portfolio overview & analytics'
+        },
+        { 
+          name: 'Analyze Asset', 
+          href: '/dashboard/symbol-analysis', 
+          icon: TrendingUp,
+          description: 'Analyze any Asset of Choice'
         },
         { 
           name: 'Live Trading', 

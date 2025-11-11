@@ -72,7 +72,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             </button>
             <div>
               <h1 className="text-2xl lg:text-3xl font-light text-white">
-                Institutional Dashboard
+                Trading Portal
               </h1>
               <p className="text-gray-400 mt-1 text-sm font-light">
                 Real-time algorithmic trading performance and analytics
@@ -100,7 +100,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             <div className="lg:hidden mb-6">
               <div>
                 <h1 className="text-2xl font-light text-white">
-                  Institutional Dashboard
+                  Trading Portal
                 </h1>
                 <p className="text-gray-400 mt-2 text-sm font-light">
                   Real-time algorithmic trading performance and analytics
@@ -108,29 +108,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               </div>
             </div>
             
-            {/* Performance Metrics Bar */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              {[
-                { label: 'Portfolio Value', value: '$124,567', change: '+2.4%', icon: TrendingUp, color: 'text-emerald-400' },
-                { label: 'Active Models', value: '3/5', change: 'Running', icon: Activity, color: 'text-cyan-800' },
-                { label: 'Win Rate', value: '87.3%', change: '+1.2%', icon: TrendingUp, color: 'text-blue-400' },
-                { label: 'Sharpe Ratio', value: '2.1', change: 'Optimal', icon: Activity, color: 'text-violet-400' },
-              ].map((metric, index) => {
-                const Icon = metric.icon;
-                return (
-                  <div key={index} className="bg-gray-800/30 backdrop-blur-sm border border-gray-700/30 rounded-xl p-4 hover:border-gray-600/50 transition-all duration-200">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-gray-400 text-sm font-light">{metric.label}</div>
-                      <Icon className="w-4 h-4 text-gray-500" />
-                    </div>
-                    <div className="flex items-baseline justify-between">
-                      <div className={`text-xl font-semibold ${metric.color}`}>{metric.value}</div>
-                      <div className="text-xs text-gray-400 font-light">{metric.change}</div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            
             
             {/* Children content with enhanced styling */}
             <div className="bg-gray-800/20 backdrop-blur-sm border border-gray-700/30 rounded-xl overflow-hidden">

@@ -27,6 +27,13 @@ export const API_ENDPOINTS = {
     GET: "/portfolio/portfolio/",
   },
 
+  USER_SEARCH_SYMBOL: {
+    ANALYZE: "/search_symbol/analyze-symbols",
+    DETAIL: (search_id: string) =>`/search_symbol/search/${search_id}`,
+    HISTORY: "/search_symbol/search-history",
+    RATE_LIMITS: "/search_symbol/rate-limit"
+  },
+
   // Trades
   TRADES: {
     LIST: "/trades/",

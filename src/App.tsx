@@ -22,6 +22,7 @@ import APIKeyManager from "./pages/walletpages/APIKeyManager";
 import Billing from "./pages/Billing/Billing";
 import SignalsPage from "./pages/pageComponents/SignalsPage";
 import TgConfigPage from "./pages/config/tgConfigPage";
+import { SymbolSearchPage } from "./pages/analytics/SymbolSearchPage";
 
 interface RouteConfig {
   path: string;
@@ -73,7 +74,7 @@ const dashboardRoutes: RouteConfig[] = [
   { path: "/dashboard/trading", element: <Trades />, layout: DashboardLayout, protected: true },
   { path: "/dashboard/settings", element: <Profile />, layout: DashboardLayout, protected: true },
   { path: "/dashboard/signals", element: <SignalsPage />, layout: DashboardLayout, protected: true },
-
+  { path: "/dashboard/symbol-analysis", element: <SymbolSearchPage />, layout: DashboardLayout, protected: true },
   { path: "/dashboard/performance", element: <div>Performance Page</div>, layout: DashboardLayout, protected: true },
 ];
 
