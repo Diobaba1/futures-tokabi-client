@@ -5,7 +5,7 @@ import {
   PlusIcon,
   XIcon,
   HistoryIcon,
-  TrendingUpIcon,
+//   TrendingUpIcon,
   AlertCircleIcon,
   CheckCircleIcon,
   ClockIcon,
@@ -14,7 +14,7 @@ import {
   BarChart3Icon,
   DownloadIcon,
   ShareIcon,
-  SparklesIcon,
+//   SparklesIcon,
 } from 'lucide-react';
 import { useSymbolSearch } from '../../components/hooks/useSymbolSearch';
 import { SymbolAnalysisCard } from './SymbolAnalysisCard';
@@ -62,7 +62,7 @@ export const SymbolSearchPage: React.FC = () => {
     clearCurrentSearch,
     selectSearchFromHistory,
     navigateToHistory,
-    navigateToSearch,
+    // navigateToSearch,
   } = useSymbolSearch();
 
   useEffect(() => {

@@ -154,9 +154,9 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
     }
   };
 
-  const getUserInitial = () => {
-    return user?.full_name?.charAt(0).toUpperCase() || 'U';
-  };
+  // const getUserInitial = () => {
+  //   return user?.full_name?.charAt(0).toUpperCase() || 'U';
+  // };
 
   const getUserName = () => {
     return user?.full_name || 'User';
@@ -269,7 +269,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
                 transition={{ delay: categoryIndex * 0.1 }}
               >
                 {!isCollapsed && (
-                  <h3 className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-3 px-2 font-light">
+                  <h3 className="text-gray-500 text-xs uppercase tracking-wider mb-3 px-2 font-light">
                     {category.category}
                   </h3>
                 )}
@@ -462,7 +462,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
               {menuItems.map((category) => (
                 <div key={category.category}>
                   {!isCollapsed && (
-                    <h3 className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-3 px-2 font-light">
+                    <h3 className="text-gray-500 text-xs uppercase tracking-wider mb-3 px-2 font-light">
                       {category.category}
                     </h3>
                   )}

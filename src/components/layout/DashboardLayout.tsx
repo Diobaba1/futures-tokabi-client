@@ -1,7 +1,7 @@
 // src/components/Layout/DashboardLayout.tsx
 import React, { useState } from 'react';
 import DashboardMenu from './Authlayout/DashboardMenu';
-import { RefreshCw, Plus, TrendingUp, Activity } from 'lucide-react';
+import { RefreshCw, Plus } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;

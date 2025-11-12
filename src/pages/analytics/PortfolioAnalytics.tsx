@@ -11,7 +11,6 @@ import {
   Activity,
   ArrowUpRight,
   ArrowDownRight,
-  Clock,
   AlertTriangle,
   RefreshCw,
   BarChart3,
@@ -25,8 +24,6 @@ import {
   Gauge,
   Sparkles,
   Layers,
-  CreditCard,
-  Scale,
   Zap,
 } from 'lucide-react';
 

@@ -15,7 +15,6 @@ import {
   ActivityIcon,
   ShieldIcon,
   TargetIcon,
-  SparklesIcon,
 } from "lucide-react";
 import { SymbolAnalysisResult } from "../../types/userSymbolSearch.types";
 import { userSymbolSearchService } from "../../api/services/userSymbolSearchService";
@@ -118,8 +117,6 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
   // Success state - with proper null checks
   const {
     final_decision,
-    consensus_strength,
-    signal_quality,
     confidence_score,
     risk_metrics,
     market_data_summary,
@@ -129,9 +126,6 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
 
   const decisionColor = userSymbolSearchService.getDecisionColor(
     final_decision || "hold"
-  );
-  const qualityColor = userSymbolSearchService.getSignalQualityColor(
-    signal_quality || "caution"
   );
 
   const getDecisionIcon = () => {
@@ -169,6 +163,9 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
       : "text-gray-400";
   };
 
+  // Add Risk Assessment section if risk metrics are available
+  
+
   return (
     <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 mb-6 hover:bg-gray-800/70">
       {/* Header - Always Visible */}
@@ -191,8 +188,6 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
                     {final_decision?.toUpperCase() || "HOLD"}
                   </div>
 
-                  
-
                   {confidence_score !== undefined &&
                     confidence_score !== null && (
                       <div className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-gray-700 text-gray-300 text-sm font-medium border border-gray-600">
@@ -202,7 +197,7 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
                     )}
                 </div>
               </div>
-              
+
               {/* Quick Stats */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                 <div>
@@ -416,7 +411,10 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
               >
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {time_analysis.map((timeframe, index) => (
-                    <div key={index} className="bg-gray-700/50 rounded-lg p-4 backdrop-blur-sm border border-gray-600">
+                    <div
+                      key={index}
+                      className="bg-gray-700/50 rounded-lg p-4 backdrop-blur-sm border border-gray-600"
+                    >
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-medium text-white">
                           {timeframe.timeframe}
@@ -488,8 +486,8 @@ const Metric: React.FC<{
   );
 };
 
-// Enhanced RiskMetric component with null handling
-const RiskMetric: React.FC<{
+// New RiskCard component to replace the unused RiskMetric
+const RiskCard: React.FC<{
   label: string;
   value: string;
   color: "blue" | "red" | "emerald" | "amber" | "purple" | "gray";
@@ -534,14 +532,12 @@ const PriceCard: React.FC<{
 
   return (
     <div
-      className={`border rounded-lg p-4 text-center backdrop-blur-sm ${colorClasses[color as keyof typeof colorClasses]} ${className}`}
+      className={`border rounded-lg p-4 text-center backdrop-blur-sm ${
+        colorClasses[color as keyof typeof colorClasses]
+      } ${className}`}
     >
-      <div className="text-sm font-medium mb-2">
-        {title}
-      </div>
-      <div className="text-xl font-bold">
-        {displayValue}
-      </div>
+      <div className="text-sm font-medium mb-2">{title}</div>
+      <div className="text-xl font-bold">{displayValue}</div>
     </div>
   );
 };
