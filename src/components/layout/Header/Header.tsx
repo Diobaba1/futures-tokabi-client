@@ -10,7 +10,6 @@ import {
   User, 
   LogOut, 
   Settings,
-  Building,
   Briefcase,
   BarChart3
 } from 'lucide-react';
@@ -104,15 +103,15 @@ const Header: React.FC = () => {
     }
   };
 
-  const handleNavClick = (href: string) => {
-    if (href.startsWith('#')) {
-      const element = document.querySelector(href);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-    setIsMobileMenuOpen(false);
-  };
+  // const handleNavClick = (href: string) => {
+  //   if (href.startsWith('#')) {
+  //     const element = document.querySelector(href);
+  //     if (element) {
+  //       element.scrollIntoView({ behavior: 'smooth' });
+  //     }
+  //   }
+  //   setIsMobileMenuOpen(false);
+  // };
 
   return (
     <>
@@ -393,7 +392,7 @@ const Header: React.FC = () => {
                         <Link
                           to="/register"
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="block w-full text-center px-4 py-3 bg-gradient-to-r from-cyan-900/80 to-cyan-800/80 text-white font-medium text-base rounded-lg hover:from-cyan-900 hover:to-cyan-800 transition-all duration-300 shadow-lg shadow-cyan-900/30 backdrop-blur-sm border border-cyan-800/20 flex items-center justify-center gap-2"
+                          className=" w-full text-center px-4 py-3 bg-gradient-to-r from-cyan-900/80 to-cyan-800/80 text-white font-medium text-base rounded-lg hover:from-cyan-900 hover:to-cyan-800 transition-all duration-300 shadow-lg shadow-cyan-900/30 backdrop-blur-sm border border-cyan-800/20 flex items-center justify-center gap-2"
                         >
                           <Shield className="w-4 h-4" />
                           Request Demo

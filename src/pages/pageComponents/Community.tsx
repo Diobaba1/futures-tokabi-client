@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { 
   MessageCircle, 
@@ -12,7 +12,6 @@ import {
   Clock,
   ArrowRight,
   CheckCircle2,
-  Volume2,
   Sparkles,
   Activity,
   Bell,
@@ -22,7 +21,6 @@ import {
   Play,
   Lightbulb,
   Brain,
-  AlertTriangle,
   DollarSign,
   ChartLine,
   Users2
@@ -214,13 +212,13 @@ const CommunityPage = () => {
     }
   ];
 
-  const socialProof = [
+  const socialProof = useMemo(() => [
     "🔥 Sarah just made +$2,847 on BTCUSDT short",
     "✅ Marcus closed +$1,932 on ETHUSDT long with 3:1 RR",
     "💎 Alex hit +$4,156 on SOLUSDT breakout trade",
     "🚀 Emma secured +$3,421 on BNBUSDT during volatility spike",
     "⚡ New member David +$1,234 first trade following AI signal"
-  ];
+  ], []);
 
   const [currentProof, setCurrentProof] = useState(0);
 
@@ -229,7 +227,7 @@ const CommunityPage = () => {
       setCurrentProof((prev) => (prev + 1) % socialProof.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [socialProof]);
 
   const containerVariants = {
     hidden: { opacity: 0 },

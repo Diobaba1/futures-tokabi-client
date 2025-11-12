@@ -1,9 +1,6 @@
 // src/pages/walletpages/Billing.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { userService } from '../../api/services/userService';
-import { SubscriptionUpdate } from '../../types/user.types';
-
 interface BillingPlan {
   id: string;
   name: string;
@@ -14,7 +11,6 @@ interface BillingPlan {
   popular?: boolean;
   current?: boolean;
 }
-
 interface BillingHistory {
   id: string;
   date: string;
@@ -23,7 +19,33 @@ interface BillingHistory {
   description: string;
   invoice_url?: string;
 }
-
+// Mock billing history data
+const mockBillingHistory: BillingHistory[] = [
+  {
+    id: 'inv_001',
+    date: '2024-01-15',
+    amount: 79,
+    status: 'completed',
+    description: 'Professional Plan - January 2024',
+    invoice_url: '#'
+  },
+  {
+    id: 'inv_002',
+    date: '2023-12-15',
+    amount: 79,
+    status: 'completed',
+    description: 'Professional Plan - December 2023',
+    invoice_url: '#'
+  },
+  {
+    id: 'inv_003',
+    date: '2023-11-15',
+    amount: 29,
+    status: 'completed',
+    description: 'Starter Plan - November 2023',
+    invoice_url: '#'
+  }
+];
 const Billing: React.FC = () => {
   const [currentPlan, setCurrentPlan] = useState<string>('pro');
   const [isLoading, setIsLoading] = useState(true);
@@ -31,7 +53,6 @@ const Billing: React.FC = () => {
   const [billingHistory, setBillingHistory] = useState<BillingHistory[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-
   const billingPlans: BillingPlan[] = [
     {
       id: 'starter',
@@ -82,103 +103,65 @@ const Billing: React.FC = () => {
       ]
     }
   ];
-
-  // Mock billing history data
-  const mockBillingHistory: BillingHistory[] = [
-    {
-      id: 'inv_001',
-      date: '2024-01-15',
-      amount: 79,
-      status: 'completed',
-      description: 'Professional Plan - January 2024',
-      invoice_url: '#'
-    },
-    {
-      id: 'inv_002',
-      date: '2023-12-15',
-      amount: 79,
-      status: 'completed',
-      description: 'Professional Plan - December 2023',
-      invoice_url: '#'
-    },
-    {
-      id: 'inv_003',
-      date: '2023-11-15',
-      amount: 29,
-      status: 'completed',
-      description: 'Starter Plan - November 2023',
-      invoice_url: '#'
-    }
-  ];
-
   const loadBillingData = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
-      
+     
       // Mock loading delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       setBillingHistory(mockBillingHistory);
-      
+     
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load billing information');
     } finally {
       setIsLoading(false);
     }
   }, []);
-
   useEffect(() => {
     loadBillingData();
   }, [loadBillingData]);
-
   const handlePlanChange = async (planId: string) => {
     if (planId === currentPlan) return;
-
     try {
       setIsUpdating(true);
       setError(null);
       setSuccess(null);
-
       // Mock API call
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+     
       setCurrentPlan(planId);
       setSuccess(`Successfully upgraded to ${billingPlans.find(p => p.id === planId)?.name} plan!`);
-      
+     
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to update subscription');
     } finally {
       setIsUpdating(false);
     }
   };
-
   const handleCancelSubscription = async () => {
     if (!window.confirm('Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your billing period.')) {
       return;
     }
-
     try {
       setIsUpdating(true);
       setError(null);
-
       // Mock API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+     
       setCurrentPlan('starter');
       setSuccess('Your subscription has been cancelled. You will retain access until the end of your billing period.');
-      
+     
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to cancel subscription');
     } finally {
       setIsUpdating(false);
     }
   };
-
   const clearMessages = () => {
     setError(null);
     setSuccess(null);
   };
-
   // Auto-clear messages after 5 seconds
   useEffect(() => {
     if (error || success) {
@@ -186,14 +169,12 @@ const Billing: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [error, success]);
-
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
     }).format(amount);
   };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -201,7 +182,6 @@ const Billing: React.FC = () => {
       day: 'numeric'
     });
   };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed': return 'text-green-400 bg-green-400/10 border-green-400/20';
@@ -210,7 +190,6 @@ const Billing: React.FC = () => {
       default: return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
     }
   };
-
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -223,7 +202,6 @@ const Billing: React.FC = () => {
       </div>
     );
   }
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 lg:space-y-8">
       {/* Header */}
@@ -235,7 +213,6 @@ const Billing: React.FC = () => {
           Manage your subscription plan and billing information
         </p>
       </div>
-
       {/* Status Messages */}
       <AnimatePresence>
         {error && (
@@ -258,7 +235,6 @@ const Billing: React.FC = () => {
             </button>
           </motion.div>
         )}
-
         {success && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -280,7 +256,6 @@ const Billing: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
         {/* Current Plan Summary & Billing Info - Stack on mobile, side by side on larger screens */}
         <div className="xl:col-span-1 space-y-6 lg:space-y-8">
@@ -292,7 +267,6 @@ const Billing: React.FC = () => {
               </svg>
               Current Plan
             </h2>
-
             <div className="space-y-4">
               <div className="text-center p-4 sm:p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl">
                 <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2">
@@ -306,7 +280,6 @@ const Billing: React.FC = () => {
                   {billingPlans.find(p => p.id === currentPlan)?.description}
                 </div>
               </div>
-
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Status</span>
@@ -321,7 +294,6 @@ const Billing: React.FC = () => {
                   <span className="text-white">Visa **** 4242</span>
                 </div>
               </div>
-
               {currentPlan !== 'starter' && (
                 <motion.button
                   onClick={handleCancelSubscription}
@@ -335,7 +307,6 @@ const Billing: React.FC = () => {
               )}
             </div>
           </div>
-
           {/* Billing Information */}
           <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 sm:p-6 backdrop-blur-sm">
             <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6 flex items-center">
@@ -344,7 +315,6 @@ const Billing: React.FC = () => {
               </svg>
               Billing Information
             </h2>
-
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -357,7 +327,6 @@ const Billing: React.FC = () => {
                   <span className="text-white font-mono text-sm sm:text-base">•••• •••• •••• 4242</span>
                 </div>
               </div>
-
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -376,7 +345,6 @@ const Billing: React.FC = () => {
                   </div>
                 </div>
               </div>
-
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -387,7 +355,6 @@ const Billing: React.FC = () => {
             </div>
           </div>
         </div>
-
         {/* Pricing Plans & Billing History */}
         <div className="xl:col-span-2 space-y-6 lg:space-y-8">
           {/* Pricing Plans */}
@@ -406,7 +373,6 @@ const Billing: React.FC = () => {
                 </button>
               </div>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {billingPlans.map((plan) => (
                 <PricingCard
@@ -419,7 +385,6 @@ const Billing: React.FC = () => {
               ))}
             </div>
           </div>
-
           {/* Billing History */}
           <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 sm:p-6 backdrop-blur-sm">
             <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6 flex items-center">
@@ -428,7 +393,6 @@ const Billing: React.FC = () => {
               </svg>
               Billing History
             </h2>
-
             <div className="space-y-3 sm:space-y-4">
               {billingHistory.map((invoice) => (
                 <motion.div
@@ -452,7 +416,7 @@ const Billing: React.FC = () => {
                     <span className="text-white font-semibold text-sm sm:text-base whitespace-nowrap">
                       {formatCurrency(invoice.amount)}
                     </span>
-                    <button 
+                    <button
                       className="p-2 text-gray-400 hover:text-white hover:bg-gray-600/50 rounded-lg transition-all duration-200 flex-shrink-0"
                       title="Download Invoice"
                     >
@@ -470,7 +434,6 @@ const Billing: React.FC = () => {
     </div>
   );
 };
-
 // Pricing Card Component
 interface PricingCardProps {
   plan: BillingPlan;
@@ -478,11 +441,9 @@ interface PricingCardProps {
   isUpdating: boolean;
   onPlanChange: (planId: string) => void;
 }
-
 const PricingCard: React.FC<PricingCardProps> = ({ plan, currentPlan, isUpdating, onPlanChange }) => {
   const isCurrentPlan = plan.id === currentPlan;
   const isPopular = plan.popular;
-
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
@@ -501,7 +462,6 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, currentPlan, isUpdating
           </span>
         </div>
       )}
-
       {isCurrentPlan && (
         <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
           <span className="px-2 py-1 bg-blue-500 text-white text-xs font-bold rounded-full whitespace-nowrap">
@@ -509,7 +469,6 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, currentPlan, isUpdating
           </span>
         </div>
       )}
-
       <div className="text-center mb-4 sm:mb-6">
         <h3 className={`text-lg sm:text-xl lg:text-2xl font-bold mb-2 ${
           isPopular ? 'text-yellow-400' : 'text-white'
@@ -517,7 +476,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, currentPlan, isUpdating
           {plan.name}
         </h3>
         <p className="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4">{plan.description}</p>
-        
+       
         <div className="mb-3 sm:mb-4">
           <span className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${
             isPopular ? 'text-yellow-400' : 'text-white'
@@ -527,7 +486,6 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, currentPlan, isUpdating
           <span className="text-gray-400 text-sm sm:text-lg">/month</span>
         </div>
       </div>
-
       <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
         {plan.features.map((feature, index) => (
           <li key={index} className="flex items-start space-x-2">
@@ -540,7 +498,6 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, currentPlan, isUpdating
           </li>
         ))}
       </ul>
-
       <motion.button
         onClick={() => onPlanChange(plan.id)}
         disabled={isCurrentPlan || isUpdating}
@@ -568,5 +525,4 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, currentPlan, isUpdating
     </motion.div>
   );
 };
-
 export default Billing;

@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Shield, Brain, Zap, Rocket, TrendingUp, Clock, Target, CheckCircle2, AlertCircle, ChevronRight } from 'lucide-react';
 
 const FeaturesSection = () => {
-  const [activeTab, setActiveTab] = useState(0);
-  const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
+  const [, setHoveredFeature] = useState<number | null>(null);
 
   const features = [
     {
