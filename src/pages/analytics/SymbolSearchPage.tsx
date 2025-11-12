@@ -304,7 +304,7 @@ export const SymbolSearchPage: React.FC = () => {
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-semibold text-white mb-3">
-                    Add Symbols (Max 5)
+                    Add Symbols (Max 2 assets/4hrs)
                   </label>
                   
                   {/* Input Group */}

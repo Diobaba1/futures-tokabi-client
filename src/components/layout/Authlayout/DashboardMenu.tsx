@@ -57,7 +57,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
           description: 'Portfolio overview & analytics'
         },
         { 
-          name: 'Analyze Asset', 
+          name: 'Analyze Assets', 
           href: '/dashboard/symbol-analysis', 
           icon: TrendingUp,
           description: 'Analyze any Asset of Choice'
