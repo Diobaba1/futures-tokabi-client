@@ -4,7 +4,7 @@ import { useAuth } from '../../components/contexts/AuthContext';
 import { useAnalytics } from '../../components/contexts/AnalyticsContext';
 import { useNavigate } from 'react-router-dom';
 import PortfolioAnalyticsComponent from '../analytics/PortfolioAnalytics';
-import SystemAnalyticsComponent from '../analytics/SystemAnalytics';
+
 
 const Dashboard: React.FC = () => {
   const { user, isLoading: authLoading } = useAuth();

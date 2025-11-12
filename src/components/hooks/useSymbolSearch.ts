@@ -3,8 +3,6 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { 
   SymbolSearchState, 
   UserSymbolSearchRequest, 
-  SymbolAnalysisResult,
-  UserSymbolSearchDetail,
   SearchHistoryItem
 } from '../../types/userSymbolSearch.types';
 import { userSymbolSearchService } from '../../api/services/userSymbolSearchService';

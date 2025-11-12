@@ -163,9 +163,6 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
       : "text-gray-400";
   };
 
-  // Add Risk Assessment section if risk metrics are available
-  
-
   return (
     <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 mb-6 hover:bg-gray-800/70">
       {/* Header - Always Visible */}
@@ -365,8 +362,6 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
               </Section>
             </div>
 
-            
-
             {/* Price Levels */}
             {risk_metrics && (
               <Section
@@ -482,34 +477,6 @@ const Metric: React.FC<{
           {displayValue}
         </span>
       </div>
-    </div>
-  );
-};
-
-// New RiskCard component to replace the unused RiskMetric
-const RiskCard: React.FC<{
-  label: string;
-  value: string;
-  color: "blue" | "red" | "emerald" | "amber" | "purple" | "gray";
-  className?: string;
-}> = ({ label, value, color, className = "" }) => {
-  const colorClasses = {
-    blue: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-    red: "bg-red-500/20 text-red-300 border-red-500/30",
-    emerald: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-    amber: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-    purple: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-    gray: "bg-gray-700 text-gray-300 border-gray-600",
-  };
-
-  const displayValue = value === "N/A" ? "Not provided" : value;
-
-  return (
-    <div
-      className={`border rounded-lg p-3 text-center backdrop-blur-sm ${colorClasses[color]} ${className}`}
-    >
-      <div className="text-xs font-medium mb-1">{label}</div>
-      <div className="text-lg font-bold">{displayValue}</div>
     </div>
   );
 };

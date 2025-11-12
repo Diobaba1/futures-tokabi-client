@@ -463,21 +463,21 @@ interface APIKeyCardProps {
 }
 
 const APIKeyCard: React.FC<APIKeyCardProps> = ({ apiKey, onDelete, isDeleting }) => {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'valid': return 'text-green-400 bg-green-400/10 border-green-400/20';
-      case 'invalid': return 'text-red-400 bg-red-400/10 border-red-400/20';
-      default: return 'text-cyan-800 bg-cyan-800/10 border-cyan-800/20';
-    }
-  };
+  // const getStatusColor = (status: string) => {
+  //   switch (status) {
+  //     case 'valid': return 'text-green-400 bg-green-400/10 border-green-400/20';
+  //     case 'invalid': return 'text-red-400 bg-red-400/10 border-red-400/20';
+  //     default: return 'text-cyan-800 bg-cyan-800/10 border-cyan-800/20';
+  //   }
+  // };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'valid': return 'Valid';
-      case 'invalid': return 'Invalid';
-      default: return 'Pending Validation';
-    }
-  };
+  // const getStatusText = (status: string) => {
+  //   switch (status) {
+  //     case 'valid': return 'Valid';
+  //     case 'invalid': return 'Invalid';
+  //     default: return 'Pending Validation';
+  //   }
+  // };
 
   return (
     <motion.div

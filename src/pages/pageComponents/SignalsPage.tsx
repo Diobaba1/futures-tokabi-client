@@ -6,22 +6,16 @@ import {
 } from "../../types/signals.types";
 import { signalsService } from "../../api/services/signalsService";
 import {
-  TrendingUp,
-  TrendingDown,
-  Target,
-  BarChart3,
-  Shield,
   Zap,
-  Clock,
+
   AlertTriangle,
-  CheckCircle,
+ 
   X,
-  Search,
+ 
   Filter,
   ArrowUpRight,
   ArrowDownRight,
   Activity,
-  Cpu,
   Database
 } from 'lucide-react';
 
@@ -54,7 +48,7 @@ const ErrorMessage: React.FC<{ message: string; onRetry?: () => void }> = ({
     {onRetry && (
       <button
         onClick={onRetry}
-        className="px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg transition-all hover:bg-red-500/30 text-sm font-medium"
+        className="px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg transition-all hover:bg-red-500/30 text-sm "
       >
         Retry Connection
       </button>
@@ -117,14 +111,14 @@ const SignalDetailModal: React.FC<{
 
           <div className="flex items-center gap-3 mb-6">
             <span
-              className={`px-3 py-1.5 rounded-full text-sm font-medium ${getDecisionColor(
+              className={`px-3 py-1.5 rounded-full text-sm  ${getDecisionColor(
                 signal.final_decision
               )}`}
             >
               {signal.final_decision.toUpperCase()}
             </span>
             {signal.is_futures_ready && (
-              <span className="px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-xs font-medium border border-cyan-500/30">
+              <span className="px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-xs  border border-cyan-500/30">
                 <Zap className="w-3 h-3 inline mr-1" />
                 Futures Ready
               </span>
@@ -137,7 +131,7 @@ const SignalDetailModal: React.FC<{
               <div className="flex justify-between items-center mb-3">
                 <span className="text-gray-400 text-sm font-light">Signal Quality</span>
                 <span
-                  className={`px-2 py-1 rounded text-sm font-medium ${getSignalQualityColor(
+                  className={`px-2 py-1 rounded text-sm  ${getSignalQualityColor(
                     signal.signal_quality
                   )}`}
                 >
@@ -178,7 +172,7 @@ const SignalDetailModal: React.FC<{
               signal.risk_per_trade ||
               signal.max_position_size) && (
               <div>
-                <h4 className="font-medium text-white mb-4 text-lg border-b border-gray-700/30 pb-2">
+                <h4 className=" text-white mb-4 text-lg border-b border-gray-700/30 pb-2">
                   Risk Parameters
                 </h4>
                 <div className="space-y-3">
@@ -219,7 +213,7 @@ const SignalDetailModal: React.FC<{
               signal.take_profit_1 ||
               signal.stop_loss_price) && (
               <div>
-                <h4 className="font-medium text-white mb-4 text-lg border-b border-gray-700/30 pb-2">
+                <h4 className=" text-white mb-4 text-lg border-b border-gray-700/30 pb-2">
                   Price Levels
                 </h4>
                 <div className="space-y-3">
@@ -280,7 +274,7 @@ const SignalDetailModal: React.FC<{
               signal.estimated_sl_percent ||
               signal.risk_reward_ratio) && (
               <div>
-                <h4 className="font-medium text-white mb-4 text-lg border-b border-gray-700/30 pb-2">
+                <h4 className=" text-white mb-4 text-lg border-b border-gray-700/30 pb-2">
                   Performance Metrics
                 </h4>
                 <div className="space-y-3">
@@ -333,7 +327,7 @@ const SignalDetailModal: React.FC<{
           <div className="mt-8 pt-6 border-t border-gray-700/30">
             <button
               onClick={onClose}
-              className="w-full px-4 py-3 bg-gray-700/30 hover:bg-gray-700/50 text-white rounded-lg transition-all font-medium border border-gray-600/30"
+              className="w-full px-4 py-3 bg-gray-700/30 hover:bg-gray-700/50 text-white rounded-lg transition-all  border border-gray-600/30"
             >
               Close Analysis
             </button>
@@ -675,7 +669,7 @@ const SignalPage: React.FC = () => {
             <div className="bg-gray-800/20 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-400 mb-2 font-light">
+                  <h3 className="text-sm  text-gray-400 mb-2 font-light">
                     Active Signals
                   </h3>
                   <p className="text-2xl font-light text-cyan-400">
@@ -690,7 +684,7 @@ const SignalPage: React.FC = () => {
             </div>
 
             <div className="bg-gray-800/20 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30">
-              <h3 className="text-sm font-medium text-gray-400 mb-2 font-light">
+              <h3 className="text-sm  text-gray-400 mb-2 font-light">
                 Long Positions
               </h3>
               <p className="text-2xl font-light text-emerald-400">
@@ -710,7 +704,7 @@ const SignalPage: React.FC = () => {
             </div>
 
             <div className="bg-gray-800/20 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30">
-              <h3 className="text-sm font-medium text-gray-400 mb-2 font-light">
+              <h3 className="text-sm  text-gray-400 mb-2 font-light">
                 Short Positions
               </h3>
               <p className="text-2xl font-light text-red-400">
@@ -730,7 +724,7 @@ const SignalPage: React.FC = () => {
             </div>
 
             <div className="bg-gray-800/20 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30">
-              <h3 className="text-sm font-medium text-gray-400 mb-2 font-light">
+              <h3 className="text-sm  text-gray-400 mb-2 font-light">
                 Avg Consensus
               </h3>
               <p
@@ -744,7 +738,7 @@ const SignalPage: React.FC = () => {
             </div>
 
             <div className="bg-gray-800/20 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30">
-              <h3 className="text-sm font-medium text-gray-400 mb-2 font-light">
+              <h3 className="text-sm  text-gray-400 mb-2 font-light">
                 Avg Leverage
               </h3>
               <p
@@ -766,7 +760,7 @@ const SignalPage: React.FC = () => {
                   key={quality}
                   className="bg-gray-800/30 rounded-lg p-3 text-center border border-gray-700/30"
                 >
-                  <div className={`text-sm font-medium capitalize mb-1 ${getSignalQualityColor(quality)}`}>
+                  <div className={`text-sm  capitalize mb-1 ${getSignalQualityColor(quality)}`}>
                     {quality.replace('_', ' ')}
                   </div>
                   <div className="text-white text-lg font-light">{count}</div>
@@ -781,13 +775,13 @@ const SignalPage: React.FC = () => {
           {/* Filters */}
           <section className="bg-gray-800/20 backdrop-blur-sm rounded-xl border border-gray-700/30 mb-6">
             <div className="p-5">
-              <h2 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+              <h2 className="text-lg  text-white mb-4 flex items-center gap-2">
                 <Filter className="w-4 h-4 text-cyan-400" />
                 Filter Signals
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2 font-light">
+                  <label className="block text-sm  text-gray-300 mb-2 font-light">
                     Instrument
                   </label>
                   <select
@@ -809,7 +803,7 @@ const SignalPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2 font-light">
+                  <label className="block text-sm  text-gray-300 mb-2 font-light">
                     Position Type
                   </label>
                   <select
@@ -831,7 +825,7 @@ const SignalPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2 font-light">
+                  <label className="block text-sm  text-gray-300 mb-2 font-light">
                     Signal Quality
                   </label>
                   <select
@@ -862,7 +856,7 @@ const SignalPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2 font-light">
+                  <label className="block text-sm  text-gray-300 mb-2 font-light">
                     Results
                   </label>
                   <div className="bg-gray-700/20 rounded-lg px-3 py-2.5 text-sm text-gray-400 font-light border border-gray-600/30">
@@ -960,7 +954,7 @@ const SignalPage: React.FC = () => {
                           </div>
                           <div className="flex items-center gap-2 flex-wrap">
                             <span
-                              className={`px-3 py-1 rounded-full text-sm font-medium ${getDecisionColor(
+                              className={`px-3 py-1 rounded-full text-sm  ${getDecisionColor(
                                 signal.final_decision
                               )}`}
                             >
@@ -972,21 +966,21 @@ const SignalPage: React.FC = () => {
                               {signal.final_decision.toUpperCase()}
                             </span>
                             <span
-                              className={`px-2 py-1 rounded-full text-sm font-medium ${getSignalQualityColor(
+                              className={`px-2 py-1 rounded-full text-sm  ${getSignalQualityColor(
                                 signal.signal_quality
                               )}`}
                             >
                               {signal.signal_quality?.toUpperCase()}
                             </span>
                             <div
-                              className={`text-sm font-medium ${getConsensusStrengthColor(
+                              className={`text-sm  ${getConsensusStrengthColor(
                                 signal.consensus_strength
                               )}`}
                             >
                               {signal.consensus_strength}% Consensus
                             </div>
                             {signal.is_futures_ready && (
-                              <span className="px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-xs font-medium border border-cyan-500/30">
+                              <span className="px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-xs  border border-cyan-500/30">
                                 <Zap className="w-3 h-3 inline mr-1" />
                                 Futures Ready
                               </span>
@@ -1117,7 +1111,7 @@ const SignalPage: React.FC = () => {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 bg-gray-800/30 border border-gray-600/30 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/30 transition-all flex items-center text-sm font-medium"
+                  className="px-4 py-2 bg-gray-800/30 border border-gray-600/30 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/30 transition-all flex items-center text-sm "
                 >
                   <span>←</span>
                   <span className="ml-2">Previous</span>
@@ -1128,7 +1122,7 @@ const SignalPage: React.FC = () => {
                     <button
                       key={page}
                       onClick={() => handlePageChange(page)}
-                      className={`px-4 py-2 rounded-lg transition-all text-sm font-medium ${
+                      className={`px-4 py-2 rounded-lg transition-all text-sm  ${
                         currentPage === page
                           ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/25"
                           : "bg-gray-800/30 text-gray-300 hover:bg-gray-700/30 border border-gray-600/30"
@@ -1142,7 +1136,7 @@ const SignalPage: React.FC = () => {
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-gray-800/30 border border-gray-600/30 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/30 transition-all flex items-center text-sm font-medium"
+                  className="px-4 py-2 bg-gray-800/30 border border-gray-600/30 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/30 transition-all flex items-center text-sm "
                 >
                   <span className="mr-2">Next</span>
                   <span>→</span>
