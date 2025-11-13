@@ -34,6 +34,25 @@ export const API_ENDPOINTS = {
     RATE_LIMITS: "/search_symbol/rate-limit"
   },
 
+  REFERAL_SYSTEM: {
+    // User Endpoints
+    APPLY: "/affiliates/apply",
+    APPLICATION: "/affiliates/application",
+    PROFILE: "/affiliates/profile",
+    REFERRAL_URL: "/affiliates/referral-url",
+    STATS: "/affiliates/stats",
+    COMMISSIONS: "/affiliates/commissions",
+
+    // Admin Endpoints
+    ADMIN_APPLICATIONS: "/affiliates/admin/applications",
+    ADMIN_APPLICATION_REVIEW: (application_id: string) => `/affiliates/admin/applications/${application_id}/review`,
+    ADMIN_COMMISSION_APPROVE: (commission_id: string) => `/affiliates/admin/commissions/${commission_id}/approve`,
+    ADMIN_COMMISSION_PAY: (commission_id: string) => `/affiliates/admin/commissions/${commission_id}/pay`,
+
+    // Integration
+    WEBHOOK_PAYMENT_SUBSCRIPTION: "/webhooks/payment/subscription",
+  },
+
   // Trades
   TRADES: {
     LIST: "/trades/",

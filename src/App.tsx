@@ -23,6 +23,7 @@ import Billing from "./pages/Billing/Billing";
 import SignalsPage from "./pages/pageComponents/SignalsPage";
 import TgConfigPage from "./pages/config/tgConfigPage";
 import { SymbolSearchPage } from "./pages/analytics/SymbolSearchPage";
+import AffiliatePage from "./pages/Users/AffiliatePage";
 
 interface RouteConfig {
   path: string;
@@ -75,7 +76,8 @@ const dashboardRoutes: RouteConfig[] = [
   { path: "/dashboard/settings", element: <Profile />, layout: DashboardLayout, protected: true },
   { path: "/dashboard/signals", element: <SignalsPage />, layout: DashboardLayout, protected: true },
   { path: "/dashboard/symbol-analysis", element: <SymbolSearchPage />, layout: DashboardLayout, protected: true },
-  { path: "/dashboard/performance", element: <div>Performance Page</div>, layout: DashboardLayout, protected: true },
+  { path: "/dashboard/performance", element: <div>Performance Page</div>, layout: DashboardLayout, protected: true }, 
+  { path: "/dashboard/affiliate-dashboard", element: <AffiliatePage />, layout: DashboardLayout, protected: true }, 
 ];
 
 function renderRoute({ path, element, layout: Layout, protected: isProtected, requireAuth }: RouteConfig) {

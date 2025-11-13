@@ -46,3 +46,14 @@ export type {
   TelegramConfigResponse
 
 } from './telegram-config.types'
+
+
+export type {
+  AffiliateApplicationCreate,
+  AffiliateApplicationResponse,
+  AffiliateProfileResponse,
+  AffiliateStatsResponse,
+  ReferralUrlResponse,
+  AffiliateCommissionResponse,
+  AffiliateCommissionParams
+} from './userAffiliate.types'
