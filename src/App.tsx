@@ -24,6 +24,7 @@ import SignalsPage from "./pages/pageComponents/SignalsPage";
 import TgConfigPage from "./pages/config/tgConfigPage";
 import { SymbolSearchPage } from "./pages/analytics/SymbolSearchPage";
 import AffiliatePage from "./pages/Users/AffiliatePage";
+import Translator from "./components/Translator"; // Import the new Translator component
 
 interface RouteConfig {
   path: string;
@@ -106,28 +107,32 @@ function App() {
       <ToastProvider>
         <AnalyticsProvider>
           <Router>
-            <Routes>
-              {/* Public Routes */}
-              {publicRoutes.map(renderRoute)}
+            <div className="relative">
+              {/* Global Translator - Positioned as a floating button in top-right */}
+              <Translator />
+              <Routes>
+                {/* Public Routes */}
+                {publicRoutes.map(renderRoute)}
 
-              {/* Dashboard Routes */}
-              {dashboardRoutes.map(renderRoute)}
+                {/* Dashboard Routes */}
+                {dashboardRoutes.map(renderRoute)}
 
-              {/* 404 Page */}
-              <Route
-                path="*"
-                element={
-                  <PublicLayout>
-                    <div className="min-h-screen flex items-center justify-center">
-                      <div className="text-center">
-                        <h1 className="text-4xl font-bold text-white mb-4">404</h1>
-                        <p className="text-gray-400 text-lg">Page not found</p>
+                {/* 404 Page */}
+                <Route
+                  path="*"
+                  element={
+                    <PublicLayout>
+                      <div className="min-h-screen flex items-center justify-center">
+                        <div className="text-center">
+                          <h1 className="text-4xl font-bold text-white mb-4">404</h1>
+                          <p className="text-gray-400 text-lg">Page not found</p>
+                        </div>
                       </div>
-                    </div>
-                  </PublicLayout>
-                }
-              />
-            </Routes>
+                    </PublicLayout>
+                  }
+                />
+              </Routes>
+            </div>
           </Router>
         </AnalyticsProvider>
       </ToastProvider>

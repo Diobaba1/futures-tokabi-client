@@ -8,6 +8,7 @@ import { useToast } from '../../../components/ui/Toast';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState<LoginRequest>({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const { login, isLoading } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gray-950 relative overflow-hidden">
       {/* Background Video */}
       <div className="absolute inset-0 w-full h-full">
         <video
@@ -40,59 +41,66 @@ const Login: React.FC = () => {
           muted
           loop
           playsInline
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover opacity-30"
           poster="https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"
         >
           <source src="https://res.cloudinary.com/deioo5lrm/video/upload/v1761910590/86786-594417043_spgl4w.mp4" type="video/mp4" />
-          {/* Fallback image if video doesn't load */}
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-900/20 to-gray-900"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-cyan-950/30 to-gray-950"></div>
         </video>
-        {/* Video overlay for better readability */}
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px]"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-950/90 via-cyan-950/50 to-gray-950/90 backdrop-blur-sm"></div>
       </div>
 
-      {/* Animated Orbs - Reduced opacity to work with video */}
+      {/* Glowing Animated Orbs */}
       <motion.div 
         animate={{ 
-          scale: [1, 1.2, 1],
-          opacity: [0.05, 0.08, 0.05]
-        }}
-        transition={{ 
-          duration: 6,
-          repeat: Infinity,
-          repeatType: "reverse"
-        }}
-        className="absolute top-10 left-10 w-64 h-64 bg-yellow-600 rounded-full mix-blend-soft-light filter blur-xl"
-      />
-      <motion.div 
-        animate={{ 
-          scale: [1.2, 1, 1.2],
-          opacity: [0.08, 0.05, 0.08]
+          scale: [1, 1.3, 1],
+          x: [0, 30, 0],
+          y: [0, -20, 0],
+          opacity: [0.15, 0.25, 0.15]
         }}
         transition={{ 
           duration: 8,
           repeat: Infinity,
           repeatType: "reverse",
-          delay: 2
+          ease: "easeInOut"
         }}
-        className="absolute top-10 right-10 w-64 h-64 bg-green-600 rounded-full mix-blend-soft-light filter blur-xl"
+        className="absolute top-20 left-20 w-96 h-96 bg-cyan-700 rounded-full mix-blend-screen filter blur-3xl"
       />
       <motion.div 
         animate={{ 
-          scale: [1, 1.3, 1],
-          opacity: [0.05, 0.1, 0.05]
+          scale: [1.2, 1, 1.2],
+          x: [0, -40, 0],
+          y: [0, 30, 0],
+          opacity: [0.2, 0.3, 0.2]
         }}
         transition={{ 
           duration: 10,
           repeat: Infinity,
           repeatType: "reverse",
+          ease: "easeInOut",
+          delay: 2
+        }}
+        className="absolute top-40 right-20 w-[500px] h-[500px] bg-blue-500 rounded-full mix-blend-screen filter blur-3xl"
+      />
+      <motion.div 
+        animate={{ 
+          scale: [1, 1.4, 1],
+          x: [0, 20, 0],
+          y: [0, -30, 0],
+          opacity: [0.15, 0.28, 0.15]
+        }}
+        transition={{ 
+          duration: 12,
+          repeat: Infinity,
+          repeatType: "reverse",
+          ease: "easeInOut",
           delay: 4
         }}
-        className="absolute bottom-10 left-20 w-64 h-64 bg-blue-600 rounded-full mix-blend-soft-light filter blur-xl"
+        className="absolute bottom-20 left-1/3 w-[450px] h-[450px] bg-cyan-500 rounded-full mix-blend-screen filter blur-3xl"
       />
 
-      {/* Subtle Grid Pattern Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
+      {/* Animated Grid Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.05)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_50%,black,transparent)]"></div>
 
       <div className="max-w-md w-full space-y-8 relative z-10 px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -105,50 +113,52 @@ const Login: React.FC = () => {
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ duration: 0.8, type: "spring" }}
-            className="mx-auto w-16 h-16 bg-gradient-to-r  rounded-2xl flex items-center justify-center shadow-lg mb-6"
+            transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
+            className="mx-auto w-10 h-10 bg-gradient-to-br from-cyan-400 via-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-cyan-500/50 mb-6 backdrop-blur-xl border border-cyan-400/20 relative overflow-hidden"
           >
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+            <svg className="w-5 h-5 text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </motion.div>
-          <h2 className="text-4xl font-light tracking-tight text-white mb-3">
-            Welcome Back
-          </h2>
-          <p className="text-gray-300 text-base font-normal leading-relaxed">
-            Sign in to access your Tokabi dashboard and continue your journey
-          </p>
         </motion.div>
 
-        {/* Form Card */}
+        {/* Glassmorphic Form Card */}
         <motion.form 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="mt-8 space-y-6 bg-gray-800/60 backdrop-blur-lg border border-gray-700/30 rounded-2xl shadow-2xl p-8"
+          className="mt-8 space-y-6 bg-gray-900/40 backdrop-blur-2xl border border-cyan-500/20 rounded-3xl shadow-2xl shadow-cyan-500/10 p-8 relative overflow-hidden"
           onSubmit={handleSubmit}
         >
-          <div className="space-y-5">
+          {/* Glass reflection effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-blue-500/5 rounded-3xl"></div>
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent"></div>
+          
+          <div className="space-y-5 relative z-10">
             {/* Email Field */}
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative"
+              className="relative group"
             >
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
+              <label className="block text-sm font-medium text-cyan-300/90 mb-2 ml-1">Email Address</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-cyan-400/70 group-focus-within:text-cyan-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                  </svg>
+                </div>
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                  className="block w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-cyan-500/30 rounded-xl placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:border-cyan-400/60 transition-all duration-300 backdrop-blur-xl font-light tracking-wide hover:border-cyan-400/50 hover:bg-gray-800/70"
+                />
               </div>
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-                className="block w-full pl-10 pr-4 py-3.5 bg-gray-700/30 border border-gray-600/30 rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-transparent transition-all duration-200 backdrop-blur-sm font-light"
-              />
             </motion.div>
 
             {/* Password Field */}
@@ -156,21 +166,40 @@ const Login: React.FC = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="relative"
+              className="relative group"
             >
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
+              <label className="block text-sm font-medium text-cyan-300/90 mb-2 ml-1">Password</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-cyan-400/70 group-focus-within:text-cyan-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  required
+                  className="block w-full pl-12 pr-12 py-4 bg-gray-800/50 border border-cyan-500/30 rounded-xl placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:border-cyan-400/60 transition-all duration-300 backdrop-blur-xl font-light tracking-wide hover:border-cyan-400/50 hover:bg-gray-800/70"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-cyan-400/70 hover:text-cyan-300 transition-colors"
+                >
+                  {showPassword ? (
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                  ) : (
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
               </div>
-              <input
-                type="password"
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required
-                className="block w-full pl-10 pr-4 py-3.5 bg-gray-700/30 border border-gray-600/30 rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200 backdrop-blur-sm font-light"
-              />
             </motion.div>
           </div>
 
@@ -179,23 +208,23 @@ const Login: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex items-center justify-between"
+            className="flex items-center justify-between relative z-10"
           >
-            <div className="flex items-center">
+            <div className="flex items-center group">
               <input
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
-                className="h-4 w-4 text-yellow-900 focus:ring-cyan-900 border-gray-600 rounded bg-gray-700/50"
+                className="h-4 w-4 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-gray-900 border-cyan-500/30 rounded bg-gray-800/50 transition-all cursor-pointer"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300 font-light">
+              <label htmlFor="remember-me" className="ml-3 block text-sm text-cyan-200/80 font-light group-hover:text-cyan-100 transition-colors cursor-pointer">
                 Keep me signed in
               </label>
             </div>
 
             <div className="text-sm">
-              <a href="/forgot-password" className="text-cyan-800 hover:text-cyan-900 transition-colors duration-200 font-normal">
-                Forgot your password?
+              <a href="/forgot-password" className="text-cyan-400 hover:text-cyan-300 transition-all duration-200 font-normal hover:underline underline-offset-4">
+                Forgot password?
               </a>
             </div>
           </motion.div>
@@ -207,19 +236,25 @@ const Login: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.5 }}
             type="submit"
             disabled={isLoading}
-            className="group relative w-full py-4 px-4 border border-transparent text-base font-medium rounded-xl text-gray-900 bg-gradient-to-r from-cyan-800 to-cyan-900 hover:from-cyan-900 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-900 disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-cyan-900/25"
+            className="group relative w-full py-4 px-4 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-cyan-500 via-cyan-600 to-blue-600 hover:from-cyan-400 hover:via-cyan-500 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-cyan-500/50 active:scale-[0.98] shadow-lg shadow-cyan-500/30 backdrop-blur-xl overflow-hidden z-10"
           >
-            <span className="relative z-10 flex items-center justify-center">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
+            <span className="relative z-10 flex items-center justify-center tracking-wide">
               {isLoading ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   Signing in...
                 </>
               ) : (
-                'Access Dashboard'
+                <>
+                  Access Dashboard
+                  <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </>
               )}
             </span>
           </motion.button>
@@ -229,13 +264,13 @@ const Login: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="relative"
+            className="relative z-10"
           >
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-600/30"></div>
+              <div className="w-full border-t border-cyan-500/20"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-3 bg-gray-800/60 text-gray-400 font-light">New to our platform?</span>
+              <span className="px-4 bg-gray-900/40 text-cyan-300/70 font-light tracking-wide backdrop-blur-xl">New to our platform?</span>
             </div>
           </motion.div>
 
@@ -244,14 +279,14 @@ const Login: React.FC = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7 }}
-            className="text-center"
+            className="text-center relative z-10"
           >
             <Link 
               to="/register" 
-              className="inline-flex items-center px-6 py-3 border border-gray-600/50 text-base font-normal rounded-xl text-gray-300 bg-gray-700/30 hover:bg-gray-700/50 hover:text-white transition-all duration-200 hover:border-gray-500/50 backdrop-blur-sm"
+              className="inline-flex items-center px-6 py-3.5 border border-cyan-500/30 text-base font-normal rounded-xl text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 hover:text-cyan-200 hover:border-cyan-400/50 transition-all duration-300 backdrop-blur-xl tracking-wide group shadow-lg shadow-cyan-500/10 hover:shadow-cyan-500/20"
             >
               Create new account
-              <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </Link>
@@ -265,17 +300,17 @@ const Login: React.FC = () => {
           transition={{ duration: 0.6, delay: 0.8 }}
           className="text-center"
         >
-          <p className="text-gray-400 text-xs font-light flex items-center justify-center space-x-2">
-            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="inline-flex items-center space-x-2 px-5 py-3 bg-cyan-500/10 rounded-full border border-cyan-500/20 backdrop-blur-xl shadow-lg shadow-cyan-500/10">
+            <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
-            <span>Enterprise-grade security & encryption</span>
-          </p>
+            <span className="text-cyan-300/90 text-xs font-light tracking-wide">256-bit encryption & enterprise security</span>
+          </div>
         </motion.div>
       </div>
 
-      {/* Bottom Gradient */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-900 to-transparent"></div>
+      {/* Bottom Gradient Overlay */}
+      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-gray-950 via-gray-950/80 to-transparent pointer-events-none"></div>
     </div>
   );
 };

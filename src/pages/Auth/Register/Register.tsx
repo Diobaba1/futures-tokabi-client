@@ -1,16 +1,36 @@
 // src/pages/Register.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../components/contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { RegisterRequest } from '../../../types';
 import { motion } from 'framer-motion';
 import { useToast } from '../../../components/ui/Toast';
 
+interface RegisterFormData extends RegisterRequest {
+  referral_code?: string;
+}
+
 const Register: React.FC = () => {
-  const [formData, setFormData] = useState<RegisterRequest>({ email: '', full_name: '', password: '' });
+  const [searchParams] = useSearchParams();
+  const refParam = searchParams.get('ref');
+  
+  const [formData, setFormData] = useState<RegisterFormData>({ 
+    email: '', 
+    full_name: '', 
+    password: '',
+    referral_code: refParam || ''
+  });
+  
   const { register, isLoading } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+
+  // Show success message if referral code is detected
+  useEffect(() => {
+    if (refParam) {
+      showToast(`Referral code "${refParam}" applied!`, 'success', 3000);
+    }
+  }, [refParam, showToast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +52,7 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className=" py-8 min-h-screen flex items-center justify-center bg-gray-900 relative overflow-hidden">
+    <div className="py-8 min-h-screen flex items-center justify-center bg-gray-900 relative overflow-hidden">
       {/* Background Video */}
       <div className="absolute inset-0 w-full h-full">
         <video
@@ -44,55 +64,53 @@ const Register: React.FC = () => {
           poster="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"
         >
           <source src="https://res.cloudinary.com/deioo5lrm/video/upload/v1761910590/86786-594417043_spgl4w.mp4" type="video/mp4" />
-          {/* Fallback gradient */}
           <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-cyan-900/20 to-gray-900"></div>
         </video>
-        {/* Video overlay */}
         <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px]"></div>
       </div>
 
-      {/* Animated Orbs - Reduced opacity for video */}
+      {/* Animated Orbs */}
       <motion.div 
         animate={{ 
           scale: [1, 1.2, 1],
-          opacity: [0.05, 0.08, 0.05]
+          opacity: [0.06, 0.1, 0.06]
         }}
         transition={{ 
-          duration: 6,
+          duration: 7,
           repeat: Infinity,
           repeatType: "reverse"
         }}
-        className="absolute top-10 left-10 w-64 h-64 bg-yellow-600 rounded-full mix-blend-soft-light filter blur-xl"
+        className="absolute top-10 left-10 w-72 h-72 bg-cyan-500 rounded-full mix-blend-soft-light filter blur-3xl"
       />
       <motion.div 
         animate={{ 
           scale: [1.2, 1, 1.2],
-          opacity: [0.08, 0.05, 0.08]
+          opacity: [0.1, 0.06, 0.1]
         }}
         transition={{ 
-          duration: 8,
+          duration: 9,
           repeat: Infinity,
           repeatType: "reverse",
           delay: 2
         }}
-        className="absolute top-10 right-10 w-64 h-64 bg-green-600 rounded-full mix-blend-soft-light filter blur-xl"
+        className="absolute top-20 right-10 w-80 h-80 bg-blue-500 rounded-full mix-blend-soft-light filter blur-3xl"
       />
       <motion.div 
         animate={{ 
           scale: [1, 1.3, 1],
-          opacity: [0.05, 0.1, 0.05]
+          opacity: [0.05, 0.12, 0.05]
         }}
         transition={{ 
-          duration: 10,
+          duration: 11,
           repeat: Infinity,
           repeatType: "reverse",
           delay: 4
         }}
-        className="absolute bottom-10 left-20 w-64 h-64 bg-blue-600 rounded-full mix-blend-soft-light filter blur-xl"
+        className="absolute bottom-10 left-1/4 w-96 h-96 bg-cyan-400 rounded-full mix-blend-soft-light filter blur-3xl"
       />
 
-      {/* Subtle Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
+      {/* Grid Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.03)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
 
       <div className="max-w-md w-full space-y-8 relative z-10 px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -106,18 +124,30 @@ const Register: React.FC = () => {
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ duration: 0.8, type: "spring" }}
-            className="mx-auto w-16 h-16  rounded-2xl flex items-center justify-center shadow-lg mb-6 backdrop-blur-sm"
+            className="mx-auto w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-cyan-500/50 mb-6 backdrop-blur-sm"
           >
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
             </svg>
           </motion.div>
           <h2 className="text-4xl font-light tracking-tight text-white mb-3">
             Create Account
           </h2>
           <p className="text-gray-300 text-base font-normal leading-relaxed tracking-wide">
-            Join our institutional trading platform and begin your professional journey
+            Join our institutional trading platform
           </p>
+          {refParam && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mt-4 inline-flex items-center space-x-2 px-4 py-2 bg-cyan-500/20 border border-cyan-500/30 rounded-full"
+            >
+              <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+              </svg>
+              <span className="text-cyan-300 text-sm font-medium">Referred by a friend</span>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Form Card */}
@@ -125,7 +155,7 @@ const Register: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="mt-8 space-y-6 bg-gray-800/40 backdrop-blur-lg border border-gray-700/30 rounded-2xl shadow-2xl p-8"
+          className="mt-8 space-y-6 bg-gray-800/50 backdrop-blur-xl border border-cyan-500/20 rounded-2xl shadow-2xl shadow-cyan-500/10 p-8"
           onSubmit={handleSubmit}
         >
           <div className="space-y-5">
@@ -134,20 +164,20 @@ const Register: React.FC = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative"
+              className="relative group"
             >
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-cyan-400 group-focus-within:text-cyan-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
               <input
                 type="text"
-                placeholder="Enter your full name"
+                placeholder="Full Name"
                 value={formData.full_name}
                 onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                 required
-                className="block w-full pl-10 pr-4 py-3.5 bg-gray-700/30 border border-gray-600/30 rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-transparent transition-all duration-200 backdrop-blur-sm font-light tracking-wide"
+                className="block w-full pl-12 pr-4 py-3.5 bg-gray-700/40 border border-cyan-500/20 rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:border-cyan-400/60 transition-all duration-200 backdrop-blur-sm font-light tracking-wide hover:border-cyan-500/30"
               />
             </motion.div>
 
@@ -156,20 +186,20 @@ const Register: React.FC = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="relative"
+              className="relative group"
             >
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-cyan-400 group-focus-within:text-cyan-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
               <input
                 type="email"
-                placeholder="Enter your email address"
+                placeholder="Email Address"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
-                className="block w-full pl-10 pr-4 py-3.5 bg-gray-700/30 border border-gray-600/30 rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200 backdrop-blur-sm font-light tracking-wide"
+                className="block w-full pl-12 pr-4 py-3.5 bg-gray-700/40 border border-cyan-500/20 rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:border-cyan-400/60 transition-all duration-200 backdrop-blur-sm font-light tracking-wide hover:border-cyan-500/30"
               />
             </motion.div>
 
@@ -178,21 +208,53 @@ const Register: React.FC = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="relative"
+              className="relative group"
             >
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-cyan-400 group-focus-within:text-cyan-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
               <input
                 type="password"
-                placeholder="Create secure password"
+                placeholder="Password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
-                className="block w-full pl-10 pr-4 py-3.5 bg-gray-700/30 border border-gray-600/30 rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-transparent transition-all duration-200 backdrop-blur-sm font-light tracking-wide"
+                className="block w-full pl-12 pr-4 py-3.5 bg-gray-700/40 border border-cyan-500/20 rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:border-cyan-400/60 transition-all duration-200 backdrop-blur-sm font-light tracking-wide hover:border-cyan-500/30"
               />
+            </motion.div>
+
+            {/* Referral Code Field */}
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="relative group"
+            >
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-cyan-400 group-focus-within:text-cyan-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder="Referral Code (Optional)"
+                value={formData.referral_code}
+                onChange={(e) => setFormData({ ...formData, referral_code: e.target.value.toUpperCase() })}
+                className="block w-full pl-12 pr-4 py-3.5 bg-gray-700/40 border border-cyan-500/20 rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:border-cyan-400/60 transition-all duration-200 backdrop-blur-sm font-light tracking-wide hover:border-cyan-500/30 uppercase"
+              />
+              {formData.referral_code && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2"
+                >
+                  <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </motion.div>
+              )}
             </motion.div>
           </div>
 
@@ -200,23 +262,23 @@ const Register: React.FC = () => {
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex items-start space-x-3"
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="flex items-start space-x-3 bg-cyan-500/5 p-4 rounded-lg border border-cyan-500/10"
           >
             <input
               id="terms"
               name="terms"
               type="checkbox"
               required
-              className="mt-1 w-4 h-4 text-cyan-500 focus:ring-cyan-500 border-gray-600 rounded bg-gray-700/50"
+              className="mt-1 w-4 h-4 text-cyan-500 focus:ring-cyan-500 border-cyan-500/30 rounded bg-gray-700/50"
             />
             <label htmlFor="terms" className="text-sm text-gray-300 font-light tracking-wide leading-relaxed">
               I agree to the{' '}
-              <a href="/terms" className="text-cyan-400 hover:text-cyan-300 transition-colors duration-200 font-normal">
+              <a href="/terms" className="text-cyan-400 hover:text-cyan-300 transition-colors duration-200 font-normal underline underline-offset-2">
                 Terms of Service
               </a>{' '}
               and{' '}
-              <a href="/privacy" className="text-cyan-400 hover:text-cyan-300 transition-colors duration-200 font-normal">
+              <a href="/privacy" className="text-cyan-400 hover:text-cyan-300 transition-colors duration-200 font-normal underline underline-offset-2">
                 Privacy Policy
               </a>
             </label>
@@ -226,22 +288,28 @@ const Register: React.FC = () => {
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
             type="submit"
             disabled={isLoading}
-            className="group relative w-full py-4 px-4 border border-transparent text-base font-medium rounded-xl text-gray-900 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-cyan-500/25 backdrop-blur-sm"
+            className="group relative w-full py-4 px-4 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-cyan-500 via-cyan-600 to-blue-600 hover:from-cyan-400 hover:via-cyan-500 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-cyan-500/30 backdrop-blur-sm overflow-hidden"
           >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
             <span className="relative z-10 flex items-center justify-center tracking-wide">
               {isLoading ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   Creating Account...
                 </>
               ) : (
-                'Create Professional Account'
+                <>
+                  Create Account
+                  <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </>
               )}
             </span>
           </motion.button>
@@ -250,14 +318,14 @@ const Register: React.FC = () => {
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
             className="relative"
           >
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-600/30"></div>
+              <div className="w-full border-t border-cyan-500/20"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-3 bg-gray-800/40 text-gray-400 font-light tracking-wide">Already registered?</span>
+              <span className="px-4 bg-gray-800/50 text-gray-400 font-light tracking-wide">Already have an account?</span>
             </div>
           </motion.div>
 
@@ -265,15 +333,15 @@ const Register: React.FC = () => {
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
+            transition={{ duration: 0.6, delay: 0.9 }}
             className="text-center"
           >
             <Link 
               to="/login" 
-              className="inline-flex items-center px-6 py-3 border border-gray-600/50 text-base font-normal rounded-xl text-gray-300 bg-gray-700/30 hover:bg-gray-700/50 hover:text-white transition-all duration-200 hover:border-gray-500/50 backdrop-blur-sm tracking-wide"
+              className="inline-flex items-center px-6 py-3 border border-cyan-500/30 text-base font-normal rounded-xl text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 hover:text-cyan-200 transition-all duration-200 hover:border-cyan-400/50 backdrop-blur-sm tracking-wide group"
             >
-              Access existing account
-              <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              Sign In
+              <svg className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </Link>
@@ -284,20 +352,20 @@ const Register: React.FC = () => {
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.9 }}
+          transition={{ duration: 0.6, delay: 1 }}
           className="text-center"
         >
-          <p className="text-gray-400 text-xs font-light flex items-center justify-center space-x-2 tracking-wide">
-            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-cyan-500/10 rounded-full border border-cyan-500/20">
+            <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
-            <span>Bank-level encryption & enterprise security protocols</span>
-          </p>
+            <span className="text-cyan-300 text-xs font-light tracking-wide">Bank-level encryption & security</span>
+          </div>
         </motion.div>
       </div>
 
       {/* Bottom Gradient */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-900 to-transparent"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent pointer-events-none"></div>
     </div>
   );
 };
