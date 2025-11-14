@@ -21,16 +21,19 @@ const Register: React.FC = () => {
     referral_code: refParam || ''
   });
   
+  const [hasShownReferralToast, setHasShownReferralToast] = useState(false);
+  
   const { register, isLoading } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  // Show success message if referral code is detected
+  // Show success message if referral code is detected (only once)
   useEffect(() => {
-    if (refParam) {
+    if (refParam && !hasShownReferralToast) {
       showToast(`Referral code "${refParam}" applied!`, 'success', 3000);
+      setHasShownReferralToast(true);
     }
-  }, [refParam, showToast]);
+  }, [refParam, hasShownReferralToast, showToast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,8 +67,8 @@ const Register: React.FC = () => {
           poster="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"
         >
           <source src="https://res.cloudinary.com/deioo5lrm/video/upload/v1761910590/86786-594417043_spgl4w.mp4" type="video/mp4" />
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-cyan-900/20 to-gray-900"></div>
         </video>
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-cyan-900/20 to-gray-900"></div>
         <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px]"></div>
       </div>
 
