@@ -277,24 +277,6 @@ const CommunityPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 relative overflow-hidden">
-      {/* Background Video */}
-      <div className="absolute inset-0 w-full h-full">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover"
-          poster=""
-        >
-          <source src="" type="video/mp4" />
-          {/* Fallback gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-cyan-900/20 to-gray-900"></div>
-        </video>
-        {/* Video overlay */}
-        <div className="absolute inset-0 bg-black/70 backdrop-blur-[1px]"></div>
-      </div>
-
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>

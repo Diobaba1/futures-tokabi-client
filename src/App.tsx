@@ -15,7 +15,6 @@ import FeaturesSection from "./pages/pageComponents/FeaturesSection";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Trades from "./pages/pageComponents/Trades";
 import Profile from "./pages/Profile";
-
 import "./App.css";
 import CommunityPage from "./pages/pageComponents/Community";
 import APIKeyManager from "./pages/walletpages/APIKeyManager";
@@ -24,7 +23,6 @@ import SignalsPage from "./pages/pageComponents/SignalsPage";
 import TgConfigPage from "./pages/config/tgConfigPage";
 import { SymbolSearchPage } from "./pages/analytics/SymbolSearchPage";
 import AffiliatePage from "./pages/Users/AffiliatePage";
-import Translator from "./components/Translator"; // Import the new Translator component
 
 interface RouteConfig {
   path: string;
@@ -108,8 +106,8 @@ function App() {
         <AnalyticsProvider>
           <Router>
             <div className="relative">
-              {/* Global Translator - Positioned as a floating button in top-right */}
-              <Translator />
+             
+             
               <Routes>
                 {/* Public Routes */}
                 {publicRoutes.map(renderRoute)}

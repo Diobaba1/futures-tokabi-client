@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardMenu from './Authlayout/DashboardMenu';
 import { useAuth } from '../../components/contexts/AuthContext';
-import { RefreshCw, TrendingUp, Sparkles, Zap, Activity } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { RefreshCw, TrendingUp, Sparkles, Zap, Activity, Globe } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import GoogleTranslator from '../GoogleTranslator';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -14,6 +15,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isTranslatorOpen, setIsTranslatorOpen] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -70,6 +72,31 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           </motion.button>
           
           <div className="flex items-center space-x-3">
+            {/* Mobile Translator */}
+            <div className="relative">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsTranslatorOpen(!isTranslatorOpen)}
+                className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-400/20 text-cyan-400/80 hover:text-cyan-300 hover:bg-cyan-500/20 transition-all duration-300"
+              >
+                <Globe className="w-4 h-4" />
+              </motion.button>
+              
+              <AnimatePresence>
+                {isTranslatorOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute top-full right-0 mt-2 w-72 bg-gray-900/95 backdrop-blur-2xl border border-cyan-500/20 rounded-xl shadow-2xl shadow-cyan-500/20 p-4"
+                  >
+                    <GoogleTranslator />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             <div className="text-right">
               <div className="text-white text-sm font-light bg-gradient-to-r from-cyan-400 to-cyan-300 bg-clip-text text-transparent">
                 {user?.full_name}
@@ -126,6 +153,54 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           
           {/* Enhanced Quick Action Buttons */}
           <div className="flex items-center space-x-3">
+            {/* Desktop Translator */}
+            <div className="relative mr-2">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsTranslatorOpen(!isTranslatorOpen)}
+                className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-400/20 text-cyan-400/70 hover:text-cyan-300 hover:bg-cyan-500/20 transition-all duration-300 flex items-center space-x-2"
+                title="Translate content"
+              >
+                <Globe className="w-4 h-4" />
+                <span className="text-sm font-medium text-cyan-400/80">Translate</span>
+              </motion.button>
+              
+              <AnimatePresence>
+                {isTranslatorOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute top-full right-0 mt-2 w-80 bg-gray-900/95 backdrop-blur-2xl border border-cyan-500/20 rounded-xl shadow-2xl shadow-cyan-500/20 p-4"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-white text-sm font-semibold flex items-center gap-2">
+                        <Globe className="w-4 h-4 text-cyan-400" />
+                        Language Translator
+                      </h3>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setIsTranslatorOpen(false)}
+                        className="text-gray-400 hover:text-white transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </motion.button>
+                    </div>
+                    <GoogleTranslator />
+                    <div className="mt-3 pt-3 border-t border-cyan-500/20">
+                      <p className="text-cyan-400/60 text-xs">
+                        Translate dashboard content to your preferred language
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             <motion.button 
               whileHover={{ scale: 1.02, y: -1 }}
               whileTap={{ scale: 0.98 }}
@@ -189,6 +264,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               
               {/* Mobile Quick Actions */}
               <div className="flex space-x-3 mb-4">
+                {/* Mobile Translator Button */}
+                <motion.button 
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setIsTranslatorOpen(!isTranslatorOpen)}
+                  className="px-3 py-2 bg-gradient-to-r from-cyan-500/10 to-cyan-600/10 rounded-xl border border-cyan-400/20 text-cyan-400 text-sm font-medium flex items-center justify-center space-x-2"
+                >
+                  <Globe className="w-4 h-4" />
+                  <span>Translate</span>
+                </motion.button>
+                
                 <motion.button 
                   whileTap={{ scale: 0.95 }}
                   onClick={affiliate}
@@ -206,6 +291,22 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                   <span>Analyze</span>
                 </motion.button>
               </div>
+
+              {/* Mobile Translator Dropdown */}
+              <AnimatePresence>
+                {isTranslatorOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mb-4 overflow-hidden"
+                  >
+                    <div className="bg-gray-900/95 backdrop-blur-2xl border border-cyan-500/20 rounded-xl p-4">
+                      <GoogleTranslator />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
             
             {/* Enhanced Children Container */}
@@ -223,7 +324,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="mt-6 flex items-center justify-between text-xs font-light"
+              className="mt-6 flex flex-col sm:flex-row items-center justify-between text-xs font-light space-y-2 sm:space-y-0"
             >
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
@@ -240,13 +341,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                     {systemStatus.operational ? 'All Systems Operational' : 'System Degraded'}
                   </span>
                 </div>
-                <span className="text-cyan-400/30">•</span>
+                <span className="text-cyan-400/30 hidden sm:inline">•</span>
                 <span className="text-cyan-400/60">Last updated: {systemStatus.lastUpdated}</span>
               </div>
               
               <div className="flex items-center space-x-4">
                 <span className="text-cyan-400/60">API Latency: {systemStatus.latency}</span>
-                <span className="text-cyan-400/30">•</span>
+                <span className="text-cyan-400/30 hidden sm:inline">•</span>
                 <div className="flex items-center space-x-2">
                   <Sparkles className="w-3 h-3 text-cyan-400/60" />
                   <span className="text-cyan-400/60">Data Feed: {systemStatus.dataFeed}</span>

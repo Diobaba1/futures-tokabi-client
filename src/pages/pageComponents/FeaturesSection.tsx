@@ -120,24 +120,6 @@ const FeaturesSection = () => {
 
   return (
     <section id="features" className="py-24 px-4 sm:px-6 lg:px-8 bg-black relative overflow-hidden">
-      {/* Background Video */}
-      <div className="absolute inset-0 w-full h-full">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover"
-          poster="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"
-        >
-          <source src="https://assets.mixkit.co/videos/preview/mixkit-close-up-of-a-data-screen-while-numbers-float-43259-large.mp4" type="video/mp4" />
-          {/* Fallback gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900"></div>
-        </video>
-        {/* Video overlay */}
-        <div className="absolute inset-0 bg-black/70 backdrop-blur-[1px]"></div>
-      </div>
-
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-purple-950/30 to-black/90"></div>
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[120px] animate-pulse"></div>

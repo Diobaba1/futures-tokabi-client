@@ -1,49 +1,90 @@
 // src/components/Layout/Header.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Menu, 
   X,
   TrendingUp, 
-  Shield, 
   User, 
   LogOut, 
   Settings,
   Briefcase,
   BarChart3,
   ChevronDown,
-  Sparkles
+  Sparkles,
+  Shield,
+  Zap,
+  Globe
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserResponse } from '../../../types';
+import GoogleTranslator from '../../GoogleTranslator';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isHoveringUser, setIsHoveringUser] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, isLoading } = useAuth();
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
+  // Enhanced scroll handler with throttle
   useEffect(() => {
+    let ticking = false;
+    
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+          setIsScrolled(scrollY > 10);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Enhanced click outside handler
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest('[data-header-menu]')) {
+      
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(target)) {
+        setIsMobileMenuOpen(false);
+      }
+      
+      if (userMenuRef.current && !userMenuRef.current.contains(target)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
         setIsMobileMenuOpen(false);
         setIsUserMenuOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
   }, []);
 
   const handleLogout = async () => {
@@ -57,13 +98,30 @@ const Header: React.FC = () => {
   };
 
   const navigation = [
-    { name: 'Features', href: '/features', icon: BarChart3 },
-    { name: 'Community', href: '/community', icon: Briefcase },
+    { 
+      name: 'Features', 
+      href: '/features', 
+      icon: BarChart3,
+      description: 'Advanced trading tools'
+    },
+    { 
+      name: 'Community', 
+      href: '/community', 
+      icon: Briefcase,
+      description: 'Join our traders'
+    },
+    { 
+      name: 'Pricing', 
+      href: '/pricing', 
+      icon: Zap,
+      description: 'Choose your plan'
+    }
   ];
 
   const userMenuItems = [
-    { name: 'Portal', href: '/dashboard', icon: BarChart3 },
-    { name: 'Account Settings', href: '/dashboard/settings', icon: Settings },
+    { name: 'Trading Desk', href: '/dashboard', icon: BarChart3, description: 'Start trading' },
+    { name: 'Account Settings', href: '/dashboard/settings', icon: Settings, description: 'Manage account' },
+    { name: 'Security', href: '/dashboard/security', icon: Shield, description: 'Privacy & security' },
   ];
 
   const getDisplayName = (user: UserResponse | null): string => {
@@ -83,9 +141,16 @@ const Header: React.FC = () => {
 
   const getStatusColor = (user: UserResponse | null): string => {
     if (!user) return 'from-cyan-500 to-blue-500';
-    if (user.is_subscribed) return 'from-cyan-400 to-blue-500';
-    if (user.is_verified) return 'from-cyan-500 to-cyan-600';
-    return 'from-gray-500 to-gray-600';
+    if (user.is_subscribed) return 'from-purple-500 to-purple-600';
+    if (user.is_verified) return 'from-emerald-500 to-emerald-600';
+    return 'from-cyan-500 to-blue-500';
+  };
+
+  const getStatusIcon = (user: UserResponse | null) => {
+    if (!user) return Sparkles;
+    if (user.is_subscribed) return Zap;
+    if (user.is_verified) return Shield;
+    return Sparkles;
   };
 
   return (
@@ -94,32 +159,41 @@ const Header: React.FC = () => {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? 'bg-gray-950/80 backdrop-blur-2xl border-b border-cyan-500/20 shadow-2xl shadow-cyan-500/10'
-            : 'bg-gray-950/40 backdrop-blur-xl border-b border-cyan-500/10'
+            ? 'bg-gray-950/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-2xl shadow-cyan-500/10'
+            : 'bg-gray-950/60 backdrop-blur-xl border-b border-cyan-500/10'
         }`}
-        data-header-menu
       >
-        {/* Glassmorphic gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-blue-500/5 pointer-events-none" />
+        {/* Enhanced gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/5 to-blue-500/10 pointer-events-none" />
         
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="flex justify-between items-center h-16 lg:h-20">
-            {/* Logo */}
+            {/* Enhanced Logo */}
             <motion.div
               whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
               className="flex-shrink-0 flex items-center relative z-10"
             >
-              <Link to="/" className="flex items-center space-x-3 group">
+              <Link 
+                to="/" 
+                className="flex items-center space-x-3 group"
+                aria-label="TOKABI Home"
+              >
                 <div className="relative w-11 h-11 bg-gradient-to-br from-cyan-500 via-cyan-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/50 group-hover:shadow-cyan-500/70 transition-all duration-300 backdrop-blur-xl border border-cyan-400/30 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
                   <TrendingUp className="w-6 h-6 text-white relative z-10 drop-shadow-lg" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-1000" />
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent"
+                    initial={{ y: '-100%' }}
+                    whileHover={{ y: '100%' }}
+                    transition={{ duration: 0.6 }}
+                  />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-white font-semibold text-xl tracking-tight drop-shadow-lg bg-gradient-to-r from-white to-cyan-100 bg-clip-text">
+                  <span className="text-white font-bold text-xl tracking-tight bg-gradient-to-r from-white to-cyan-100 bg-clip-text">
                     TOKABI
                   </span>
                   <span className="text-cyan-400 text-xs font-medium tracking-wider flex items-center gap-1">
@@ -130,8 +204,8 @@ const Header: React.FC = () => {
               </Link>
             </motion.div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center space-x-2 relative z-10">
+            {/* Enhanced Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-1 relative z-10">
               {navigation.map((item) => {
                 const isActive = location.pathname === item.href;
                 const Icon = item.icon;
@@ -140,22 +214,30 @@ const Header: React.FC = () => {
                     key={item.name} 
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.98 }}
+                    className="relative"
                   >
                     <Link
                       to={item.href}
-                      className={`relative px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 flex items-center gap-2 backdrop-blur-xl group overflow-hidden ${
+                      className={`relative px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 flex items-center gap-2 backdrop-blur-xl group overflow-hidden ${
                         isActive
                           ? 'text-white bg-gradient-to-r from-cyan-500/20 via-cyan-600/20 to-blue-600/20 border border-cyan-400/40 shadow-lg shadow-cyan-500/20'
                           : 'text-gray-300 hover:text-white hover:bg-cyan-500/10 border border-transparent hover:border-cyan-500/20'
                       }`}
                     >
-                      <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 ${isActive ? 'opacity-100' : 'opacity-0'}`} />
-                      <Icon className={`w-4 h-4 relative z-10 ${isActive ? 'text-cyan-400' : ''}`} />
+                      <motion.div 
+                        className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent ${
+                          isActive ? 'opacity-100' : 'opacity-0'
+                        }`}
+                        whileHover={{ x: ['0%', '200%'] }}
+                        transition={{ duration: 0.8 }}
+                      />
+                      <Icon className={`w-4 h-4 relative z-10 ${isActive ? 'text-cyan-400' : 'text-gray-400'}`} />
                       <span className="relative z-10">{item.name}</span>
+                      
                       {isActive && (
                         <motion.div
                           layoutId="activeIndicator"
-                          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"
+                          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full"
                           transition={{ type: "spring", stiffness: 300, damping: 30 }}
                         />
                       )}
@@ -165,46 +247,64 @@ const Header: React.FC = () => {
               })}
             </div>
 
-            {/* Desktop CTA Buttons */}
+            {/* Enhanced Desktop CTA Buttons */}
             <div className="hidden lg:flex items-center space-x-3 relative z-10">
+              {/* Enhanced Google Translator */}
+              <div className="mr-2">
+                <GoogleTranslator />
+              </div>
+
               {isAuthenticated ? (
                 <>
-                  {/* User Menu */}
-                  <div className="relative" data-header-menu>
+                  {/* Enhanced User Menu */}
+                  <div 
+                    className="relative" 
+                    ref={userMenuRef}
+                    onMouseEnter={() => setIsHoveringUser(true)}
+                    onMouseLeave={() => setIsHoveringUser(false)}
+                  >
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                       className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-gray-800/50 border border-cyan-500/20 hover:border-cyan-400/40 transition-all duration-300 backdrop-blur-xl group shadow-lg shadow-cyan-500/10 hover:shadow-cyan-500/20"
+                      aria-expanded={isUserMenuOpen}
+                      aria-haspopup="true"
                     >
                       <div className={`w-9 h-9 bg-gradient-to-br ${getStatusColor(user)} rounded-lg flex items-center justify-center backdrop-blur-xl border border-white/20 shadow-lg relative overflow-hidden`}>
                         <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent" />
                         <User className="w-5 h-5 text-white relative z-10" />
                       </div>
                       <div className="flex flex-col items-start">
-                        <span className="text-white text-sm font-medium">
+                        <span className="text-white text-sm font-semibold">
                           {getDisplayName(user)}
                         </span>
                         <span className="text-cyan-400 text-xs font-light flex items-center gap-1">
                           {getUserStatus(user)}
-                          {user?.is_subscribed && <Sparkles className="w-3 h-3" />}
+                          {React.createElement(getStatusIcon(user), { className: "w-3 h-3" })}
                         </span>
                       </div>
-                      <ChevronDown className={`w-4 h-4 text-cyan-400 transition-transform duration-300 ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+                      <motion.div
+                        animate={{ rotate: isUserMenuOpen ? 180 : 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <ChevronDown className="w-4 h-4 text-cyan-400" />
+                      </motion.div>
                     </motion.button>
 
                     <AnimatePresence>
-                      {isUserMenuOpen && (
+                      {(isUserMenuOpen || isHoveringUser) && (
                         <motion.div
                           initial={{ opacity: 0, y: 10, scale: 0.95 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute right-0 top-full mt-3 w-72 bg-gray-900/95 backdrop-blur-2xl border border-cyan-500/20 rounded-2xl shadow-2xl shadow-cyan-500/20 py-2 overflow-hidden"
+                          className="absolute right-0 top-full mt-2 w-80 bg-gray-900/95 backdrop-blur-2xl border border-cyan-500/20 rounded-2xl shadow-2xl shadow-cyan-500/20 py-2 overflow-hidden"
                         >
-                          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-blue-500/5 pointer-events-none" />
+                          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-purple-500/5 to-blue-500/5 pointer-events-none" />
                           
-                          <div className="px-4 py-3 border-b border-cyan-500/20 relative">
+                          {/* User Info Section */}
+                          <div className="px-4 py-4 border-b border-cyan-500/20 relative">
                             <div className="flex items-center gap-3">
                               <div className={`w-12 h-12 bg-gradient-to-br ${getStatusColor(user)} rounded-xl flex items-center justify-center backdrop-blur-xl border border-white/20 shadow-lg relative overflow-hidden`}>
                                 <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent" />
@@ -216,65 +316,86 @@ const Header: React.FC = () => {
                                 </p>
                                 <p className="text-cyan-400 text-xs font-medium flex items-center gap-1">
                                   {getUserStatus(user)}
-                                  {user?.is_subscribed && <Sparkles className="w-3 h-3" />}
+                                  {React.createElement(getStatusIcon(user), { className: "w-3 h-3" })}
                                 </p>
                                 <p className="text-gray-400 text-xs truncate mt-0.5">
                                   {user?.email}
                                 </p>
                               </div>
                             </div>
-                            {user?.last_login && (
-                              <div className="mt-2 px-3 py-1.5 bg-cyan-500/10 rounded-lg border border-cyan-500/20">
-                                <p className="text-cyan-300 text-xs">
-                                  Last login: {new Date(user.last_login).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                </p>
-                              </div>
-                            )}
                           </div>
                           
+                          {/* Menu Items */}
                           <div className="py-2">
-                            {userMenuItems.map((item) => {
+                            {userMenuItems.map((item, index) => {
                               const Icon = item.icon;
                               return (
-                                <Link
+                                <motion.div
                                   key={item.name}
-                                  to={item.href}
-                                  onClick={() => setIsUserMenuOpen(false)}
-                                  className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-cyan-500/10 transition-all duration-200 backdrop-blur-xl group"
+                                  initial={{ opacity: 0, x: -20 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: index * 0.1 }}
                                 >
-                                  <div className="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center group-hover:bg-cyan-500/20 transition-all">
-                                    <Icon className="w-4 h-4 text-cyan-400" />
-                                  </div>
-                                  <span className="font-medium">{item.name}</span>
-                                </Link>
+                                  <Link
+                                    to={item.href}
+                                    onClick={() => setIsUserMenuOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-cyan-500/10 transition-all duration-200 group"
+                                  >
+                                    <div className="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center group-hover:bg-cyan-500/20 transition-all">
+                                      <Icon className="w-4 h-4 text-cyan-400" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                      <span className="font-medium text-sm">{item.name}</span>
+                                      <span className="text-gray-400 text-xs">{item.description}</span>
+                                    </div>
+                                  </Link>
+                                </motion.div>
                               );
                             })}
                           </div>
                           
+                          {/* Logout Section */}
                           <div className="border-t border-cyan-500/20 pt-2">
-                            <button
+                            <motion.button
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.3 }}
                               onClick={handleLogout}
                               disabled={isLoading}
-                              className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 backdrop-blur-xl disabled:opacity-50 group"
+                              className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 disabled:opacity-50 group"
                             >
                               <div className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center group-hover:bg-red-500/20 transition-all">
                                 <LogOut className="w-4 h-4" />
                               </div>
-                              <span className="font-medium">{isLoading ? 'Signing Out...' : 'Sign Out'}</span>
-                            </button>
+                              <div className="flex flex-col">
+                                <span className="font-medium text-sm text-left">
+                                  {isLoading ? 'Signing Out...' : 'Sign Out'}
+                                </span>
+                                <span className="text-red-400/70 text-xs">End your session</span>
+                              </div>
+                            </motion.button>
                           </div>
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
 
-                  {/* Quick Dashboard Button */}
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  {/* Enhanced Quick Dashboard Button */}
+                  <motion.div 
+                    whileHover={{ scale: 1.02 }} 
+                    whileTap={{ scale: 0.98 }}
+                    className="relative"
+                  >
                     <Link
                       to="/dashboard"
                       className="px-6 py-2.5 bg-gradient-to-r from-cyan-500 via-cyan-600 to-blue-600 text-white font-medium text-sm rounded-xl hover:from-cyan-400 hover:via-cyan-500 hover:to-blue-500 transition-all duration-300 shadow-lg shadow-cyan-500/40 hover:shadow-cyan-500/60 backdrop-blur-xl border border-cyan-400/30 flex items-center gap-2 relative overflow-hidden group"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        initial={{ x: '-100%' }}
+                        whileHover={{ x: '100%' }}
+                        transition={{ duration: 0.6 }}
+                      />
                       <BarChart3 className="w-4 h-4 relative z-10" />
                       <span className="relative z-10">Trading Desk</span>
                     </Link>
@@ -283,164 +404,221 @@ const Header: React.FC = () => {
               ) : (
                 <>
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    
                     <Link
                       to="/login"
                       className="px-6 py-2.5 text-gray-300 hover:text-white font-medium text-sm transition-all duration-300 hover:bg-cyan-500/10 rounded-xl border border-transparent hover:border-cyan-500/20 backdrop-blur-xl"
                     >
-                      Login
+                      Sign In
                     </Link>
                   </motion.div>
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <motion.div 
+                    whileHover={{ scale: 1.02 }} 
+                    whileTap={{ scale: 0.98 }}
+                    className="relative"
+                  >
                     <Link
                       to="/register"
                       className="px-6 py-2.5 bg-gradient-to-r from-cyan-500 via-cyan-600 to-blue-600 text-white font-medium text-sm rounded-xl hover:from-cyan-400 hover:via-cyan-500 hover:to-blue-500 transition-all duration-300 shadow-lg shadow-cyan-500/40 hover:shadow-cyan-500/60 backdrop-blur-xl border border-cyan-400/30 flex items-center gap-2 relative overflow-hidden group"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        initial={{ x: '-100%' }}
+                        whileHover={{ x: '100%' }}
+                        transition={{ duration: 0.6 }}
+                      />
                       <User className="w-4 h-4 relative z-10" />
-                      <span className="relative z-10">Register</span>
+                      <span className="relative z-10">Get Started</span>
                     </Link>
                   </motion.div>
                 </>
               )}
             </div>
 
-            {/* Mobile menu button */}
-            <div className="lg:hidden relative z-10" data-header-menu>
+            {/* Enhanced Mobile menu button */}
+            <div className="lg:hidden flex items-center gap-3 relative z-10" ref={mobileMenuRef}>
+              {/* Mobile Translator */}
+              <div className="scale-90">
+                <GoogleTranslator />
+              </div>
+              
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="p-2.5 rounded-xl bg-gray-800/50 border border-cyan-500/20 text-gray-300 hover:text-white hover:border-cyan-400/40 transition-all duration-300 backdrop-blur-xl shadow-lg shadow-cyan-500/10"
+                aria-expanded={isMobileMenuOpen}
+                aria-label="Toggle menu"
               >
-                {isMobileMenuOpen ? (
-                  <X className="w-5 h-5" />
-                ) : (
-                  <Menu className="w-5 h-5" />
-                )}
+                <motion.div
+                  animate={{ rotate: isMobileMenuOpen ? 90 : 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {isMobileMenuOpen ? (
+                    <X className="w-5 h-5" />
+                  ) : (
+                    <Menu className="w-5 h-5" />
+                  )}
+                </motion.div>
               </motion.button>
+
+              {/* Enhanced Mobile Dropdown Menu */}
+              <AnimatePresence>
+                {isMobileMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute top-full right-0 mt-2 w-80 bg-gray-900/95 backdrop-blur-2xl border border-cyan-500/20 rounded-2xl shadow-2xl shadow-cyan-500/20 overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-purple-500/5 to-blue-500/5 pointer-events-none" />
+                    
+                    {/* Navigation Items */}
+                    <div className="py-3">
+                      {navigation.map((item, index) => {
+                        const Icon = item.icon;
+                        const isActive = location.pathname === item.href;
+                        return (
+                          <motion.div
+                            key={item.name}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                          >
+                            <Link
+                              to={item.href}
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className={`flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-cyan-500/10 transition-all duration-200 group ${
+                                isActive ? 'bg-cyan-500/10 text-white' : ''
+                              }`}
+                            >
+                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                                isActive 
+                                  ? 'bg-cyan-500/20 text-cyan-400' 
+                                  : 'bg-cyan-500/10 group-hover:bg-cyan-500/20 text-cyan-400/70'
+                              }`}>
+                                <Icon className="w-4 h-4" />
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="font-medium text-sm">{item.name}</span>
+                                <span className="text-gray-400 text-xs">{item.description}</span>
+                              </div>
+                            </Link>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Auth Section */}
+                    <div className="border-t border-cyan-500/20 pt-2">
+                      {isAuthenticated ? (
+                        <>
+                          {/* User Info */}
+                          <div className="px-4 py-3 border-b border-cyan-500/20">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-10 h-10 bg-gradient-to-br ${getStatusColor(user)} rounded-xl flex items-center justify-center backdrop-blur-xl border border-white/20 shadow-lg`}>
+                                <User className="w-5 h-5 text-white" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-white text-sm font-semibold truncate">
+                                  {getDisplayName(user)}
+                                </p>
+                                <p className="text-cyan-400 text-xs flex items-center gap-1">
+                                  {getUserStatus(user)}
+                                  {React.createElement(getStatusIcon(user), { className: "w-3 h-3" })}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                          >
+                            <Link
+                              to="/dashboard"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-cyan-500/10 transition-all duration-200 group"
+                            >
+                              <div className="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center group-hover:bg-cyan-500/20 transition-all">
+                                <BarChart3 className="w-4 h-4 text-cyan-400" />
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="font-medium text-sm">Trading Desk</span>
+                                <span className="text-gray-400 text-xs">Start trading</span>
+                              </div>
+                            </Link>
+                          </motion.div>
+
+                          <motion.button
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.4 }}
+                            onClick={handleLogout}
+                            disabled={isLoading}
+                            className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 disabled:opacity-50 group"
+                          >
+                            <div className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center group-hover:bg-red-500/20 transition-all">
+                              <LogOut className="w-4 h-4" />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-medium text-sm text-left">
+                                {isLoading ? 'Signing Out...' : 'Sign Out'}
+                              </span>
+                              <span className="text-red-400/70 text-xs">End your session</span>
+                            </div>
+                          </motion.button>
+                        </>
+                      ) : (
+                        <>
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                          >
+                            <Link
+                              to="/login"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-cyan-500/10 transition-all duration-200 group"
+                            >
+                              <div className="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center group-hover:bg-cyan-500/20 transition-all">
+                                <User className="w-4 h-4 text-cyan-400" />
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="font-medium text-sm">Sign In</span>
+                                <span className="text-gray-400 text-xs">Access your account</span>
+                              </div>
+                            </Link>
+                          </motion.div>
+
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.4 }}
+                          >
+                            <Link
+                              to="/register"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="flex items-center gap-3 px-4 py-3 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-all duration-200 group"
+                            >
+                              <div className="w-8 h-8 bg-cyan-500/20 rounded-lg flex items-center justify-center group-hover:bg-cyan-500/30 transition-all">
+                                <Sparkles className="w-4 h-4" />
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="font-medium text-sm">Get Started</span>
+                                <span className="text-cyan-400/70 text-xs">Create your account</span>
+                              </div>
+                            </Link>
+                          </motion.div>
+                        </>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </nav>
-
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="lg:hidden bg-gray-900/95 backdrop-blur-2xl border-t border-cyan-500/20 relative overflow-hidden"
-              data-header-menu
-            >
-              <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent pointer-events-none" />
-              
-              <div className="px-4 py-6 space-y-3 relative">
-                {navigation.map((item) => {
-                  const isActive = location.pathname === item.href;
-                  const Icon = item.icon;
-                  return (
-                    <motion.div
-                      key={item.name}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <Link
-                        to={item.href}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className={`flex items-center gap-3 w-full text-left px-4 py-3.5 rounded-xl font-medium text-base transition-all duration-300 backdrop-blur-xl ${
-                          isActive
-                            ? 'text-white bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/40 shadow-lg shadow-cyan-500/20'
-                            : 'text-gray-300 hover:text-white hover:bg-cyan-500/10 border border-transparent hover:border-cyan-500/20'
-                        }`}
-                      >
-                        <div className={`w-9 h-9 ${isActive ? 'bg-cyan-500/20' : 'bg-gray-800/50'} rounded-lg flex items-center justify-center`}>
-                          <Icon className={`w-5 h-5 ${isActive ? 'text-cyan-400' : 'text-gray-400'}`} />
-                        </div>
-                        {item.name}
-                      </Link>
-                    </motion.div>
-                  );
-                })}
-                
-                <div className="pt-4 border-t border-cyan-500/20 space-y-3">
-                  {isAuthenticated ? (
-                    <>
-                      <div className="px-4 py-4 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-xl border border-cyan-500/20 backdrop-blur-xl">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-12 h-12 bg-gradient-to-br ${getStatusColor(user)} rounded-xl flex items-center justify-center backdrop-blur-xl border border-white/20 shadow-lg relative overflow-hidden`}>
-                            <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent" />
-                            <User className="w-6 h-6 text-white relative z-10" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-white text-sm font-semibold">
-                              {getDisplayName(user)}
-                            </p>
-                            <p className="text-cyan-400 text-xs font-medium flex items-center gap-1">
-                              {getUserStatus(user)}
-                              {user?.is_subscribed && <Sparkles className="w-3 h-3" />}
-                            </p>
-                            <p className="text-gray-400 text-xs truncate mt-0.5">
-                              {user?.email}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {userMenuItems.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                          <Link
-                            key={item.name}
-                            to={item.href}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex items-center gap-3 w-full px-4 py-3.5 text-gray-300 hover:text-white font-medium text-base transition-all duration-300 backdrop-blur-xl hover:bg-cyan-500/10 rounded-xl border border-transparent hover:border-cyan-500/20"
-                          >
-                            <div className="w-9 h-9 bg-cyan-500/10 rounded-lg flex items-center justify-center">
-                              <Icon className="w-5 h-5 text-cyan-400" />
-                            </div>
-                            {item.name}
-                          </Link>
-                        );
-                      })}
-                      
-                      <button
-                        onClick={handleLogout}
-                        disabled={isLoading}
-                        className="flex items-center gap-3 w-full px-4 py-3.5 text-red-400 hover:text-red-300 font-medium text-base transition-all duration-300 backdrop-blur-xl hover:bg-red-500/10 rounded-xl disabled:opacity-50 border border-transparent hover:border-red-500/20"
-                      >
-                        <div className="w-9 h-9 bg-red-500/10 rounded-lg flex items-center justify-center">
-                          <LogOut className="w-5 h-5" />
-                        </div>
-                        {isLoading ? 'Signing Out...' : 'Sign Out'}
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <Link
-                        to="/login"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="block w-full text-center px-4 py-3.5 text-gray-300 hover:text-white font-medium text-base transition-all duration-300 backdrop-blur-xl hover:bg-cyan-500/10 rounded-xl border border-cyan-500/20 hover:border-cyan-400/40"
-                      >
-                        Login
-                      </Link>
-                      <motion.div whileTap={{ scale: 0.98 }}>
-                        <Link
-                          to="/register"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="w-full text-center px-4 py-3.5 bg-gradient-to-r from-cyan-500 via-cyan-600 to-blue-600 text-white font-medium text-base rounded-xl hover:from-cyan-400 hover:via-cyan-500 hover:to-blue-500 transition-all duration-300 shadow-lg shadow-cyan-500/40 backdrop-blur-xl border border-cyan-400/30 flex items-center justify-center gap-2 relative overflow-hidden group"
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-active:translate-x-[200%] transition-transform duration-1000" />
-                          <Shield className="w-5 h-5 relative z-10" />
-                          <span className="relative z-10">Request Demo</span>
-                        </Link>
-                      </motion.div>
-                    </>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.header>
 
       {/* Header Spacer */}

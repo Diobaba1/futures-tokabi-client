@@ -1036,7 +1036,7 @@ const SignalPage: React.FC = () => {
                             </div>
                           </div>
                         )}
-                        {signal.risk_reward_ratio && (
+                        {/* {signal.risk_reward_ratio && (
                           <div>
                             <span className="text-gray-400 text-sm font-light">
                               Risk/Reward
@@ -1049,7 +1049,7 @@ const SignalPage: React.FC = () => {
                               {signal.risk_reward_ratio.toFixed(2)}:1
                             </div>
                           </div>
-                        )}
+                        )} */}
                         {signal.suggested_leverage && (
                           <div>
                             <span className="text-gray-400 text-sm font-light">

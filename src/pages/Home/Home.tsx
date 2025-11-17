@@ -12,9 +12,12 @@ const HomePage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
       <HeroSection />
       <FeaturesSection />
+      <div className="#pricing">
+      <PricingSection />
+      </div>
       <HowItWorks />
       <SecuritySection />
-      <PricingSection />
+      
       <CTASection />
     </div>
   );

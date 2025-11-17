@@ -1,5 +1,5 @@
 // src/components/home/HomeItems/SecuritySection.tsx
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   Shield, 
@@ -15,16 +15,6 @@ import {
 } from 'lucide-react';
 
 const SecuritySection: React.FC = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoLoaded, setVideoLoaded] = useState(false);
-
-  const handleVideoLoad = () => {
-    setVideoLoaded(true);
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 0.8;
-    }
-  };
-
   const securityFeatures = [
     {
       title: 'AES-256 Encryption',
@@ -115,28 +105,6 @@ const SecuritySection: React.FC = () => {
 
   return (
     <section id="security" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-950 relative overflow-hidden">
-      {/* Background Video */}
-      <div className="absolute inset-0">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          onLoadedData={handleVideoLoad}
-          className="w-full h-full object-cover opacity-15"
-        >
-          <source src="" type="video/mp4" />
-          <source src="/videos/security-background.mp4" type="video/mp4" />
-          <source src="/videos/security-background.webm" type="video/webm" />
-        </video>
-        
-        {/* Video Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950/95 via-blue-950/20 to-gray-950/95"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-transparent to-gray-950/80"></div>
-      </div>
-
       {/* Subtle Background Elements */}
       <motion.div 
         animate={{ 
@@ -320,21 +288,6 @@ const SecuritySection: React.FC = () => {
           </p>
         </motion.div>
       </div>
-
-      {/* Video Loading State */}
-      {!videoLoaded && (
-        <motion.div
-          initial={{ opacity: 1 }}
-          animate={{ opacity: videoLoaded ? 0 : 1 }}
-          className="absolute inset-0 bg-gray-950 flex items-center justify-center"
-        >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full"
-          />
-        </motion.div>
-      )}
     </section>
   );
 };
