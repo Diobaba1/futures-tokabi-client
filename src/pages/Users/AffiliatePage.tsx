@@ -1,3 +1,7 @@
+// ============================================================================
+// FILE: src/pages/AffiliatePage.tsx (UPDATED)
+// ============================================================================
+
 import React, { useState, useEffect } from 'react';
 import { 
   Users, 
@@ -32,6 +36,7 @@ const AffiliatePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   // State for different data
   const [stats, setStats] = useState<AffiliateStatsResponse | null>(null);
@@ -47,31 +52,42 @@ const AffiliatePage: React.FC = () => {
 
   const loadInitialData = async () => {
     setLoading(true);
+    setError(null);
+    
     try {
+      // Always load stats and referral URL (these work for all users)
       const [statsData, refUrlData] = await Promise.all([
-        UserAffiliateService.getStats().catch(() => null),
-        UserAffiliateService.getReferralUrl().catch(() => null)
+        UserAffiliateService.getStats(),
+        UserAffiliateService.getReferralUrl()
       ]);
       
       setStats(statsData);
       setReferralUrl(refUrlData);
 
-      // Try to load application and profile
+      // Try to load application (may not exist)
       try {
         const appData = await UserAffiliateService.getApplication();
         setApplication(appData);
-      } catch (error) {
-        // No application yet
+      } catch (err: any) {
+        // 404 is expected if no application exists
+        if (err.response?.status !== 404) {
+          console.error('Error loading application:', err);
+        }
       }
 
+      // Try to load profile (only exists for approved affiliates)
       try {
         const profileData = await UserAffiliateService.getProfile();
         setProfile(profileData);
-      } catch (error) {
-        // No profile yet
+      } catch (err: any) {
+        // 404 is expected if not an affiliate
+        if (err.response?.status !== 404) {
+          console.error('Error loading profile:', err);
+        }
       }
-    } catch (error) {
-      console.error('Error loading data:', error);
+    } catch (err: any) {
+      console.error('Error loading initial data:', err);
+      setError(err.response?.data?.detail || 'Failed to load affiliate data');
     } finally {
       setLoading(false);
     }
@@ -81,8 +97,11 @@ const AffiliatePage: React.FC = () => {
     try {
       const data = await UserAffiliateService.getCommissions({ limit: 50 });
       setCommissions(data);
-    } catch (error) {
-      console.error('Error loading commissions:', error);
+    } catch (error: any) {
+      // Empty array is fine if user has no commissions
+      if (error.response?.status !== 404) {
+        console.error('Error loading commissions:', error);
+      }
     }
   };
 
@@ -112,6 +131,8 @@ const AffiliatePage: React.FC = () => {
       case 'rejected':
       case 'cancelled':
         return 'text-red-400';
+      case 'suspended':
+        return 'text-orange-400';
       default:
         return 'text-gray-400';
     }
@@ -126,6 +147,7 @@ const AffiliatePage: React.FC = () => {
         return <Clock className="w-4 h-4" />;
       case 'rejected':
       case 'cancelled':
+      case 'suspended':
         return <XCircle className="w-4 h-4" />;
       default:
         return null;
@@ -135,7 +157,28 @@ const AffiliatePage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 text-cyan-400 animate-spin mx-auto mb-4" />
+          <p className="text-gray-400">Loading affiliate data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-white mb-2">Failed to Load</h2>
+          <p className="text-gray-400 mb-4">{error}</p>
+          <button
+            onClick={loadInitialData}
+            className="px-6 py-3 bg-cyan-500 hover:bg-cyan-600 rounded-lg font-medium transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }
@@ -149,7 +192,12 @@ const AffiliatePage: React.FC = () => {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
               Affiliate Program
             </h1>
-            <p className="text-gray-400 mt-1">Earn rewards by referring new users</p>
+            <p className="text-gray-400 mt-1">
+              {stats?.is_affiliate 
+                ? `Earn ${stats.initial_commission_rate}% on new signups + ${stats.renewal_commission_rate}% on renewals`
+                : 'Earn 10% commission by referring new users'
+              }
+            </p>
           </div>
           {!application && (
             <button
@@ -157,7 +205,7 @@ const AffiliatePage: React.FC = () => {
               className="flex items-center gap-2 px-6 py-3 bg-cyan-500 hover:bg-cyan-600 rounded-lg font-medium transition-colors"
             >
               <Plus className="w-5 h-5" />
-              Apply as Affiliate
+              {stats?.is_affiliate ? 'Already an Affiliate' : 'Become an Affiliate'}
             </button>
           )}
         </div>
@@ -175,18 +223,21 @@ const AffiliatePage: React.FC = () => {
               icon={<TrendingUp className="w-6 h-6" />}
               title="Active Referrals"
               value={stats.active_referrals}
+              subtitle={`${stats.conversion_rate.toFixed(1)}% conversion`}
               color="emerald"
             />
             <StatCard
               icon={<DollarSign className="w-6 h-6" />}
               title="Total Earnings"
               value={formatCurrency(stats.total_earnings)}
+              subtitle={`${formatCurrency(stats.pending_earnings)} pending`}
               color="blue"
             />
             <StatCard
               icon={<Award className="w-6 h-6" />}
-              title="Conversion Rate"
-              value={`${stats.conversion_rate}%`}
+              title="Commission Rate"
+              value={`${stats.initial_commission_rate}%`}
+              subtitle={stats.is_affiliate ? 'Approved Affiliate' : 'Standard User'}
               color="purple"
             />
           </div>
@@ -203,12 +254,6 @@ const AffiliatePage: React.FC = () => {
                 label="Overview"
               />
               <Tab
-                active={activeTab === 'application'}
-                onClick={() => setActiveTab('application')}
-                icon={<FileText className="w-4 h-4" />}
-                label="Application"
-              />
-              <Tab
                 active={activeTab === 'referral'}
                 onClick={() => setActiveTab('referral')}
                 icon={<Share2 className="w-4 h-4" />}
@@ -220,12 +265,22 @@ const AffiliatePage: React.FC = () => {
                 icon={<DollarSign className="w-4 h-4" />}
                 label="Commissions"
               />
-              <Tab
-                active={activeTab === 'profile'}
-                onClick={() => setActiveTab('profile')}
-                icon={<Award className="w-4 h-4" />}
-                label="Profile"
-              />
+              {(application || stats?.is_affiliate) && (
+                <Tab
+                  active={activeTab === 'application'}
+                  onClick={() => setActiveTab('application')}
+                  icon={<FileText className="w-4 h-4" />}
+                  label="Application"
+                />
+              )}
+              {profile && (
+                <Tab
+                  active={activeTab === 'profile'}
+                  onClick={() => setActiveTab('profile')}
+                  icon={<Award className="w-4 h-4" />}
+                  label="Profile"
+                />
+              )}
             </div>
           </div>
 
@@ -271,27 +326,29 @@ const AffiliatePage: React.FC = () => {
   );
 };
 
-// Components
+// StatCard component with optional subtitle
 const StatCard: React.FC<{
   icon: React.ReactNode;
   title: string;
   value: string | number;
+  subtitle?: string;
   color: 'cyan' | 'emerald' | 'blue' | 'purple';
-}> = ({ icon, title, value, color }) => {
+}> = ({ icon, title, value, subtitle, color }) => {
   const colorClasses = {
-    cyan: 'from-cyan-500/20 to-cyan-500/5 border-cyan-500/30',
-    emerald: 'from-emerald-500/20 to-emerald-500/5 border-emerald-500/30',
-    blue: 'from-blue-500/20 to-blue-500/5 border-blue-500/30',
-    purple: 'from-purple-500/20 to-purple-500/5 border-purple-500/30'
+    cyan: 'from-cyan-500/20 to-cyan-500/5 border-cyan-500/30 text-cyan-400',
+    emerald: 'from-emerald-500/20 to-emerald-500/5 border-emerald-500/30 text-emerald-400',
+    blue: 'from-blue-500/20 to-blue-500/5 border-blue-500/30 text-blue-400',
+    purple: 'from-purple-500/20 to-purple-500/5 border-purple-500/30 text-purple-400'
   };
 
   return (
     <div className={`bg-gradient-to-br ${colorClasses[color]} border rounded-xl p-6`}>
       <div className="flex items-center gap-3 mb-2">
-        <div className="text-cyan-400">{icon}</div>
+        <div className={colorClasses[color].split(' ')[3]}>{icon}</div>
         <h3 className="text-gray-400 text-sm">{title}</h3>
       </div>
       <p className="text-2xl font-bold">{value}</p>
+      {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
     </div>
   );
 };
@@ -316,7 +373,14 @@ const Tab: React.FC<{
 );
 
 const OverviewTab: React.FC<{ stats: AffiliateStatsResponse | null }> = ({ stats }) => {
-  if (!stats) return <div className="text-gray-400">Loading stats...</div>;
+  if (!stats) {
+    return (
+      <div className="text-center py-12">
+        <Loader2 className="w-8 h-8 text-gray-600 mx-auto mb-4 animate-spin" />
+        <p className="text-gray-400">Loading stats...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -342,7 +406,7 @@ const OverviewTab: React.FC<{ stats: AffiliateStatsResponse | null }> = ({ stats
         </div>
       </div>
 
-      {stats.recent_commissions.length > 0 && (
+      {stats.recent_commissions && stats.recent_commissions.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mb-4">Recent Commissions</h3>
           <div className="space-y-2">
@@ -361,13 +425,27 @@ const OverviewTab: React.FC<{ stats: AffiliateStatsResponse | null }> = ({ stats
                   <div className="font-bold text-cyan-400">
                     ${(commission.commission_amount / 100).toFixed(2)}
                   </div>
-                  <div className={`text-sm ${commission.status === 'paid' ? 'text-emerald-400' : 'text-amber-400'}`}>
+                  <div className={`text-sm capitalize ${
+                    commission.status === 'paid' ? 'text-emerald-400' : 
+                    commission.status === 'pending' ? 'text-amber-400' :
+                    'text-red-400'
+                  }`}>
                     {commission.status}
                   </div>
                 </div>
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {(!stats.recent_commissions || stats.recent_commissions.length === 0) && (
+        <div className="text-center py-12">
+          <DollarSign className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2">No Commissions Yet</h3>
+          <p className="text-gray-400">
+            Share your referral link to start earning commissions
+          </p>
         </div>
       )}
     </div>
@@ -384,7 +462,7 @@ const ApplicationTab: React.FC<{
         <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
         <h3 className="text-xl font-semibold mb-2">No Application Yet</h3>
         <p className="text-gray-400 mb-6">
-          Apply to become an affiliate and earn higher commission rates
+          Apply to become an affiliate and earn 25% commission on initial subscriptions + 10% on renewals
         </p>
         <button
           onClick={onApply}
@@ -403,7 +481,8 @@ const ApplicationTab: React.FC<{
         <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${
           application.status === 'approved' ? 'bg-emerald-500/20 text-emerald-400' :
           application.status === 'pending' ? 'bg-amber-500/20 text-amber-400' :
-          'bg-red-500/20 text-red-400'
+          application.status === 'rejected' ? 'bg-red-500/20 text-red-400' :
+          'bg-orange-500/20 text-orange-400'
         }`}>
           {getStatusIcon(application.status)}
           <span className="capitalize font-medium">{application.status}</span>
@@ -412,7 +491,7 @@ const ApplicationTab: React.FC<{
 
       <div className="bg-slate-800/30 rounded-lg p-6 space-y-4">
         <div>
-          <div className="text-sm text-gray-400 mb-1">Social Links</div>
+          <div className="text-sm text-gray-400 mb-2">Social Links</div>
           <div className="space-y-2">
             {application.social_links.map((link, index) => (
               <a
@@ -420,9 +499,9 @@ const ApplicationTab: React.FC<{
                 href={link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300"
+                className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 break-all"
               >
-                <ExternalLink className="w-4 h-4" />
+                <ExternalLink className="w-4 h-4 flex-shrink-0" />
                 {link}
               </a>
             ))}
@@ -446,7 +525,7 @@ const ApplicationTab: React.FC<{
           </div>
         )}
 
-        <div className="flex items-center gap-4 text-sm text-gray-400">
+        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 border-t border-slate-700 pt-4">
           <span>Applied: {new Date(application.created_at).toLocaleDateString()}</span>
           {application.reviewed_at && (
             <span>Reviewed: {new Date(application.reviewed_at).toLocaleDateString()}</span>
@@ -462,24 +541,31 @@ const ReferralTab: React.FC<{
   copiedUrl: boolean;
   onCopy: (text: string) => void;
 }> = ({ referralUrl, copiedUrl, onCopy }) => {
-  if (!referralUrl) return <div className="text-gray-400">Loading referral link...</div>;
+  if (!referralUrl) {
+    return (
+      <div className="text-center py-12">
+        <Loader2 className="w-8 h-8 text-gray-600 mx-auto mb-4 animate-spin" />
+        <p className="text-gray-400">Loading referral link...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div>
         <h3 className="text-xl font-semibold mb-4">Your Referral Link</h3>
-        <div className="bg-slate-800/30 rounded-lg p-4 flex items-center justify-between">
-          <div className="flex-1 mr-4">
+        <div className="bg-slate-800/30 rounded-lg p-4 flex items-center justify-between gap-4">
+          <div className="flex-1 min-w-0">
             <input
               type="text"
               value={referralUrl.referral_url}
               readOnly
-              className="w-full bg-transparent text-cyan-400 focus:outline-none"
+              className="w-full bg-transparent text-cyan-400 focus:outline-none truncate"
             />
           </div>
           <button
             onClick={() => onCopy(referralUrl.referral_url)}
-            className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-colors flex-shrink-0"
           >
             {copiedUrl ? (
               <>
@@ -499,37 +585,74 @@ const ReferralTab: React.FC<{
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 border border-cyan-500/30 rounded-lg p-6">
           <div className="text-gray-400 text-sm mb-1">Referral Code</div>
-          <div className="text-2xl font-bold text-cyan-400">{referralUrl.referral_code}</div>
+          <div className="text-2xl font-bold text-cyan-400 font-mono">{referralUrl.referral_code}</div>
         </div>
         <div className="bg-gradient-to-br from-blue-500/20 to-blue-500/5 border border-blue-500/30 rounded-lg p-6">
           <div className="text-gray-400 text-sm mb-1">Affiliate Status</div>
-          <div className="text-2xl font-bold">
+          <div className="text-xl font-bold">
             {referralUrl.is_affiliate ? (
-              <span className="text-emerald-400">Approved Affiliate</span>
+              <span className="text-emerald-400">✓ Approved Affiliate</span>
             ) : (
-              <span className="text-amber-400">Regular User</span>
+              <span className="text-amber-400">Standard User</span>
             )}
           </div>
         </div>
       </div>
 
       <div className="bg-slate-800/30 rounded-lg p-6">
-        <h4 className="font-semibold mb-4">Commission Rates</h4>
+        <h4 className="font-semibold mb-4">Your Commission Rates</h4>
         <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-400">Initial Subscription</span>
-            <span className="text-xl font-bold text-cyan-400">
+          <div className="flex justify-between items-center py-3 border-b border-slate-700">
+            <div>
+              <div className="font-medium">Initial Subscription</div>
+              <div className="text-sm text-gray-400">One-time commission on first purchase</div>
+            </div>
+            <span className="text-2xl font-bold text-cyan-400">
               {referralUrl.commission_rates.initial}%
             </span>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-gray-400">Renewal Subscriptions</span>
-            <span className="text-xl font-bold text-blue-400">
+          <div className="flex justify-between items-center py-3">
+            <div>
+              <div className="font-medium">Renewal Subscriptions</div>
+              <div className="text-sm text-gray-400">
+                {referralUrl.commission_rates.renewal > 0 
+                  ? 'Recurring commission on renewals'
+                  : 'Upgrade to affiliate for renewal commissions'
+                }
+              </div>
+            </div>
+            <span className={`text-2xl font-bold ${
+              referralUrl.commission_rates.renewal > 0 ? 'text-blue-400' : 'text-gray-500'
+            }`}>
               {referralUrl.commission_rates.renewal}%
             </span>
           </div>
         </div>
       </div>
+
+      {!referralUrl.is_affiliate && (
+        <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-lg p-6">
+          <h4 className="font-semibold text-cyan-400 mb-3">Become an Affiliate</h4>
+          <p className="text-gray-300 mb-4">
+            Upgrade to our affiliate program to earn <strong>25%</strong> on initial subscriptions and{' '}
+            <strong>10%</strong> recurring commission on all renewals!
+          </p>
+          <ul className="space-y-2 text-sm text-gray-400">
+            <li className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-cyan-400" />
+              Higher initial commission (10% → 25%)
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-cyan-400" />
+              Earn 10% on all subscription renewals
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-cyan-400" />
+              Access to exclusive marketing materials
+            </li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
@@ -545,7 +668,9 @@ const CommissionsTab: React.FC<{
       <div className="text-center py-12">
         <DollarSign className="w-16 h-16 text-gray-600 mx-auto mb-4" />
         <h3 className="text-xl font-semibold mb-2">No Commissions Yet</h3>
-        <p className="text-gray-400">Start referring users to earn commissions</p>
+        <p className="text-gray-400">
+          Start referring users to earn commissions. Share your referral link to get started!
+        </p>
       </div>
     );
   }
@@ -567,17 +692,17 @@ const CommissionsTab: React.FC<{
           </thead>
           <tbody>
             {commissions.map((commission) => (
-              <tr key={commission.id} className="border-b border-slate-800/50 hover:bg-slate-800/30">
+              <tr key={commission.id} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
                 <td className="py-4 px-4 text-sm">
                   {new Date(commission.created_at).toLocaleDateString()}
                 </td>
                 <td className="py-4 px-4">
-                  <span className="capitalize text-sm">{commission.commission_type}</span>
+                  <span className="capitalize text-sm font-medium">{commission.commission_type}</span>
                 </td>
                 <td className="py-4 px-4 text-right text-sm">
                   {formatCurrency(commission.subscription_amount)}
                 </td>
-                <td className="py-4 px-4 text-right text-sm text-cyan-400">
+                <td className="py-4 px-4 text-right text-sm text-cyan-400 font-medium">
                   {commission.commission_rate}%
                 </td>
                 <td className="py-4 px-4 text-right font-bold text-cyan-400">
@@ -586,7 +711,7 @@ const CommissionsTab: React.FC<{
                 <td className="py-4 px-4">
                   <div className={`flex items-center justify-center gap-2 ${getStatusColor(commission.status)}`}>
                     {getStatusIcon(commission.status)}
-                    <span className="capitalize text-sm">{commission.status}</span>
+                    <span className="capitalize text-sm font-medium">{commission.status}</span>
                   </div>
                 </td>
               </tr>
@@ -607,8 +732,8 @@ const ProfileTab: React.FC<{
       <div className="text-center py-12">
         <Award className="w-16 h-16 text-gray-600 mx-auto mb-4" />
         <h3 className="text-xl font-semibold mb-2">No Affiliate Profile</h3>
-        <p className="text-gray-400">
-          Apply to become an affiliate to unlock your profile
+        <p className="text-gray-400 mb-6">
+          Apply to become an affiliate to unlock your profile and earn higher commissions
         </p>
       </div>
     );
@@ -631,7 +756,7 @@ const ProfileTab: React.FC<{
           <div>
             <div className="text-sm text-gray-400 mb-1">Status</div>
             <div className={`font-semibold ${profile.is_active ? 'text-emerald-400' : 'text-red-400'}`}>
-              {profile.is_active ? 'Active' : 'Inactive'}
+              {profile.is_active ? '✓ Active' : '✗ Inactive'}
             </div>
           </div>
           <div>
@@ -690,7 +815,9 @@ const ApplicationModal: React.FC<{
   };
 
   const removeSocialLink = (index: number) => {
-    setSocialLinks(socialLinks.filter((_, i) => i !== index));
+    if (socialLinks.length > 1) {
+      setSocialLinks(socialLinks.filter((_, i) => i !== index));
+    }
   };
 
   const updateSocialLink = (index: number, value: string) => {
@@ -703,19 +830,19 @@ const ApplicationModal: React.FC<{
     e.preventDefault();
     setError('');
 
-    const validLinks = socialLinks.filter(link => link.trim());
+    const validLinks = socialLinks.filter(link => link.trim() && link.startsWith('http'));
     if (validLinks.length === 0) {
-      setError('Please add at least one social link');
+      setError('Please add at least one valid social link (must start with http:// or https://)');
       return;
     }
 
     if (reason.length < 50) {
-      setError('Reason must be at least 50 characters');
+      setError(`Reason must be at least 50 characters (currently ${reason.length})`);
       return;
     }
 
     if (howFound.length < 10) {
-      setError('Please provide more detail about how you found us');
+      setError(`"How you found us" must be at least 10 characters (currently ${howFound.length})`);
       return;
     }
 
@@ -728,7 +855,7 @@ const ApplicationModal: React.FC<{
       });
       onSuccess();
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to submit application');
+      setError(err.response?.data?.detail || 'Failed to submit application. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -738,7 +865,7 @@ const ApplicationModal: React.FC<{
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-slate-900 rounded-xl border border-slate-700 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Modal Header */}
-        <div className="sticky top-0 bg-slate-900 border-b border-slate-700 p-6 flex items-center justify-between">
+        <div className="sticky top-0 bg-slate-900 border-b border-slate-700 p-6 flex items-center justify-between z-10">
           <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
             Apply for Affiliate Program
           </h2>
@@ -753,7 +880,7 @@ const ApplicationModal: React.FC<{
         {/* Modal Content */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400 text-sm">
               {error}
             </div>
           )}
@@ -764,7 +891,7 @@ const ApplicationModal: React.FC<{
               Social Media Links <span className="text-red-400">*</span>
             </label>
             <p className="text-sm text-gray-400 mb-3">
-              Add your social media profiles (Twitter, Instagram, YouTube, etc.)
+              Add your social media profiles (Twitter, Instagram, YouTube, TikTok, etc.)
             </p>
             <div className="space-y-2">
               {socialLinks.map((link, index) => (
@@ -815,8 +942,8 @@ const ApplicationModal: React.FC<{
               placeholder="I have a dedicated audience of crypto traders who would benefit from Tokabi's automated trading features..."
               className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 resize-none"
             />
-            <div className="text-xs text-gray-500 mt-1">
-              {reason.length} / 50 characters minimum
+            <div className={`text-xs mt-1 ${reason.length >= 50 ? 'text-emerald-400' : 'text-gray-500'}`}>
+              {reason.length} / 50 characters {reason.length >= 50 && '✓'}
             </div>
           </div>
 
@@ -835,8 +962,8 @@ const ApplicationModal: React.FC<{
               placeholder="I discovered Tokabi through..."
               className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 resize-none"
             />
-            <div className="text-xs text-gray-500 mt-1">
-              {howFound.length} / 10 characters minimum
+            <div className={`text-xs mt-1 ${howFound.length >= 10 ? 'text-emerald-400' : 'text-gray-500'}`}>
+              {howFound.length} / 10 characters {howFound.length >= 10 && '✓'}
             </div>
           </div>
 
@@ -868,7 +995,8 @@ const ApplicationModal: React.FC<{
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg font-medium transition-colors"
+              disabled={loading}
+              className="flex-1 px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg font-medium transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
@@ -893,7 +1021,7 @@ const ApplicationModal: React.FC<{
   );
 };
 
-// Helper function to get status icon
+// Helper function for status icons
 const getStatusIcon = (status: string) => {
   switch (status) {
     case 'approved':
@@ -903,6 +1031,7 @@ const getStatusIcon = (status: string) => {
       return <Clock className="w-4 h-4" />;
     case 'rejected':
     case 'cancelled':
+    case 'suspended':
       return <XCircle className="w-4 h-4" />;
     default:
       return null;
