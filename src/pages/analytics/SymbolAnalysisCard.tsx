@@ -114,14 +114,13 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
     );
   }
 
-  // Success state - with proper null checks
+  // Success state - with proper null checks for new structure
   const {
     final_decision,
-    confidence_score,
+    consensus_strength,
     risk_metrics,
     market_data_summary,
     indicators_summary,
-    time_analysis,
   } = analysis;
 
   const decisionColor = userSymbolSearchService.getDecisionColor(
@@ -163,6 +162,13 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
       : "text-gray-400";
   };
 
+  const getConsensusStrengthColor = (strength?: number | null) => {
+    if (strength === undefined || strength === null) return "text-gray-400";
+    if (strength >= 80) return "text-emerald-400";
+    if (strength >= 60) return "text-amber-400";
+    return "text-red-400";
+  };
+
   return (
     <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 mb-6 hover:bg-gray-800/70">
       {/* Header - Always Visible */}
@@ -185,11 +191,13 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
                     {final_decision?.toUpperCase() || "HOLD"}
                   </div>
 
-                  {confidence_score !== undefined &&
-                    confidence_score !== null && (
+                  {consensus_strength !== undefined &&
+                    consensus_strength !== null && (
                       <div className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-gray-700 text-gray-300 text-sm font-medium border border-gray-600">
                         <ShieldIcon className="w-4 h-4" />
-                        {confidence_score}% Confidence
+                        <span className={getConsensusStrengthColor(consensus_strength)}>
+                          {consensus_strength}% Consensus
+                        </span>
                       </div>
                     )}
                 </div>
@@ -272,19 +280,8 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
                   )}
                 />
                 <Metric
-                  label="7d Change"
-                  value={formatPercentage(market_data_summary?.price_change_7d)}
-                  valueClass={getPercentageColor(
-                    market_data_summary?.price_change_7d
-                  )}
-                />
-                <Metric
                   label="24h Volume"
                   value={formatPrice(market_data_summary?.volume_24h)}
-                />
-                <Metric
-                  label="Market Cap"
-                  value={formatPrice(market_data_summary?.market_cap)}
                 />
                 <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-700">
                   <div>
@@ -344,96 +341,108 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
                       : "text-gray-400"
                   }
                 />
-                <Metric
-                  label="Momentum"
-                  value={
-                    indicators_summary?.momentum
-                      ? indicators_summary.momentum.toUpperCase()
-                      : "Not provided"
-                  }
-                  valueClass={
-                    indicators_summary?.momentum === "strong"
-                      ? "text-emerald-400"
-                      : indicators_summary?.momentum === "moderate"
-                      ? "text-amber-400"
-                      : "text-gray-400"
-                  }
-                />
               </Section>
             </div>
 
-            {/* Price Levels */}
+            {/* Risk Metrics & Price Levels */}
             {risk_metrics && (
               <Section
-                title="Price Levels"
+                title="Risk Parameters & Price Levels"
                 icon={<TargetIcon className="w-4 h-4" />}
               >
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                  <PriceCard
-                    title="Entry"
-                    color="blue"
-                    value={risk_metrics.entry_price}
-                  />
-                  <PriceCard
-                    title="Stop Loss"
-                    color="red"
-                    value={risk_metrics.stop_loss_price}
-                  />
-                  <PriceCard
-                    title="TP 1"
-                    color="emerald"
-                    value={risk_metrics.take_profit_1}
-                  />
-                  <PriceCard
-                    title="TP 2"
-                    color="emerald"
-                    value={risk_metrics.take_profit_2}
-                  />
-                  <PriceCard
-                    title="TP 3"
-                    color="emerald"
-                    value={risk_metrics.take_profit_3}
-                  />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Risk Metrics */}
+                  <div className="space-y-4">
+                    <h4 className="text-white font-semibold">Risk Metrics</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <Metric
+                        label="Stop Loss %"
+                        value={
+                          risk_metrics.estimated_sl_percent
+                            ? `-${risk_metrics.estimated_sl_percent.toFixed(2)}%`
+                            : "Not provided"
+                        }
+                        valueClass="text-red-400"
+                      />
+                      <Metric
+                        label="Take Profit %"
+                        value={
+                          risk_metrics.estimated_tp_percent
+                            ? `+${risk_metrics.estimated_tp_percent.toFixed(2)}%`
+                            : "Not provided"
+                        }
+                        valueClass="text-emerald-400"
+                      />
+                      <Metric
+                        label="Risk/Reward"
+                        value={
+                          risk_metrics.risk_reward_ratio
+                            ? `${risk_metrics.risk_reward_ratio.toFixed(2)}:1`
+                            : "Not provided"
+                        }
+                        valueClass={
+                          risk_metrics.risk_reward_ratio && risk_metrics.risk_reward_ratio >= 1.5
+                            ? "text-emerald-400"
+                            : risk_metrics.risk_reward_ratio && risk_metrics.risk_reward_ratio >= 1
+                            ? "text-amber-400"
+                            : "text-red-400"
+                        }
+                      />
+                      <Metric
+                        label="Leverage"
+                        value={
+                          risk_metrics.suggested_leverage
+                            ? `${risk_metrics.suggested_leverage}x`
+                            : "Not provided"
+                        }
+                        valueClass={
+                          risk_metrics.suggested_leverage && risk_metrics.suggested_leverage >= 5
+                            ? "text-red-400"
+                            : risk_metrics.suggested_leverage && risk_metrics.suggested_leverage >= 3
+                            ? "text-amber-400"
+                            : "text-emerald-400"
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  {/* Price Levels */}
+                  <div className="space-y-4">
+                    <h4 className="text-white font-semibold">Price Levels</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <PriceCard
+                        title="Entry"
+                        color="blue"
+                        value={risk_metrics.entry_price}
+                      />
+                      <PriceCard
+                        title="Stop Loss"
+                        color="red"
+                        value={risk_metrics.stop_loss_price}
+                      />
+                      <PriceCard
+                        title="Take Profit"
+                        color="emerald"
+                        value={risk_metrics.take_profit_price}
+                      />
+                    </div>
+                  </div>
                 </div>
               </Section>
             )}
 
-            {/* Time Analysis */}
-            {time_analysis && time_analysis.length > 0 && (
-              <Section
-                title="Timeframe Analysis"
-                icon={<ClockIcon className="w-4 h-4" />}
-              >
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {time_analysis.map((timeframe, index) => (
-                    <div
-                      key={index}
-                      className="bg-gray-700/50 rounded-lg p-4 backdrop-blur-sm border border-gray-600"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium text-white">
-                          {timeframe.timeframe}
-                        </span>
-                        <div
-                          className={`px-2 py-1 rounded text-xs font-medium ${
-                            timeframe.score >= 7
-                              ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                              : timeframe.score >= 4
-                              ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                              : "bg-red-500/20 text-red-300 border border-red-500/30"
-                          }`}
-                        >
-                          Score: {timeframe.score}/10
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-300">
-                        {timeframe.recommendation}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </Section>
-            )}
+            {/* Additional Information */}
+            <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600/30">
+              <div className="flex items-center gap-2 mb-2">
+                <ClockIcon className="w-4 h-4 text-gray-400" />
+                <span className="text-sm text-gray-400">Analysis Timestamp</span>
+              </div>
+              <p className="text-white text-sm">
+                {analysis.timestamp
+                  ? new Date(analysis.timestamp).toLocaleString()
+                  : "Not available"}
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -499,12 +508,12 @@ const PriceCard: React.FC<{
 
   return (
     <div
-      className={`border rounded-lg p-4 text-center backdrop-blur-sm ${
+      className={`border rounded-lg p-3 text-center backdrop-blur-sm ${
         colorClasses[color as keyof typeof colorClasses]
       } ${className}`}
     >
-      <div className="text-sm font-medium mb-2">{title}</div>
-      <div className="text-xl font-bold">{displayValue}</div>
+      <div className="text-sm font-medium mb-1">{title}</div>
+      <div className="text-lg font-bold">{displayValue}</div>
     </div>
   );
 };

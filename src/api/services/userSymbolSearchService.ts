@@ -13,7 +13,6 @@ import axiosInstance from '../axiosConfig';
 import { API_ENDPOINTS } from '../endpoints';
 
 class UserSymbolSearchService {
-  // Use the endpoints from your config
   async analyzeSymbols(request: UserSymbolSearchRequest): Promise<UserSymbolSearchResponse> {
     try {
       const response = await axiosInstance.post<UserSymbolSearchResponse>(
@@ -33,9 +32,6 @@ class UserSymbolSearchService {
     }
   }
 
-  /**
-   * Get detailed information about a specific search by ID
-   */
   async getSearchDetail(searchId: string): Promise<UserSymbolSearchDetail> {
     try {
       const response = await axiosInstance.get<UserSymbolSearchDetail>(
@@ -65,57 +61,39 @@ class UserSymbolSearchService {
     return response.data;
   }
 
-  // Helper method to check if analysis is complete (now works with the correct type)
   isAnalysisComplete(results: SymbolAnalysisResult[] | null): boolean {
     if (!results || results.length === 0) return false;
     return results.every(result => result.status !== 'pending');
   }
 
-  // Helper method to check if analysis has any results
   hasAnalysisResults(results: SymbolAnalysisResult[] | null): boolean {
     if (!results) return false;
     return results.some(result => result.status === 'success' || result.status === 'error');
   }
 
-  // Helper method to get successful analyses
   getSuccessfulAnalyses(results: SymbolAnalysisResult[] | null): SymbolAnalysisResult[] {
     if (!results) return [];
     return results.filter(result => result.status === 'success');
   }
 
-  // Helper method to format signal quality with colors
-  getSignalQualityColor(quality: string): string {
-    const colors = {
-      divine: '#10B981', // green
-      excellent: '#3B82F6', // blue
-      very_good: '#8B5CF6', // purple
-      good: '#F59E0B', // amber
-      caution: '#EF4444', // red
-    };
-    return colors[quality as keyof typeof colors] || '#6B7280';
-  }
-
-  // Helper method to format decision with colors
   getDecisionColor(decision: string): string {
     const colors = {
-      long: '#10B981', // green
-      short: '#EF4444', // red
-      hold: '#6B7280', // gray
+      long: '#10B981',
+      short: '#EF4444',
+      hold: '#6B7280',
     };
     return colors[decision as keyof typeof colors] || '#6B7280';
   }
 
-  // Helper method to get status color
   getStatusColor(status: AnalysisStatus): string {
     const colors = {
-      pending: '#F59E0B', // amber
-      success: '#10B981', // green
-      error: '#EF4444', // red
+      pending: '#F59E0B',
+      success: '#10B981',
+      error: '#EF4444',
     };
     return colors[status];
   }
 
-  // Helper to format price for display
   formatPrice(price: number | undefined): string {
     if (price === undefined || price === null) return 'N/A';
     if (price >= 1000) {
@@ -124,10 +102,24 @@ class UserSymbolSearchService {
     return `$${price.toFixed(4)}`;
   }
 
-  // Helper to format percentage
   formatPercentage(value: number | undefined): string {
     if (value === undefined || value === null) return 'N/A';
     return `${value > 0 ? '+' : ''}${value.toFixed(2)}%`;
+  }
+
+  getLeverageColor(leverage: number | undefined): string {
+    if (!leverage) return '#6B7280';
+    if (leverage >= 5) return '#EF4444';
+    if (leverage >= 3) return '#F59E0B';
+    return '#10B981';
+  }
+
+  getConsensusColor(consensus: number | undefined): string {
+    if (!consensus) return '#6B7280';
+    if (consensus >= 90) return '#10B981';
+    if (consensus >= 80) return '#3B82F6';
+    if (consensus >= 70) return '#F59E0B';
+    return '#EF4444';
   }
 }
 

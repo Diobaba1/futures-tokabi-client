@@ -7,17 +7,14 @@ import {
 import { signalsService } from "../../api/services/signalsService";
 import {
   Zap,
-
   AlertTriangle,
- 
   X,
- 
   Filter,
   ArrowUpRight,
   ArrowDownRight,
   Activity,
-  Database
-} from 'lucide-react';
+  Database,
+} from "lucide-react";
 
 // Components
 const LoadingSpinner: React.FC<{ size?: "sm" | "md" | "lg" }> = ({
@@ -48,7 +45,7 @@ const ErrorMessage: React.FC<{ message: string; onRetry?: () => void }> = ({
     {onRetry && (
       <button
         onClick={onRetry}
-        className="px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg transition-all hover:bg-red-500/30 text-sm "
+        className="px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg transition-all hover:bg-red-500/30 text-sm"
       >
         Retry Connection
       </button>
@@ -75,7 +72,6 @@ const SignalDetailModal: React.FC<{
   onClose: () => void;
   formatDate: (dateString: string) => string;
   getDecisionColor: (decision: string) => string;
-  getSignalQualityColor: (quality: string | null) => string;
   getConsensusStrengthColor: (strength: number) => string;
   getLeverageColor: (leverage: number | null) => string;
   getPriceChangeColor: (value: number | null) => string;
@@ -84,7 +80,6 @@ const SignalDetailModal: React.FC<{
   onClose,
   formatDate,
   getDecisionColor,
-  getSignalQualityColor,
   getConsensusStrengthColor,
   getLeverageColor,
   getPriceChangeColor,
@@ -111,36 +106,21 @@ const SignalDetailModal: React.FC<{
 
           <div className="flex items-center gap-3 mb-6">
             <span
-              className={`px-3 py-1.5 rounded-full text-sm  ${getDecisionColor(
+              className={`px-3 py-1.5 rounded-full text-sm ${getDecisionColor(
                 signal.final_decision
               )}`}
             >
               {signal.final_decision.toUpperCase()}
             </span>
-            {signal.is_futures_ready && (
-              <span className="px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-xs  border border-cyan-500/30">
-                <Zap className="w-3 h-3 inline mr-1" />
-                Futures Ready
-              </span>
-            )}
           </div>
 
           <div className="space-y-6">
-            {/* Signal Quality & Consensus */}
+            {/* Consensus Strength */}
             <div className="bg-gray-700/20 rounded-lg p-4 border border-gray-600/20">
               <div className="flex justify-between items-center mb-3">
-                <span className="text-gray-400 text-sm font-light">Signal Quality</span>
-                <span
-                  className={`px-2 py-1 rounded text-sm  ${getSignalQualityColor(
-                    signal.signal_quality
-                  )}`}
-                >
-                  {signal.signal_quality?.toUpperCase()}
+                <span className="text-gray-400 text-sm font-light">
+                  Consensus Strength
                 </span>
-              </div>
-
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-gray-400 text-sm font-light">Consensus Strength</span>
                 <span
                   className={`text-lg font-light ${getConsensusStrengthColor(
                     signal.consensus_strength
@@ -151,7 +131,9 @@ const SignalDetailModal: React.FC<{
               </div>
 
               <div className="flex justify-between text-sm">
-                <span className="text-gray-400 font-light">Signal Generated</span>
+                <span className="text-gray-400 font-light">
+                  Signal Generated
+                </span>
                 <span className="text-white font-light">
                   {formatDate(signal.created_at)}
                 </span>
@@ -159,7 +141,9 @@ const SignalDetailModal: React.FC<{
 
               {signal.analysis_duration_ms && (
                 <div className="flex justify-between text-sm mt-2">
-                  <span className="text-gray-400 font-light">Analysis Speed</span>
+                  <span className="text-gray-400 font-light">
+                    Analysis Speed
+                  </span>
                   <span className="text-cyan-400 font-light">
                     {signal.analysis_duration_ms}ms
                   </span>
@@ -167,97 +151,63 @@ const SignalDetailModal: React.FC<{
               )}
             </div>
 
-            {/* Leverage & Risk */}
-            {(signal.suggested_leverage ||
-              signal.risk_per_trade ||
-              signal.max_position_size) && (
+            {/* Leverage */}
+            {signal.suggested_leverage && (
               <div>
-                <h4 className=" text-white mb-4 text-lg border-b border-gray-700/30 pb-2">
+                <h4 className="text-white mb-4 text-lg border-b border-gray-700/30 pb-2">
                   Risk Parameters
                 </h4>
-                <div className="space-y-3">
-                  {signal.suggested_leverage && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm font-light">Suggested Leverage</span>
-                      <span
-                        className={`text-lg font-light ${getLeverageColor(
-                          signal.suggested_leverage
-                        )}`}
-                      >
-                        {signal.suggested_leverage}x
-                      </span>
-                    </div>
-                  )}
-                  {signal.risk_per_trade && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm font-light">Risk per Trade</span>
-                      <span className="text-lg font-light text-amber-400">
-                        {signal.risk_per_trade}%
-                      </span>
-                    </div>
-                  )}
-                  {signal.max_position_size && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm font-light">Max Position Size</span>
-                      <span className="text-lg font-light text-blue-400">
-                        {signal.max_position_size.toFixed(1)}%
-                      </span>
-                    </div>
-                  )}
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400 text-sm font-light">
+                    Suggested Leverage
+                  </span>
+                  <span
+                    className={`text-lg font-light ${getLeverageColor(
+                      signal.suggested_leverage
+                    )}`}
+                  >
+                    {signal.suggested_leverage}x
+                  </span>
                 </div>
               </div>
             )}
 
             {/* Price Levels */}
             {(signal.entry_price ||
-              signal.take_profit_1 ||
+              signal.take_profit_price ||
               signal.stop_loss_price) && (
               <div>
-                <h4 className=" text-white mb-4 text-lg border-b border-gray-700/30 pb-2">
+                <h4 className="text-white mb-4 text-lg border-b border-gray-700/30 pb-2">
                   Price Levels
                 </h4>
                 <div className="space-y-3">
                   {signal.entry_price && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm font-light">Entry Price</span>
+                      <span className="text-gray-400 text-sm font-light">
+                        Entry Price
+                      </span>
                       <span className="text-lg font-light text-white">
                         ${signal.entry_price.toFixed(8)}
                       </span>
                     </div>
                   )}
-                  {signal.take_profit_1 && (
+                  {signal.take_profit_price && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm font-light">Take Profit 1</span>
+                      <span className="text-gray-400 text-sm font-light">
+                        Take Profit
+                      </span>
                       <div className="text-right">
                         <div className="text-lg font-light text-emerald-400">
-                          ${signal.take_profit_1.toFixed(8)}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {signal.take_profit_2 && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm font-light">Take Profit 2</span>
-                      <div className="text-right">
-                        <div className="text-lg font-light text-emerald-400">
-                          ${signal.take_profit_2.toFixed(8)}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {signal.take_profit_3 && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm font-light">Take Profit 3</span>
-                      <div className="text-right">
-                        <div className="text-lg font-light text-emerald-400">
-                          ${signal.take_profit_3.toFixed(8)}
+                          ${signal.take_profit_price.toFixed(8)}
                         </div>
                       </div>
                     </div>
                   )}
                   {signal.stop_loss_price && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm font-light">Stop Loss</span>
+                      <span className="text-gray-400 text-sm font-light">
+                        Stop Loss
+                      </span>
                       <div className="text-right">
                         <div className="text-lg font-light text-red-400">
                           ${signal.stop_loss_price.toFixed(8)}
@@ -274,13 +224,15 @@ const SignalDetailModal: React.FC<{
               signal.estimated_sl_percent ||
               signal.risk_reward_ratio) && (
               <div>
-                <h4 className=" text-white mb-4 text-lg border-b border-gray-700/30 pb-2">
+                <h4 className="text-white mb-4 text-lg border-b border-gray-700/30 pb-2">
                   Performance Metrics
                 </h4>
                 <div className="space-y-3">
                   {signal.estimated_tp_percent && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm font-light">Target Profit</span>
+                      <span className="text-gray-400 text-sm font-light">
+                        Target Profit
+                      </span>
                       <span className="text-lg font-light text-emerald-400">
                         +{signal.estimated_tp_percent.toFixed(2)}%
                       </span>
@@ -288,7 +240,9 @@ const SignalDetailModal: React.FC<{
                   )}
                   {signal.estimated_sl_percent && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm font-light">Stop Loss</span>
+                      <span className="text-gray-400 text-sm font-light">
+                        Stop Loss
+                      </span>
                       <span className="text-lg font-light text-red-400">
                         -{signal.estimated_sl_percent.toFixed(2)}%
                       </span>
@@ -296,7 +250,9 @@ const SignalDetailModal: React.FC<{
                   )}
                   {signal.risk_reward_ratio && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm font-light">Risk/Reward Ratio</span>
+                      <span className="text-gray-400 text-sm font-light">
+                        Risk/Reward Ratio
+                      </span>
                       <span
                         className={`text-lg font-light ${getPriceChangeColor(
                           signal.risk_reward_ratio
@@ -327,7 +283,7 @@ const SignalDetailModal: React.FC<{
           <div className="mt-8 pt-6 border-t border-gray-700/30">
             <button
               onClick={onClose}
-              className="w-full px-4 py-3 bg-gray-700/30 hover:bg-gray-700/50 text-white rounded-lg transition-all  border border-gray-600/30"
+              className="w-full px-4 py-3 bg-gray-700/30 hover:bg-gray-700/50 text-white rounded-lg transition-all border border-gray-600/30"
             >
               Close Analysis
             </button>
@@ -340,15 +296,14 @@ const SignalDetailModal: React.FC<{
 
 const SignalPage: React.FC = () => {
   const [allSignals, setAllSignals] = useState<SignalResponse[]>([]);
-  const [selectedSignal, setSelectedSignal] = useState<SignalDetailResponse | null>(null);
+  const [selectedSignal, setSelectedSignal] =
+    useState<SignalDetailResponse | null>(null);
   const [availableSymbols, setAvailableSymbols] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<SignalFilters>({
     symbol: undefined,
     decision: undefined,
-    signal_quality: undefined,
-    futures_ready: undefined,
   });
   const [currentPage, setCurrentPage] = useState(1);
   const signalsPerPage = 10;
@@ -366,18 +321,6 @@ const SignalPage: React.FC = () => {
     if (filters.decision) {
       filtered = filtered.filter(
         (signal) => signal.final_decision === filters.decision
-      );
-    }
-
-    if (filters.signal_quality) {
-      filtered = filtered.filter(
-        (signal) => signal.signal_quality === filters.signal_quality
-      );
-    }
-
-    if (filters.futures_ready !== undefined) {
-      filtered = filtered.filter(
-        (signal) => signal.is_futures_ready === filters.futures_ready
       );
     }
 
@@ -428,22 +371,6 @@ const SignalPage: React.FC = () => {
       }
     }
 
-    // Signal quality distribution
-    const qualityDistribution = {
-      divine: recentSignals.filter((s) => s.signal_quality === "divine").length,
-      excellent: recentSignals.filter((s) => s.signal_quality === "excellent")
-        .length,
-      very_good: recentSignals.filter((s) => s.signal_quality === "very_good")
-        .length,
-      good: recentSignals.filter((s) => s.signal_quality === "good").length,
-      caution: recentSignals.filter((s) => s.signal_quality === "caution")
-        .length,
-    };
-
-    const futuresReadySignals = recentSignals.filter(
-      (s) => s.is_futures_ready
-    ).length;
-
     const symbolCounts = recentSignals
       .filter((s) => s.final_decision !== "hold")
       .reduce((acc, signal) => {
@@ -462,13 +389,10 @@ const SignalPage: React.FC = () => {
       decisions: {
         long: longSignals,
         short: shortSignals,
-        hold: 0,
       },
       avg_consensus_strength: avgConsensus,
       avg_leverage: avgLeverage,
-      signal_quality_distribution: qualityDistribution,
       most_active_symbols: mostActiveSymbols,
-      total_futures_ready: futuresReadySignals,
     };
   }, [allSignals]);
 
@@ -552,18 +476,6 @@ const SignalPage: React.FC = () => {
     return colors[decision as keyof typeof colors] || colors.default;
   }, []);
 
-  const getSignalQualityColor = useCallback((quality: string | null) => {
-    const colors = {
-      divine: "text-amber-400 bg-amber-500/10 border border-amber-500/20",
-      excellent: "text-violet-400 bg-violet-500/10 border border-violet-500/20",
-      very_good: "text-blue-400 bg-blue-500/10 border border-blue-500/20",
-      good: "text-emerald-400 bg-emerald-500/10 border border-emerald-500/20",
-      caution: "text-orange-400 bg-orange-500/10 border border-orange-500/20",
-      default: "text-gray-400 bg-gray-500/10 border border-gray-500/20",
-    };
-    return colors[quality as keyof typeof colors] || colors.default;
-  }, []);
-
   const getPriceChangeColor = useCallback((value: number | null) => {
     if (!value) return "text-gray-300";
     return value >= 0 ? "text-emerald-400" : "text-red-400";
@@ -641,12 +553,14 @@ const SignalPage: React.FC = () => {
                   Algorithmic Signals
                 </h1>
                 <p className="text-gray-400 text-sm font-light">
-                  Institutional-grade trading opportunities with AI analysis
+                  AI-powered trading opportunities
                 </p>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-xs text-gray-400 font-light">Last Updated</div>
+              <div className="text-xs text-gray-400 font-light">
+                Last Updated
+              </div>
               <div className="text-sm text-cyan-400 font-light">
                 {new Date().toLocaleTimeString()}
               </div>
@@ -669,7 +583,7 @@ const SignalPage: React.FC = () => {
             <div className="bg-gray-800/20 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm  text-gray-400 mb-2 font-light">
+                  <h3 className="text-sm text-gray-400 mb-2 font-light">
                     Active Signals
                   </h3>
                   <p className="text-2xl font-light text-cyan-400">
@@ -680,11 +594,13 @@ const SignalPage: React.FC = () => {
                   <Zap className="w-5 h-5 text-cyan-400" />
                 </div>
               </div>
-              <p className="text-xs text-gray-500 mt-2 font-light">Last 24 hours</p>
+              <p className="text-xs text-gray-500 mt-2 font-light">
+                Last 24 hours
+              </p>
             </div>
 
             <div className="bg-gray-800/20 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30">
-              <h3 className="text-sm  text-gray-400 mb-2 font-light">
+              <h3 className="text-sm text-gray-400 mb-2 font-light">
                 Long Positions
               </h3>
               <p className="text-2xl font-light text-emerald-400">
@@ -704,7 +620,7 @@ const SignalPage: React.FC = () => {
             </div>
 
             <div className="bg-gray-800/20 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30">
-              <h3 className="text-sm  text-gray-400 mb-2 font-light">
+              <h3 className="text-sm text-gray-400 mb-2 font-light">
                 Short Positions
               </h3>
               <p className="text-2xl font-light text-red-400">
@@ -724,7 +640,7 @@ const SignalPage: React.FC = () => {
             </div>
 
             <div className="bg-gray-800/20 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30">
-              <h3 className="text-sm  text-gray-400 mb-2 font-light">
+              <h3 className="text-sm text-gray-400 mb-2 font-light">
                 Avg Consensus
               </h3>
               <p
@@ -734,11 +650,13 @@ const SignalPage: React.FC = () => {
               >
                 {clientStats.avg_consensus_strength.toFixed(1)}%
               </p>
-              <p className="text-xs text-gray-500 mt-2 font-light">Signal Strength</p>
+              <p className="text-xs text-gray-500 mt-2 font-light">
+                Signal Strength
+              </p>
             </div>
 
             <div className="bg-gray-800/20 backdrop-blur-sm p-5 rounded-xl border border-gray-700/30">
-              <h3 className="text-sm  text-gray-400 mb-2 font-light">
+              <h3 className="text-sm text-gray-400 mb-2 font-light">
                 Avg Leverage
               </h3>
               <p
@@ -748,25 +666,10 @@ const SignalPage: React.FC = () => {
               >
                 {clientStats.avg_leverage.toFixed(1)}x
               </p>
-              <p className="text-xs text-gray-500 mt-2 font-light">Risk Level</p>
+              <p className="text-xs text-gray-500 mt-2 font-light">
+                Risk Level
+              </p>
             </div>
-          </div>
-
-          {/* Quality Distribution */}
-          <div className="mt-4 grid grid-cols-2 md:grid-cols-5 gap-2">
-            {Object.entries(clientStats.signal_quality_distribution).map(
-              ([quality, count]) => (
-                <div
-                  key={quality}
-                  className="bg-gray-800/30 rounded-lg p-3 text-center border border-gray-700/30"
-                >
-                  <div className={`text-sm  capitalize mb-1 ${getSignalQualityColor(quality)}`}>
-                    {quality.replace('_', ' ')}
-                  </div>
-                  <div className="text-white text-lg font-light">{count}</div>
-                </div>
-              )
-            )}
           </div>
         </section>
 
@@ -775,13 +678,13 @@ const SignalPage: React.FC = () => {
           {/* Filters */}
           <section className="bg-gray-800/20 backdrop-blur-sm rounded-xl border border-gray-700/30 mb-6">
             <div className="p-5">
-              <h2 className="text-lg  text-white mb-4 flex items-center gap-2">
+              <h2 className="text-lg text-white mb-4 flex items-center gap-2">
                 <Filter className="w-4 h-4 text-cyan-400" />
                 Filter Signals
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm  text-gray-300 mb-2 font-light">
+                  <label className="block text-sm text-gray-300 mb-2 font-light">
                     Instrument
                   </label>
                   <select
@@ -803,7 +706,7 @@ const SignalPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm  text-gray-300 mb-2 font-light">
+                  <label className="block text-sm text-gray-300 mb-2 font-light">
                     Position Type
                   </label>
                   <select
@@ -825,38 +728,7 @@ const SignalPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm  text-gray-300 mb-2 font-light">
-                    Signal Quality
-                  </label>
-                  <select
-                    value={filters.signal_quality || ""}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      handleFilterChange({
-                        signal_quality:
-                          value === ""
-                            ? undefined
-                            : (value as
-                                | "divine"
-                                | "excellent"
-                                | "very_good"
-                                | "good"
-                                | "caution"),
-                      });
-                    }}
-                    className="w-full bg-gray-700/30 border border-gray-600/30 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 transition-all text-sm font-light"
-                  >
-                    <option value="">All Qualities</option>
-                    <option value="divine">Divine</option>
-                    <option value="excellent">Excellent</option>
-                    <option value="very_good">Very Good</option>
-                    <option value="good">Good</option>
-                    <option value="caution">Caution</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm  text-gray-300 mb-2 font-light">
+                  <label className="block text-sm text-gray-300 mb-2 font-light">
                     Results
                   </label>
                   <div className="bg-gray-700/20 rounded-lg px-3 py-2.5 text-sm text-gray-400 font-light border border-gray-600/30">
@@ -864,25 +736,6 @@ const SignalPage: React.FC = () => {
                     {filteredSignals.length} signals
                   </div>
                 </div>
-              </div>
-
-              {/* Advanced Filters */}
-              <div className="mt-4 flex items-center space-x-4">
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={filters.futures_ready || false}
-                    onChange={(e) =>
-                      handleFilterChange({
-                        futures_ready: e.target.checked || undefined,
-                      })
-                    }
-                    className="rounded border-gray-600 bg-gray-700/30 text-cyan-500 focus:ring-cyan-500"
-                  />
-                  <span className="text-sm text-gray-300 font-light">
-                    Futures Ready Only
-                  </span>
-                </label>
               </div>
             </div>
           </section>
@@ -916,185 +769,111 @@ const SignalPage: React.FC = () => {
               </div>
             ) : paginatedSignals.length > 0 ? (
               <div className="space-y-4">
-                {paginatedSignals.map((signal) => {
-                  const tp1Percentage =
-                    signal.entry_price && signal.take_profit_1
-                      ? calculatePercentageChange(
-                          signal.take_profit_1,
-                          signal.entry_price
-                        )
-                      : null;
-
-                  const slPercentage =
-                    signal.entry_price && signal.stop_loss_price
-                      ? calculatePercentageChange(
-                          signal.stop_loss_price,
-                          signal.entry_price
-                        )
-                      : null;
-
-                  return (
-                    <div
-                      key={signal.id}
-                      className={`bg-gray-800/20 backdrop-blur-sm rounded-xl p-5 cursor-pointer transition-all duration-300 border ${
-                        selectedSignal?.id === signal.id
-                          ? "border-cyan-500 shadow-lg shadow-cyan-500/20"
-                          : "border-gray-700/30 hover:border-cyan-500/30 hover:shadow-lg"
-                      } ${
-                        signal.is_futures_ready
-                          ? "ring-1 ring-cyan-500/20"
-                          : ""
-                      }`}
-                      onClick={() => handleSignalSelect(signal.id)}
-                    >
-                      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 gap-3">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                          <div className="text-xl font-light text-white">
+                {paginatedSignals.map((signal) => (
+                  <div
+                    key={signal.id}
+                    className="bg-gray-800/20 backdrop-blur-sm rounded-xl p-5 border border-gray-700/30 hover:border-cyan-500/30 transition-all duration-300 cursor-pointer group"
+                    onClick={() => handleSignalSelect(signal.id)}
+                  >
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg font-light text-white">
                             {signal.symbol}
-                          </div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span
-                              className={`px-3 py-1 rounded-full text-sm  ${getDecisionColor(
-                                signal.final_decision
-                              )}`}
-                            >
-                              {signal.final_decision === 'long' ? (
-                                <ArrowUpRight className="w-3 h-3 inline mr-1" />
-                              ) : (
-                                <ArrowDownRight className="w-3 h-3 inline mr-1" />
-                              )}
-                              {signal.final_decision.toUpperCase()}
-                            </span>
-                            <span
-                              className={`px-2 py-1 rounded-full text-sm  ${getSignalQualityColor(
-                                signal.signal_quality
-                              )}`}
-                            >
-                              {signal.signal_quality?.toUpperCase()}
-                            </span>
-                            <div
-                              className={`text-sm  ${getConsensusStrengthColor(
-                                signal.consensus_strength
-                              )}`}
-                            >
-                              {signal.consensus_strength}% Consensus
-                            </div>
-                            {signal.is_futures_ready && (
-                              <span className="px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-xs  border border-cyan-500/30">
-                                <Zap className="w-3 h-3 inline mr-1" />
-                                Futures Ready
-                              </span>
-                            )}
-                          </div>
+                          </span>
+                          <span
+                            className={`px-2.5 py-1 rounded-full text-xs ${getDecisionColor(
+                              signal.final_decision
+                            )}`}
+                          >
+                            {signal.final_decision.toUpperCase()}
+                          </span>
                         </div>
-                        <div className="text-right">
-                          <div className="text-sm text-gray-400 font-light">
-                            {formatDate(signal.created_at)}
-                          </div>
-                          {signal.analysis_duration_ms && (
-                            <div className="text-xs text-cyan-400 font-light">
-                              Analyzed in {signal.analysis_duration_ms}ms
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-sm">
-                        {signal.entry_price && (
-                          <div>
-                            <span className="text-gray-400 text-sm font-light">
-                              Entry Price
-                            </span>
-                            <div className="text-lg font-light text-white">
-                              ${signal.entry_price.toFixed(8)}
-                            </div>
-                          </div>
-                        )}
-                        {signal.take_profit_1 && tp1Percentage !== null && (
-                          <div>
-                            <span className="text-gray-400 text-sm font-light">
-                              Take Profit 1
-                            </span>
-                            <div className="text-lg font-light text-emerald-400">
-                              ${signal.take_profit_1.toFixed(8)}
-                              <span className="text-sm ml-2 font-light">
-                                (+{tp1Percentage.toFixed(2)}%)
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                        {signal.stop_loss_price && slPercentage !== null && (
-                          <div>
-                            <span className="text-gray-400 text-sm font-light">
-                              Stop Loss
-                            </span>
-                            <div className="text-lg font-light text-red-400">
-                              ${signal.stop_loss_price.toFixed(8)}
-                              <span className="text-sm ml-2 font-light">
-                                ({slPercentage.toFixed(2)}%)
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                        {/* {signal.risk_reward_ratio && (
-                          <div>
-                            <span className="text-gray-400 text-sm font-light">
-                              Risk/Reward
-                            </span>
-                            <div
-                              className={`text-lg font-light ${getPriceChangeColor(
-                                signal.risk_reward_ratio
-                              )}`}
-                            >
-                              {signal.risk_reward_ratio.toFixed(2)}:1
-                            </div>
-                          </div>
-                        )} */}
-                        {signal.suggested_leverage && (
-                          <div>
-                            <span className="text-gray-400 text-sm font-light">
-                              Leverage
-                            </span>
-                            <div
-                              className={`text-lg font-light ${getLeverageColor(
-                                signal.suggested_leverage
-                              )}`}
-                            >
-                              {signal.suggested_leverage}x
-                            </div>
-                          </div>
+                        {signal.final_decision === "long" ? (
+                          <ArrowUpRight className="w-4 h-4 text-emerald-400" />
+                        ) : (
+                          <ArrowDownRight className="w-4 h-4 text-red-400" />
                         )}
                       </div>
-
-                      {/* Additional Take Profit Levels */}
-                      {(signal.take_profit_2 || signal.take_profit_3) && (
-                        <div className="mt-4 pt-4 border-t border-gray-700/30">
-                          <div className="text-sm text-gray-400 mb-2 font-light">
-                            Additional Take Profits:
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {signal.take_profit_2 && (
-                              <div className="flex justify-between items-center text-sm">
-                                <span className="text-gray-400 font-light">TP2:</span>
-                                <span className="text-emerald-400 font-light">
-                                  ${signal.take_profit_2.toFixed(8)}
-                                </span>
-                              </div>
-                            )}
-                            {signal.take_profit_3 && (
-                              <div className="flex justify-between items-center text-sm">
-                                <span className="text-gray-400 font-light">TP3:</span>
-                                <span className="text-emerald-400 font-light">
-                                  ${signal.take_profit_3.toFixed(8)}
-                                </span>
-                              </div>
-                            )}
-                          </div>
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className="text-gray-400 font-light">
+                          {formatDate(signal.created_at)}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+                          <span className="text-cyan-400 font-light">Live</span>
                         </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div>
+                        <span className="text-gray-400 text-sm font-light block mb-1">
+                          Consensus Strength
+                        </span>
+                        <span
+                          className={`text-lg font-light ${getConsensusStrengthColor(
+                            signal.consensus_strength
+                          )}`}
+                        >
+                          {signal.consensus_strength}%
+                        </span>
+                      </div>
+
+                      <div>
+                        <span className="text-gray-400 text-sm font-light block mb-1">
+                          Suggested Leverage
+                        </span>
+                        <span
+                          className={`text-lg font-light ${getLeverageColor(
+                            signal.suggested_leverage
+                          )}`}
+                        >
+                          {signal.suggested_leverage
+                            ? `${signal.suggested_leverage}x`
+                            : "N/A"}
+                        </span>
+                      </div>
+
+                      <div>
+                        <span className="text-gray-400 text-sm font-light block mb-1">
+                          Entry Price
+                        </span>
+                        <span className="text-lg font-light text-white">
+                          {signal.entry_price
+                            ? `$${signal.entry_price.toFixed(6)}`
+                            : "N/A"}
+                        </span>
+                      </div>
+
+                      <div>
+                        <span className="text-gray-400 text-sm font-light block mb-1">
+                          Risk/Reward
+                        </span>
+                        <span
+                          className={`text-lg font-light ${getPriceChangeColor(
+                            signal.risk_reward_ratio
+                          )}`}
+                        >
+                          {signal.risk_reward_ratio
+                            ? `${signal.risk_reward_ratio.toFixed(2)}:1`
+                            : "N/A"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 pt-4 border-t border-gray-700/30 flex justify-between items-center">
+                      <span className="text-gray-500 text-sm font-light group-hover:text-cyan-400 transition-colors">
+                        Click for detailed analysis →
+                      </span>
+                      {signal.expires_at && (
+                        <span className="text-amber-400 text-xs font-light">
+                          Expires: {formatDate(signal.expires_at)}
+                        </span>
                       )}
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
               </div>
             ) : (
               <EmptyState
@@ -1106,40 +885,36 @@ const SignalPage: React.FC = () => {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <section className="mt-6">
-              <div className="flex justify-center items-center space-x-2">
+            <section className="mt-8 flex justify-center">
+              <div className="flex items-center gap-2 bg-gray-800/20 backdrop-blur-sm rounded-xl p-2 border border-gray-700/30">
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 bg-gray-800/30 border border-gray-600/30 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/30 transition-all flex items-center text-sm "
+                  className="px-3 py-2 rounded-lg text-sm font-light transition-all disabled:opacity-30 disabled:cursor-not-allowed text-gray-400 hover:text-white hover:bg-gray-700/30"
                 >
-                  <span>←</span>
-                  <span className="ml-2">Previous</span>
+                  Previous
                 </button>
 
-                <div className="flex space-x-1">
-                  {getPageNumbers().map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => handlePageChange(page)}
-                      className={`px-4 py-2 rounded-lg transition-all text-sm  ${
-                        currentPage === page
-                          ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/25"
-                          : "bg-gray-800/30 text-gray-300 hover:bg-gray-700/30 border border-gray-600/30"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                </div>
+                {getPageNumbers().map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-3 py-2 rounded-lg text-sm font-light transition-all ${
+                      currentPage === page
+                        ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30"
+                        : "text-gray-400 hover:text-white hover:bg-gray-700/30"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
 
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-gray-800/30 border border-gray-600/30 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/30 transition-all flex items-center text-sm "
+                  className="px-3 py-2 rounded-lg text-sm font-light transition-all disabled:opacity-30 disabled:cursor-not-allowed text-gray-400 hover:text-white hover:bg-gray-700/30"
                 >
-                  <span className="mr-2">Next</span>
-                  <span>→</span>
+                  Next
                 </button>
               </div>
             </section>
@@ -1153,7 +928,6 @@ const SignalPage: React.FC = () => {
         onClose={handleCloseModal}
         formatDate={formatDate}
         getDecisionColor={getDecisionColor}
-        getSignalQualityColor={getSignalQualityColor}
         getConsensusStrengthColor={getConsensusStrengthColor}
         getLeverageColor={getLeverageColor}
         getPriceChangeColor={getPriceChangeColor}
