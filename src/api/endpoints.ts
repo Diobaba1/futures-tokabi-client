@@ -9,7 +9,15 @@ export const API_ENDPOINTS = {
     REGISTER: "/auth/register/",
     LOGOUT: "/auth/logout/",
     PROFILE: "/auth/profile/",
+
+    // Password Reset & Management
+    FORGOT_PASSWORD: "/auth/forgot-password",
+    RESET_PASSWORD: "/auth/reset-password",
+    VALIDATE_RESET_TOKEN: "/auth/validate-reset-token",
+    CHANGE_PASSWORD: "/auth/change-password",
+
   },
+
 
   // Users
   USERS: {

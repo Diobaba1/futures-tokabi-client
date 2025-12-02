@@ -24,6 +24,11 @@ import TgConfigPage from "./pages/config/tgConfigPage";
 import { SymbolSearchPage } from "./pages/analytics/SymbolSearchPage";
 import AffiliatePage from "./pages/Users/AffiliatePage";
 
+import ForgotPasswordPage from "./pages/Auth/settings/password/ForgotPasswordPage";
+import SecuritySettingsPage from "./pages/Auth/settings/SecuritySettingsPage";
+import ChangePasswordPage from "./pages/Auth/settings/password/ChangePasswordPage";
+import ResetPasswordPage from "./pages/Auth/settings/password/ResetPasswordPage";
+
 interface RouteConfig {
   path: string;
   element: React.ReactNode;
@@ -49,37 +54,109 @@ const publicRoutes: RouteConfig[] = [
     requireAuth: false,
   },
   {
+    path: "/forgot-password",
+    element: <ForgotPasswordPage />,
+    layout: PublicLayout,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPasswordPage />,
+    layout: PublicLayout,
+  },
+  {
     path: "/features",
     element: <FeaturesSection />,
     layout: PublicLayout,
-    protected: true,
-    requireAuth: false,
   },
-
   {
     path: "/community",
     element: <CommunityPage />,
     layout: PublicLayout,
-    protected: true,
-    requireAuth: false,
   },
 ];
 
-//APIKeyManager
 const dashboardRoutes: RouteConfig[] = [
-  { path: "/dashboard", element: <Dashboard />, layout: DashboardLayout, protected: true },
-  { path: "/dashboard/api-key", element: <APIKeyManager />, layout: DashboardLayout, protected: true },
-  { path: "/dashboard/notifications", element: <TgConfigPage />, layout: DashboardLayout, protected: true },
-  { path: "/dashboard/billing", element: <Billing />, layout: DashboardLayout, protected: true },
-  { path: "/dashboard/trading", element: <Trades />, layout: DashboardLayout, protected: true },
-  { path: "/dashboard/settings", element: <Profile />, layout: DashboardLayout, protected: true },
-  { path: "/dashboard/signals", element: <SignalsPage />, layout: DashboardLayout, protected: true },
-  { path: "/dashboard/symbol-analysis", element: <SymbolSearchPage />, layout: DashboardLayout, protected: true },
-  { path: "/dashboard/performance", element: <div>Performance Page</div>, layout: DashboardLayout, protected: true }, 
-  { path: "/dashboard/affiliate-dashboard", element: <AffiliatePage />, layout: DashboardLayout, protected: true }, 
+  {
+    path: "/dashboard",
+    element: <Dashboard />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  {
+    path: "/dashboard/api-key",
+    element: <APIKeyManager />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  {
+    path: "/dashboard/notifications",
+    element: <TgConfigPage />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  {
+    path: "/dashboard/billing",
+    element: <Billing />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  {
+    path: "/dashboard/trading",
+    element: <Trades />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  {
+    path: "/dashboard/settings",
+    element: <Profile />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  {
+    path: "/dashboard/settings/security",
+    element: <SecuritySettingsPage />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  {
+    path: "/dashboard/settings/change-password",
+    element: <ChangePasswordPage />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  {
+    path: "/dashboard/signals",
+    element: <SignalsPage />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  {
+    path: "/dashboard/symbol-analysis",
+    element: <SymbolSearchPage />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  {
+    path: "/dashboard/performance",
+    element: <div>Performance Page</div>,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  {
+    path: "/dashboard/affiliate-dashboard",
+    element: <AffiliatePage />,
+    layout: DashboardLayout,
+    protected: true,
+  },
 ];
 
-function renderRoute({ path, element, layout: Layout, protected: isProtected, requireAuth }: RouteConfig) {
+function renderRoute({
+  path,
+  element,
+  layout: Layout,
+  protected: isProtected,
+  requireAuth,
+}: RouteConfig) {
   const content = <Layout>{element}</Layout>;
 
   if (isProtected) {
@@ -88,9 +165,7 @@ function renderRoute({ path, element, layout: Layout, protected: isProtected, re
         key={path}
         path={path}
         element={
-          <ProtectedRoute requireAuth={requireAuth}>
-            {content}
-          </ProtectedRoute>
+          <ProtectedRoute requireAuth={requireAuth}>{content}</ProtectedRoute>
         }
       />
     );
@@ -106,13 +181,8 @@ function App() {
         <AnalyticsProvider>
           <Router>
             <div className="relative">
-             
-             
               <Routes>
-                {/* Public Routes */}
                 {publicRoutes.map(renderRoute)}
-
-                {/* Dashboard Routes */}
                 {dashboardRoutes.map(renderRoute)}
 
                 {/* 404 Page */}
@@ -122,8 +192,12 @@ function App() {
                     <PublicLayout>
                       <div className="min-h-screen flex items-center justify-center">
                         <div className="text-center">
-                          <h1 className="text-4xl font-bold text-white mb-4">404</h1>
-                          <p className="text-gray-400 text-lg">Page not found</p>
+                          <h1 className="text-4xl font-bold text-white mb-4">
+                            404
+                          </h1>
+                          <p className="text-gray-400 text-lg">
+                            Page not found
+                          </p>
                         </div>
                       </div>
                     </PublicLayout>
