@@ -19,7 +19,6 @@ import "./App.css";
 import CommunityPage from "./pages/pageComponents/Community";
 import APIKeyManager from "./pages/walletpages/APIKeyManager";
 import Billing from "./pages/Billing/Billing";
-import SignalsPage from "./pages/pageComponents/SignalsPage";
 import TgConfigPage from "./pages/config/tgConfigPage";
 import { SymbolSearchPage } from "./pages/analytics/SymbolSearchPage";
 import AffiliatePage from "./pages/Users/AffiliatePage";
@@ -28,6 +27,7 @@ import ForgotPasswordPage from "./pages/Auth/settings/password/ForgotPasswordPag
 import SecuritySettingsPage from "./pages/Auth/settings/SecuritySettingsPage";
 import ChangePasswordPage from "./pages/Auth/settings/password/ChangePasswordPage";
 import ResetPasswordPage from "./pages/Auth/settings/password/ResetPasswordPage";
+import { SignalsDashboard } from "./pages/signals";
 
 interface RouteConfig {
   path: string;
@@ -126,7 +126,7 @@ const dashboardRoutes: RouteConfig[] = [
   },
   {
     path: "/dashboard/signals",
-    element: <SignalsPage />,
+    element: <SignalsDashboard />,
     layout: DashboardLayout,
     protected: true,
   },

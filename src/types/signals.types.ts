@@ -1,67 +1,98 @@
-// FILE: src/types/signals.types.ts
+// =============================================================================
+// FILE: src/types/index.ts
+// =============================================================================
+// TypeScript type definitions for User Signal Frontend
+// Users can only see: Symbol, Entry, SL, Active Status, Created Time
+// =============================================================================
 
-export interface SignalResponse {
+// =============================================================================
+// Enums
+// =============================================================================
+
+export enum SignalDecision {
+  LONG = "long",
+  SHORT = "short",
+  HOLD = "hold",
+}
+
+export enum SignalStatus {
+  ACTIVE = "active",
+  EXPIRED = "expired",
+  EXECUTED = "executed",
+  CANCELLED = "cancelled",
+}
+
+// =============================================================================
+// User Signal Types (Limited Fields Only)
+// =============================================================================
+
+/**
+ * User-visible signal fields only
+ * Users can ONLY see: Symbol, Entry, SL, Active Status, Created Time
+ */
+export interface UserSignal {
   id: string;
   symbol: string;
-  final_decision: 'long' | 'short' | 'hold';
-  consensus_strength: number;
+  decision: SignalDecision | string;
   entry_price: number | null;
   stop_loss_price: number | null;
-  take_profit_price: number | null;  // Simplified to single TP
-  risk_reward_ratio: number | null;
-  suggested_leverage: number | null;
+  status: SignalStatus | string;
   created_at: string;
-  analysis_duration_ms: number | null;
-  expires_at: string | null;
 }
 
-export interface SignalDetailResponse extends SignalResponse {
-  market_data: Record<string, any>;
-  indicators: Record<string, any>;
-  estimated_tp_percent: number | null;
-  estimated_sl_percent: number | null;
-  anthropic_decision: SignalDecision | null;
-  qwen_decision: SignalDecision | null;
-  deepseek_decision: SignalDecision | null;
-  grok_decision: SignalDecision | null;
+/**
+ * User signal list response
+ */
+export interface UserSignalListResponse {
+  signals: UserSignal[];
+  total: number;
+  hasMore: boolean;
 }
 
-export interface SignalDecision {
-  decision: string | null;
-  confidence: number | null;
-  reasoning: string | null;
-}
-
-export interface SignalStats {
+/**
+ * User signal stats (limited view)
+ */
+export interface UserSignalStats {
   timeframe: string;
   total_signals: number;
   decisions: {
     long: number;
     short: number;
+    hold?: number;
   };
-  avg_consensus_strength: number;
-  avg_leverage: number | null;
   most_active_symbols: Array<{
     symbol: string;
-    signal_count: number;
+    count: number;
   }>;
-  success_rate: number | null;
 }
 
-export interface SignalFilters {
+/**
+ * User signal filters
+ */
+export interface UserSignalFilters {
   symbol?: string;
-  decision?: 'long' | 'short' | 'hold';
-  min_leverage?: number;
-  max_leverage?: number;
-  min_consensus?: number;
+  decision?: SignalDecision | string;
+  status?: SignalStatus | string;
   limit?: number;
   offset?: number;
   start_date?: string;
   end_date?: string;
 }
 
-export interface SignalsResponse {
-  signals: SignalResponse[];
-  total: number;
-  hasMore: boolean;
+// =============================================================================
+// API Response Types
+// =============================================================================
+
+export interface StatusUpdateResponse {
+  message: string;
+  signal: UserSignal;
+}
+
+// =============================================================================
+// UI State Types
+// =============================================================================
+
+export interface LoadingState {
+  isLoading: boolean;
+  error: string | null;
 }

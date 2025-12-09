@@ -1,7 +1,8 @@
 // ============================================================================
 // FILE: src/api/endpoints.ts (UPDATED - Referral System Section)
 // ============================================================================
-
+const API_BASE =
+  process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api";
 export const API_ENDPOINTS = {
   // Authentication
   AUTH: {
@@ -15,9 +16,7 @@ export const API_ENDPOINTS = {
     RESET_PASSWORD: "/auth/reset-password",
     VALIDATE_RESET_TOKEN: "/auth/validate-reset-token",
     CHANGE_PASSWORD: "/auth/change-password",
-
   },
-
 
   // Users
   USERS: {
@@ -42,7 +41,7 @@ export const API_ENDPOINTS = {
     ANALYZE: "/search_symbol/analyze-symbols",
     DETAIL: (search_id: string) => `/search_symbol/search/${search_id}`,
     HISTORY: "/search_symbol/search-history",
-    RATE_LIMITS: "/search_symbol/rate-limit"
+    RATE_LIMITS: "/search_symbol/rate-limit",
   },
 
   // ============================================================================
@@ -63,11 +62,11 @@ export const API_ENDPOINTS = {
     // Affiliate Endpoints (Admin)
     // ========================================
     ADMIN_APPLICATIONS: "/affiliates/admin/applications",
-    ADMIN_APPLICATION_REVIEW: (application_id: string) => 
+    ADMIN_APPLICATION_REVIEW: (application_id: string) =>
       `/affiliates/admin/applications/${application_id}/review`,
-    ADMIN_COMMISSION_APPROVE: (commission_id: string) => 
+    ADMIN_COMMISSION_APPROVE: (commission_id: string) =>
       `/affiliates/admin/commissions/${commission_id}/approve`,
-    ADMIN_COMMISSION_PAY: (commission_id: string) => 
+    ADMIN_COMMISSION_PAY: (commission_id: string) =>
       `/affiliates/admin/commissions/${commission_id}/pay`,
 
     // ========================================
@@ -99,15 +98,27 @@ export const API_ENDPOINTS = {
     PORTFOLIO: "/analytics/portfolio/",
     PERFORMANCE: "/analytics/performance/",
     HISTORY: "/analytics/history/",
-    SYSTEM: "/analytics/system/"
+    SYSTEM: "/analytics/system/",
   },
 
-  // Signals (open endpoints)
   SIGNALS: {
+    // GET /signals/ - List signals with filters
     LIST: "/signals/",
-    DETAIL: "/signals/{signal_id}",
-    SYMBOLS: "/signals/symbols/",
-    STATS: "/signals/stats/summary",
+
+    // GET /signals/active - Get active signals
+    ACTIVE: "/signals/active",
+
+    // GET /signals/stats - Get signal statistics
+    STATS: "/signals/stats",
+
+    // GET /signals/symbols - Get available symbols
+    SYMBOLS: "/signals/symbols",
+
+    // GET /signals/{signal_id} - Get signal detail
+    DETAIL: (signalId: string) => `/signals/${signalId}`,
+
+    // PATCH /signals/{signal_id}/status - Update signal status
+    UPDATE_STATUS: (signalId: string) => `/signals/${signalId}/status`,
   },
 
   // Binance Stream
@@ -120,3 +131,23 @@ export const API_ENDPOINTS = {
   HEALTH: "/health",
   METRICS: "/metrics",
 } as const;
+
+/**
+ * Build query string from params object
+ */
+export function buildQueryString(params: Record<string, any>): string {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      if (Array.isArray(value)) {
+        value.forEach((v) => searchParams.append(key, String(v)));
+      } else {
+        searchParams.append(key, String(value));
+      }
+    }
+  });
+
+  const queryString = searchParams.toString();
+  return queryString ? `?${queryString}` : "";
+}
