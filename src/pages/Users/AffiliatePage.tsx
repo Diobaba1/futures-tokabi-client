@@ -1,5 +1,5 @@
 // ============================================================================
-// FILE: src/pages/AffiliatePage.tsx (UPDATED)
+// FILE: src/pages/Users/AffiliatePage.tsx (COMPLETE)
 // ============================================================================
 
 import React, { useState, useEffect } from 'react';
@@ -17,16 +17,18 @@ import {
   ExternalLink,
   Plus,
   X,
-  Loader2
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 import { UserAffiliateService } from '../../api/services/UserAffiliateService';
 import { useAuth } from '../../components/contexts/AuthContext';
 import type {
-  AffiliateApplicationResponse,
-  AffiliateProfileResponse,
+  ApplicationStatusResponse,
+  ProfileStatusResponse,
   AffiliateStatsResponse,
   ReferralUrlResponse,
-  AffiliateCommissionResponse
+  AffiliateCommissionResponse,
+  AffiliateApplicationResponse
 } from '../../types/userAffiliate.types';
 
 type TabType = 'overview' | 'application' | 'referral' | 'commissions' | 'profile';
@@ -40,8 +42,8 @@ const AffiliatePage: React.FC = () => {
   
   // State for different data
   const [stats, setStats] = useState<AffiliateStatsResponse | null>(null);
-  const [application, setApplication] = useState<AffiliateApplicationResponse | null>(null);
-  const [profile, setProfile] = useState<AffiliateProfileResponse | null>(null);
+  const [applicationStatus, setApplicationStatus] = useState<ApplicationStatusResponse | null>(null);
+  const [profileStatus, setProfileStatus] = useState<ProfileStatusResponse | null>(null);
   const [referralUrl, setReferralUrl] = useState<ReferralUrlResponse | null>(null);
   const [commissions, setCommissions] = useState<AffiliateCommissionResponse[]>([]);
   const [copiedUrl, setCopiedUrl] = useState(false);
@@ -56,35 +58,18 @@ const AffiliatePage: React.FC = () => {
     
     try {
       // Always load stats and referral URL (these work for all users)
-      const [statsData, refUrlData] = await Promise.all([
+      const [statsData, refUrlData, appStatusData, profStatusData] = await Promise.all([
         UserAffiliateService.getStats(),
-        UserAffiliateService.getReferralUrl()
+        UserAffiliateService.getReferralUrl(),
+        UserAffiliateService.getApplication(),
+        UserAffiliateService.getProfile()
       ]);
       
       setStats(statsData);
       setReferralUrl(refUrlData);
+      setApplicationStatus(appStatusData);
+      setProfileStatus(profStatusData);
 
-      // Try to load application (may not exist)
-      try {
-        const appData = await UserAffiliateService.getApplication();
-        setApplication(appData);
-      } catch (err: any) {
-        // 404 is expected if no application exists
-        if (err.response?.status !== 404) {
-          console.error('Error loading application:', err);
-        }
-      }
-
-      // Try to load profile (only exists for approved affiliates)
-      try {
-        const profileData = await UserAffiliateService.getProfile();
-        setProfile(profileData);
-      } catch (err: any) {
-        // 404 is expected if not an affiliate
-        if (err.response?.status !== 404) {
-          console.error('Error loading profile:', err);
-        }
-      }
     } catch (err: any) {
       console.error('Error loading initial data:', err);
       setError(err.response?.data?.detail || 'Failed to load affiliate data');
@@ -98,10 +83,8 @@ const AffiliatePage: React.FC = () => {
       const data = await UserAffiliateService.getCommissions({ limit: 50 });
       setCommissions(data);
     } catch (error: any) {
-      // Empty array is fine if user has no commissions
-      if (error.response?.status !== 404) {
-        console.error('Error loading commissions:', error);
-      }
+      console.error('Error loading commissions:', error);
+      // Empty array is fine - handled gracefully
     }
   };
 
@@ -154,6 +137,11 @@ const AffiliatePage: React.FC = () => {
     }
   };
 
+  // Determine what actions to show based on user status
+  const canApply = !applicationStatus?.has_application && !profileStatus?.is_affiliate;
+  const hasApplication = applicationStatus?.has_application || false;
+  const isAffiliate = profileStatus?.is_affiliate || false;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
@@ -193,22 +181,42 @@ const AffiliatePage: React.FC = () => {
               Affiliate Program
             </h1>
             <p className="text-gray-400 mt-1">
-              {stats?.is_affiliate 
-                ? `Earn ${stats.initial_commission_rate}% on new signups + ${stats.renewal_commission_rate}% on renewals`
+              {isAffiliate
+                ? `Earn ${stats?.initial_commission_rate}% on new signups + ${stats?.renewal_commission_rate}% on renewals`
                 : 'Earn 10% commission by referring new users'
               }
             </p>
           </div>
-          {!application && (
+          {canApply && (
             <button
               onClick={() => setShowApplicationModal(true)}
               className="flex items-center gap-2 px-6 py-3 bg-cyan-500 hover:bg-cyan-600 rounded-lg font-medium transition-colors"
             >
               <Plus className="w-5 h-5" />
-              {stats?.is_affiliate ? 'Already an Affiliate' : 'Become an Affiliate'}
+              Become an Affiliate
             </button>
           )}
+          {isAffiliate && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-lg border border-emerald-500/30">
+              <CheckCircle className="w-5 h-5" />
+              <span className="font-medium">Approved Affiliate</span>
+            </div>
+          )}
         </div>
+
+        {/* Info Banner for non-affiliates with application */}
+        {hasApplication && !isAffiliate && applicationStatus?.application && (
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex items-start gap-3">
+            <AlertCircle className="w-6 h-6 text-amber-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-amber-400 mb-1">Application Pending</h3>
+              <p className="text-gray-300 text-sm">
+                Your affiliate application is under review. We'll notify you once it's been processed.
+                Current status: <span className="capitalize font-medium">{applicationStatus.application.status}</span>
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Stats Cards */}
         {stats && (
@@ -237,7 +245,7 @@ const AffiliatePage: React.FC = () => {
               icon={<Award className="w-6 h-6" />}
               title="Commission Rate"
               value={`${stats.initial_commission_rate}%`}
-              subtitle={stats.is_affiliate ? 'Approved Affiliate' : 'Standard User'}
+              subtitle={isAffiliate ? 'Approved Affiliate' : 'Standard User'}
               color="purple"
             />
           </div>
@@ -265,7 +273,7 @@ const AffiliatePage: React.FC = () => {
                 icon={<DollarSign className="w-4 h-4" />}
                 label="Commissions"
               />
-              {(application || stats?.is_affiliate) && (
+              {hasApplication && (
                 <Tab
                   active={activeTab === 'application'}
                   onClick={() => setActiveTab('application')}
@@ -273,7 +281,7 @@ const AffiliatePage: React.FC = () => {
                   label="Application"
                 />
               )}
-              {profile && (
+              {isAffiliate && profileStatus?.profile && (
                 <Tab
                   active={activeTab === 'profile'}
                   onClick={() => setActiveTab('profile')}
@@ -288,8 +296,9 @@ const AffiliatePage: React.FC = () => {
             {activeTab === 'overview' && <OverviewTab stats={stats} />}
             {activeTab === 'application' && (
               <ApplicationTab
-                application={application}
+                applicationStatus={applicationStatus}
                 onApply={() => setShowApplicationModal(true)}
+                getStatusIcon={getStatusIcon}
               />
             )}
             {activeTab === 'referral' && (
@@ -305,9 +314,15 @@ const AffiliatePage: React.FC = () => {
                 formatCurrency={formatCurrency}
                 getStatusColor={getStatusColor}
                 getStatusIcon={getStatusIcon}
+                isAffiliate={isAffiliate}
               />
             )}
-            {activeTab === 'profile' && <ProfileTab profile={profile} stats={stats} />}
+            {activeTab === 'profile' && (
+              <ProfileTab 
+                profileStatus={profileStatus} 
+                stats={stats} 
+              />
+            )}
           </div>
         </div>
       </div>
@@ -326,7 +341,10 @@ const AffiliatePage: React.FC = () => {
   );
 };
 
-// StatCard component with optional subtitle
+// ============================================================================
+// HELPER COMPONENTS
+// ============================================================================
+
 const StatCard: React.FC<{
   icon: React.ReactNode;
   title: string;
@@ -372,6 +390,10 @@ const Tab: React.FC<{
   </button>
 );
 
+// ============================================================================
+// TAB COMPONENTS
+// ============================================================================
+
 const OverviewTab: React.FC<{ stats: AffiliateStatsResponse | null }> = ({ stats }) => {
   if (!stats) {
     return (
@@ -406,45 +428,12 @@ const OverviewTab: React.FC<{ stats: AffiliateStatsResponse | null }> = ({ stats
         </div>
       </div>
 
-      {stats.recent_commissions && stats.recent_commissions.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold mb-4">Recent Commissions</h3>
-          <div className="space-y-2">
-            {stats.recent_commissions.slice(0, 5).map((commission) => (
-              <div
-                key={commission.id}
-                className="bg-slate-800/30 rounded-lg p-4 flex justify-between items-center"
-              >
-                <div>
-                  <div className="font-medium capitalize">{commission.commission_type}</div>
-                  <div className="text-sm text-gray-400">
-                    {new Date(commission.created_at).toLocaleDateString()}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-cyan-400">
-                    ${(commission.commission_amount / 100).toFixed(2)}
-                  </div>
-                  <div className={`text-sm capitalize ${
-                    commission.status === 'paid' ? 'text-emerald-400' : 
-                    commission.status === 'pending' ? 'text-amber-400' :
-                    'text-red-400'
-                  }`}>
-                    {commission.status}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {(!stats.recent_commissions || stats.recent_commissions.length === 0) && (
+      {stats.total_referrals === 0 && (
         <div className="text-center py-12">
-          <DollarSign className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold mb-2">No Commissions Yet</h3>
+          <Users className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2">No Referrals Yet</h3>
           <p className="text-gray-400">
-            Share your referral link to start earning commissions
+            Share your referral link to start earning commissions!
           </p>
         </div>
       )}
@@ -453,16 +442,18 @@ const OverviewTab: React.FC<{ stats: AffiliateStatsResponse | null }> = ({ stats
 };
 
 const ApplicationTab: React.FC<{
-  application: AffiliateApplicationResponse | null;
+  applicationStatus: ApplicationStatusResponse | null;
   onApply: () => void;
-}> = ({ application, onApply }) => {
-  if (!application) {
+  getStatusIcon: (status: string) => React.ReactNode;
+}> = ({ applicationStatus, onApply, getStatusIcon }) => {
+  if (!applicationStatus?.has_application || !applicationStatus.application) {
     return (
       <div className="text-center py-12">
         <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
         <h3 className="text-xl font-semibold mb-2">No Application Yet</h3>
-        <p className="text-gray-400 mb-6">
-          Apply to become an affiliate and earn 25% commission on initial subscriptions + 10% on renewals
+        <p className="text-gray-400 mb-2">{applicationStatus?.message}</p>
+        <p className="text-gray-500 text-sm mb-6">
+          Apply to earn 25% commission on initial subscriptions + 10% on renewals
         </p>
         <button
           onClick={onApply}
@@ -473,6 +464,8 @@ const ApplicationTab: React.FC<{
       </div>
     );
   }
+
+  const application = applicationStatus.application;
 
   return (
     <div className="space-y-6">
@@ -662,7 +655,20 @@ const CommissionsTab: React.FC<{
   formatCurrency: (cents: number) => string;
   getStatusColor: (status: string) => string;
   getStatusIcon: (status: string) => React.ReactNode;
-}> = ({ commissions, formatCurrency, getStatusColor, getStatusIcon }) => {
+  isAffiliate: boolean;
+}> = ({ commissions, formatCurrency, getStatusColor, getStatusIcon, isAffiliate }) => {
+  if (!isAffiliate) {
+    return (
+      <div className="text-center py-12">
+        <DollarSign className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+        <h3 className="text-xl font-semibold mb-2">Affiliate-Only Feature</h3>
+        <p className="text-gray-400">
+          Apply to become an affiliate to start earning commissions and track your earnings here.
+        </p>
+      </div>
+    );
+  }
+
   if (commissions.length === 0) {
     return (
       <div className="text-center py-12">
@@ -724,20 +730,23 @@ const CommissionsTab: React.FC<{
 };
 
 const ProfileTab: React.FC<{
-  profile: AffiliateProfileResponse | null;
+  profileStatus: ProfileStatusResponse | null;
   stats: AffiliateStatsResponse | null;
-}> = ({ profile, stats }) => {
-  if (!profile) {
+}> = ({ profileStatus, stats }) => {
+  if (!profileStatus?.has_profile || !profileStatus.profile) {
     return (
       <div className="text-center py-12">
         <Award className="w-16 h-16 text-gray-600 mx-auto mb-4" />
         <h3 className="text-xl font-semibold mb-2">No Affiliate Profile</h3>
-        <p className="text-gray-400 mb-6">
+        <p className="text-gray-400 mb-2">{profileStatus?.message}</p>
+        <p className="text-gray-500 text-sm">
           Apply to become an affiliate to unlock your profile and earn higher commissions
         </p>
       </div>
     );
   }
+
+  const profile = profileStatus.profile;
 
   return (
     <div className="space-y-6">
@@ -797,6 +806,10 @@ const ProfileTab: React.FC<{
     </div>
   );
 };
+
+// ============================================================================
+// APPLICATION MODAL
+// ============================================================================
 
 const ApplicationModal: React.FC<{
   onClose: () => void;
@@ -1019,23 +1032,6 @@ const ApplicationModal: React.FC<{
       </div>
     </div>
   );
-};
-
-// Helper function for status icons
-const getStatusIcon = (status: string) => {
-  switch (status) {
-    case 'approved':
-    case 'paid':
-      return <CheckCircle className="w-4 h-4" />;
-    case 'pending':
-      return <Clock className="w-4 h-4" />;
-    case 'rejected':
-    case 'cancelled':
-    case 'suspended':
-      return <XCircle className="w-4 h-4" />;
-    default:
-      return null;
-  }
 };
 
 export default AffiliatePage;

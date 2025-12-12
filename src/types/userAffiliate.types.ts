@@ -20,6 +20,13 @@ export interface AffiliateApplicationResponse {
   created_at: string; // ISO date string
 }
 
+// NEW: Wrapper response for application endpoint
+export interface ApplicationStatusResponse {
+  has_application: boolean;
+  message: string;
+  application: AffiliateApplicationResponse | null;
+}
+
 export interface AffiliateProfileResponse {
   id: string;
   user_id: string;
@@ -31,6 +38,14 @@ export interface AffiliateProfileResponse {
   initial_commission_rate: number; // Percentage (e.g., 25 for 25%)
   renewal_commission_rate: number; // Percentage (e.g., 10 for 10%)
   created_at: string; // ISO date string
+}
+
+// NEW: Wrapper response for profile endpoint
+export interface ProfileStatusResponse {
+  has_profile: boolean;
+  is_affiliate: boolean;
+  message: string;
+  profile: AffiliateProfileResponse | null;
 }
 
 export interface AffiliateCommissionResponse {
@@ -45,16 +60,25 @@ export interface AffiliateCommissionResponse {
 }
 
 export interface AffiliateStatsResponse {
+  affiliate_id: string | null; // null for non-affiliates
   is_affiliate: boolean;
   total_referrals: number;
   active_referrals: number;
+  converted_referrals: number;
+  conversion_rate: number; // Percentage as decimal (e.g., 80.5 for 80.5%)
   total_earnings: number; // In cents
   pending_earnings: number; // In cents
   paid_earnings: number; // In cents
-  conversion_rate: number; // Percentage as decimal (e.g., 80.5 for 80.5%)
+  total_commissions: number;
+  pending_commissions: number;
+  approved_commissions: number;
+  paid_commissions: number;
+  current_month_earnings: number; // In cents
+  current_month_referrals: number;
+  last_payout_date: string | null; // ISO date string
+  next_payout_date: string | null; // ISO date string
   initial_commission_rate: number; // Percentage
   renewal_commission_rate: number; // Percentage
-  recent_commissions: AffiliateCommissionResponse[];
 }
 
 export interface ReferralUrlResponse {

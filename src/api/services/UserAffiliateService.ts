@@ -9,7 +9,9 @@ import { API_ENDPOINTS } from '../endpoints';
 import type {
   AffiliateApplicationCreate,
   AffiliateApplicationResponse,
-  AffiliateProfileResponse,
+  ApplicationStatusResponse,
+  // AffiliateProfileResponse,
+  ProfileStatusResponse,
   AffiliateStatsResponse,
   ReferralUrlResponse,
   AffiliateCommissionResponse,
@@ -41,8 +43,9 @@ export const UserAffiliateService = {
   /**
    * Get current user's affiliate application
    * GET /affiliates/application
+   * Returns structured response indicating if application exists
    */
-  getApplication: async (): Promise<AffiliateApplicationResponse> => {
+  getApplication: async (): Promise<ApplicationStatusResponse> => {
     const response = await axiosInstance.get(API_ENDPOINTS.REFERAL_SYSTEM.APPLICATION);
     return response.data;
   },
@@ -50,8 +53,9 @@ export const UserAffiliateService = {
   /**
    * Get current user's affiliate profile
    * GET /affiliates/profile
+   * Returns structured response indicating if profile exists
    */
-  getProfile: async (): Promise<AffiliateProfileResponse> => {
+  getProfile: async (): Promise<ProfileStatusResponse> => {
     const response = await axiosInstance.get(API_ENDPOINTS.REFERAL_SYSTEM.PROFILE);
     return response.data;
   },
@@ -68,6 +72,7 @@ export const UserAffiliateService = {
   /**
    * Get comprehensive affiliate statistics
    * GET /affiliates/stats
+   * Works for both regular users and affiliates
    */
   getStats: async (): Promise<AffiliateStatsResponse> => {
     const response = await axiosInstance.get(API_ENDPOINTS.REFERAL_SYSTEM.STATS);
@@ -77,6 +82,7 @@ export const UserAffiliateService = {
   /**
    * Get commission history with optional filters
    * GET /affiliates/commissions
+   * Returns empty array if user is not an affiliate
    */
   getCommissions: async (params?: AffiliateCommissionParams): Promise<AffiliateCommissionResponse[]> => {
     const response = await axiosInstance.get(
