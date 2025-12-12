@@ -28,6 +28,7 @@ import SecuritySettingsPage from "./pages/Auth/settings/SecuritySettingsPage";
 import ChangePasswordPage from "./pages/Auth/settings/password/ChangePasswordPage";
 import ResetPasswordPage from "./pages/Auth/settings/password/ResetPasswordPage";
 import { SignalsDashboard } from "./pages/signals";
+import ReferredUsersList from "./pages/Users/ReferredUsersList";
 
 interface RouteConfig {
   path: string;
@@ -145,6 +146,13 @@ const dashboardRoutes: RouteConfig[] = [
   {
     path: "/dashboard/affiliate-dashboard",
     element: <AffiliatePage />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+
+  {
+    path: "/dashboard/referals",
+    element: <ReferredUsersList />,
     layout: DashboardLayout,
     protected: true,
   },

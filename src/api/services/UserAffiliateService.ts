@@ -2,8 +2,8 @@
 // FILE: src/api/services/UserAffiliateService.ts (UPDATED)
 // ============================================================================
 
-import axiosInstance from '../axiosConfig';
-import { API_ENDPOINTS } from '../endpoints';
+import axiosInstance from "../axiosConfig";
+import { API_ENDPOINTS } from "../endpoints";
 
 // Import types
 import type {
@@ -16,12 +16,14 @@ import type {
   ReferralUrlResponse,
   AffiliateCommissionResponse,
   AffiliateCommissionParams,
-  AffiliateApplicationReview,
   ReferralCodeResponse,
   ReferralStats,
   ReferralResponse,
-  ReferralRewardResponse
-} from '../../types/userAffiliate.types';
+  ReferralRewardResponse,
+  ReferredUserParams,
+  ReferredUser,
+  MyReferralsResponse,
+} from "../../types/userAffiliate.types";
 
 export const UserAffiliateService = {
   // ============================================================================
@@ -32,7 +34,9 @@ export const UserAffiliateService = {
    * Apply to become an affiliate
    * POST /affiliates/apply
    */
-  applyForAffiliate: async (data: AffiliateApplicationCreate): Promise<AffiliateApplicationResponse> => {
+  applyForAffiliate: async (
+    data: AffiliateApplicationCreate
+  ): Promise<AffiliateApplicationResponse> => {
     const response = await axiosInstance.post(
       API_ENDPOINTS.REFERAL_SYSTEM.APPLY,
       data
@@ -46,7 +50,9 @@ export const UserAffiliateService = {
    * Returns structured response indicating if application exists
    */
   getApplication: async (): Promise<ApplicationStatusResponse> => {
-    const response = await axiosInstance.get(API_ENDPOINTS.REFERAL_SYSTEM.APPLICATION);
+    const response = await axiosInstance.get(
+      API_ENDPOINTS.REFERAL_SYSTEM.APPLICATION
+    );
     return response.data;
   },
 
@@ -56,7 +62,31 @@ export const UserAffiliateService = {
    * Returns structured response indicating if profile exists
    */
   getProfile: async (): Promise<ProfileStatusResponse> => {
-    const response = await axiosInstance.get(API_ENDPOINTS.REFERAL_SYSTEM.PROFILE);
+    const response = await axiosInstance.get(
+      API_ENDPOINTS.REFERAL_SYSTEM.PROFILE
+    );
+    return response.data;
+  },
+
+  /**
+   * Get detailed list of users you referred
+   * GET /referrals/my-referrals
+   *
+   * Returns structured response with:
+   * - has_referrals: boolean indicating if user has any referrals
+   * - message: user-friendly message about referral status
+   * - referrals: array of ReferredUser objects (empty if none)
+   * - total: total count before filters
+   * - filtered: count after filters
+   * - showing: count in current response
+   */
+  getMyReferals: async (
+    params?: ReferredUserParams
+  ): Promise<MyReferralsResponse> => {
+    const response = await axiosInstance.get(
+      API_ENDPOINTS.REFERAL_SYSTEM.MY_REFERALS,
+      { params }
+    );
     return response.data;
   },
 
@@ -65,7 +95,9 @@ export const UserAffiliateService = {
    * GET /affiliates/referral-url
    */
   getReferralUrl: async (): Promise<ReferralUrlResponse> => {
-    const response = await axiosInstance.get(API_ENDPOINTS.REFERAL_SYSTEM.REFERRAL_URL);
+    const response = await axiosInstance.get(
+      API_ENDPOINTS.REFERAL_SYSTEM.REFERRAL_URL
+    );
     return response.data;
   },
 
@@ -75,7 +107,9 @@ export const UserAffiliateService = {
    * Works for both regular users and affiliates
    */
   getStats: async (): Promise<AffiliateStatsResponse> => {
-    const response = await axiosInstance.get(API_ENDPOINTS.REFERAL_SYSTEM.STATS);
+    const response = await axiosInstance.get(
+      API_ENDPOINTS.REFERAL_SYSTEM.STATS
+    );
     return response.data;
   },
 
@@ -84,9 +118,11 @@ export const UserAffiliateService = {
    * GET /affiliates/commissions
    * Returns empty array if user is not an affiliate
    */
-  getCommissions: async (params?: AffiliateCommissionParams): Promise<AffiliateCommissionResponse[]> => {
+  getCommissions: async (
+    params?: AffiliateCommissionParams
+  ): Promise<AffiliateCommissionResponse[]> => {
     const response = await axiosInstance.get(
-      API_ENDPOINTS.REFERAL_SYSTEM.COMMISSIONS, 
+      API_ENDPOINTS.REFERAL_SYSTEM.COMMISSIONS,
       { params }
     );
     return response.data;
@@ -101,7 +137,9 @@ export const UserAffiliateService = {
    * GET /referrals/codes
    */
   getReferralCodes: async (): Promise<ReferralCodeResponse[]> => {
-    const response = await axiosInstance.get(API_ENDPOINTS.REFERAL_SYSTEM.REFERRAL_CODES);
+    const response = await axiosInstance.get(
+      API_ENDPOINTS.REFERAL_SYSTEM.REFERRAL_CODES
+    );
     return response.data;
   },
 
@@ -110,7 +148,9 @@ export const UserAffiliateService = {
    * GET /referrals/stats
    */
   getReferralStats: async (): Promise<ReferralStats> => {
-    const response = await axiosInstance.get(API_ENDPOINTS.REFERAL_SYSTEM.REFERRAL_STATS);
+    const response = await axiosInstance.get(
+      API_ENDPOINTS.REFERAL_SYSTEM.REFERRAL_STATS
+    );
     return response.data;
   },
 
@@ -118,7 +158,11 @@ export const UserAffiliateService = {
    * Get referrals made by current user
    * GET /referrals/referrals
    */
-  getReferrals: async (params?: { status?: string; limit?: number; offset?: number }): Promise<ReferralResponse[]> => {
+  getReferrals: async (params?: {
+    status?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<ReferralResponse[]> => {
     const response = await axiosInstance.get(
       API_ENDPOINTS.REFERAL_SYSTEM.REFERRALS_LIST,
       { params }
@@ -130,67 +174,13 @@ export const UserAffiliateService = {
    * Get referral rewards
    * GET /referrals/rewards
    */
-  getReferralRewards: async (params?: { limit?: number; offset?: number }): Promise<ReferralRewardResponse[]> => {
+  getReferralRewards: async (params?: {
+    limit?: number;
+    offset?: number;
+  }): Promise<ReferralRewardResponse[]> => {
     const response = await axiosInstance.get(
       API_ENDPOINTS.REFERAL_SYSTEM.REFERRAL_REWARDS,
       { params }
-    );
-    return response.data;
-  },
-
-  // ============================================================================
-  // ADMIN ENDPOINTS
-  // ============================================================================
-
-  /**
-   * Get all affiliate applications (Admin only)
-   * GET /affiliates/admin/applications
-   */
-  getAdminApplications: async (params?: {
-    status?: string;
-    limit?: number;
-    offset?: number;
-  }): Promise<AffiliateApplicationResponse[]> => {
-    const response = await axiosInstance.get(
-      API_ENDPOINTS.REFERAL_SYSTEM.ADMIN_APPLICATIONS,
-      { params }
-    );
-    return response.data;
-  },
-
-  /**
-   * Review affiliate application (Admin only)
-   * POST /affiliates/admin/applications/{application_id}/review
-   */
-  reviewApplication: async (
-    applicationId: string,
-    data: AffiliateApplicationReview
-  ): Promise<AffiliateApplicationResponse> => {
-    const response = await axiosInstance.post(
-      API_ENDPOINTS.REFERAL_SYSTEM.ADMIN_APPLICATION_REVIEW(applicationId),
-      data
-    );
-    return response.data;
-  },
-
-  /**
-   * Approve commission for payment (Admin only)
-   * POST /affiliates/admin/commissions/{commission_id}/approve
-   */
-  approveCommission: async (commissionId: string): Promise<{ message: string; commission_id: string }> => {
-    const response = await axiosInstance.post(
-      API_ENDPOINTS.REFERAL_SYSTEM.ADMIN_COMMISSION_APPROVE(commissionId)
-    );
-    return response.data;
-  },
-
-  /**
-   * Mark commission as paid (Admin only)
-   * POST /affiliates/admin/commissions/{commission_id}/pay
-   */
-  markCommissionPaid: async (commissionId: string): Promise<{ message: string; commission_id: string }> => {
-    const response = await axiosInstance.post(
-      API_ENDPOINTS.REFERAL_SYSTEM.ADMIN_COMMISSION_PAY(commissionId)
     );
     return response.data;
   },

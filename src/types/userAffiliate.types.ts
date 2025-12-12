@@ -1,5 +1,5 @@
 // ============================================================================
-// FILE: src/types/userAffiliate.types.ts (UPDATED)
+// FILE: src/types/userAffiliate.types.ts (CLEANED)
 // ============================================================================
 
 export interface AffiliateApplicationCreate {
@@ -20,7 +20,7 @@ export interface AffiliateApplicationResponse {
   created_at: string; // ISO date string
 }
 
-// NEW: Wrapper response for application endpoint
+// Wrapper response for application endpoint
 export interface ApplicationStatusResponse {
   has_application: boolean;
   message: string;
@@ -40,7 +40,7 @@ export interface AffiliateProfileResponse {
   created_at: string; // ISO date string
 }
 
-// NEW: Wrapper response for profile endpoint
+// Wrapper response for profile endpoint
 export interface ProfileStatusResponse {
   has_profile: boolean;
   is_affiliate: boolean;
@@ -148,4 +148,105 @@ export interface ReferralRewardResponse {
   status: string;
   created_at: string;
   processed_at: string | null;
+}
+
+/**
+ * Comprehensive information about a referred user
+ * Returned by GET /referrals/referred-users AND GET /referrals/my-referrals
+ */
+export interface ReferredUser {
+  // Referral Information
+  referral_id: string;
+  
+  // User Information
+  user_id: string;
+  email: string;
+  full_name: string | null;
+  
+  // Referral Status
+  status: 'pending' | 'completed' | 'rewarded';
+  conversion_stage: string;
+  
+  // User Account Status
+  is_active: boolean;
+  is_verified: boolean;
+  is_subscribed: boolean;
+  
+  // Subscription Details
+  subscription_status: 'active' | 'inactive' | 'expired';
+  subscription_end: string | null;
+  
+  // Reward Information
+  reward_given: boolean;
+  reward_amount: number;  // in cents
+  reward_given_at: string | null;
+  
+  // Time Tracking
+  referred_at: string;
+  days_since_referral: number;
+  last_login: string | null;
+  days_since_login: number | null;
+  completed_at: string | null;
+}
+
+/**
+ * Query parameters for filtering referred users
+ * Used with GET /referrals/referred-users
+ */
+export interface ReferredUserParams {
+  status?: 'pending' | 'completed' | 'rewarded';
+  is_active?: boolean;
+  is_subscribed?: boolean;
+  search?: string;
+  sort_by?: 'created_at' | 'email' | 'status';
+  sort_order?: 'asc' | 'desc';
+  limit?: number;
+  offset?: number;
+}
+
+/**
+ * Structured response for my-referrals endpoint
+ * Always returns 200 with clear messaging about referral status
+ */
+export interface MyReferralsResponse {
+  has_referrals: boolean;
+  message: string;
+  referrals: ReferredUser[];
+  total: number;
+  filtered: number;
+  showing: number;
+}
+
+/**
+ * Summary of referral activity
+ * Returned by GET /referrals/summary
+ */
+export interface ReferralSummary {
+  statistics: {
+    total_referrals: number;
+    active_users: number;
+    subscribed_users: number;
+    completed_referrals: number;
+    pending_referrals: number;
+    conversion_rate: number;
+    subscription_rate: number;
+  };
+  rewards: {
+    total_earned: number;
+    pending: number;
+    processed: number;
+    total_count: number;
+  };
+  recent_referrals: Array<{
+    email: string;
+    status: string;
+    referred_at: string;
+    is_subscribed: boolean;
+  }>;
+  referral_code_performance: Array<{
+    code_id: string;
+    total_uses: number;
+    successful_conversions: number;
+    conversion_rate: number;
+  }>;
 }

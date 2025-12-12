@@ -1,8 +1,7 @@
 // ============================================================================
 // FILE: src/api/endpoints.ts (UPDATED - Referral System Section)
 // ============================================================================
-const API_BASE =
-  process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api";
+
 export const API_ENDPOINTS = {
   // Authentication
   AUTH: {
@@ -58,16 +57,6 @@ export const API_ENDPOINTS = {
     STATS: "/affiliates/stats",
     COMMISSIONS: "/affiliates/commissions",
 
-    // ========================================
-    // Affiliate Endpoints (Admin)
-    // ========================================
-    ADMIN_APPLICATIONS: "/affiliates/admin/applications",
-    ADMIN_APPLICATION_REVIEW: (application_id: string) =>
-      `/affiliates/admin/applications/${application_id}/review`,
-    ADMIN_COMMISSION_APPROVE: (commission_id: string) =>
-      `/affiliates/admin/commissions/${commission_id}/approve`,
-    ADMIN_COMMISSION_PAY: (commission_id: string) =>
-      `/affiliates/admin/commissions/${commission_id}/pay`,
 
     // ========================================
     // Referral Endpoints (General)
@@ -76,6 +65,7 @@ export const API_ENDPOINTS = {
     REFERRAL_STATS: "/referrals/stats",
     REFERRALS_LIST: "/referrals/referrals",
     REFERRAL_REWARDS: "/referrals/rewards",
+    MY_REFERALS: "/referrals/referrals/my-referrals",
 
     // ========================================
     // Webhook Integration
