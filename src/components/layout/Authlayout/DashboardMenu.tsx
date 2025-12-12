@@ -74,13 +74,21 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
       ]
     },
     {
-      category: 'Analytics',
+      category: 'Affiliate Program',
       items: [
         { 
-          name: 'Reports', 
-          href: '/dashboard/reports', 
+          name: 'My Referals', 
+          href: '/dashboard/referals', 
           icon: FileText,
-          description: 'Performance analysis',
+          description: 'My refered Users',
+          badge: null
+        },
+
+        { 
+          name: 'My Affiliate', 
+          href: '/dashboard/affiliate-dashboard', 
+          icon: FileText,
+          description: 'My Affiliate Dashboard',
           badge: null
         },
       ]
