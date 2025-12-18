@@ -15,6 +15,7 @@ import {
   FileText,
   CheckCircle,
   XCircle,
+  ExternalLink,
 } from "lucide-react";
 import {
   StaffSignalDetailResponse,
@@ -361,21 +362,47 @@ const SignalDetailsModal: React.FC<SignalDetailsModalProps> = ({
                       </div>
                       <div className="space-y-1">
                         {Object.entries(entry.changes).map(
-                          ([field, change]) => (
-                            <div
-                              key={field}
-                              className="text-xs text-gray-400 flex items-center gap-2"
-                            >
-                              <span className="text-gray-500">{field}:</span>
-                              <span className="text-red-400 line-through">
-                                {JSON.stringify(change.old)}
-                              </span>
-                              <span className="text-gray-600">→</span>
-                              <span className="text-green-400">
-                                {JSON.stringify(change.new)}
-                              </span>
-                            </div>
-                          )
+                          ([field, value]) => {
+                            // Handle both formats:
+                            // 1. Direct value: { "sl_hit": true }
+                            // 2. Old/New format: { "field": { "old": x, "new": y } }
+                            const isOldNewFormat = value !== null && 
+                              typeof value === 'object' && 
+                              'old' in value && 
+                              'new' in value;
+                            
+                            if (isOldNewFormat) {
+                              const change = value as { old: any; new: any };
+                              return (
+                                <div
+                                  key={field}
+                                  className="text-xs text-gray-400 flex items-center gap-2"
+                                >
+                                  <span className="text-gray-500">{field}:</span>
+                                  <span className="text-red-400 line-through">
+                                    {JSON.stringify(change.old)}
+                                  </span>
+                                  <span className="text-gray-600">→</span>
+                                  <span className="text-green-400">
+                                    {JSON.stringify(change.new)}
+                                  </span>
+                                </div>
+                              );
+                            }
+                            
+                            // Direct value format - just show the new value
+                            return (
+                              <div
+                                key={field}
+                                className="text-xs text-gray-400 flex items-center gap-2"
+                              >
+                                <span className="text-gray-500">{field}:</span>
+                                <span className="text-cyan-400">
+                                  {value === null ? 'null' : JSON.stringify(value)}
+                                </span>
+                              </div>
+                            );
+                          }
                         )}
                       </div>
                     </div>

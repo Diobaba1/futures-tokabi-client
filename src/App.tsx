@@ -170,7 +170,7 @@ const dashboardRoutes: RouteConfig[] = [
     requireStaff: true,
   },
   {
-    path: "/dashboard/trading-signals",
+    path: "/dashboard/professional-signals",
     element: <ActiveSignalsPage />,
     layout: DashboardLayout,
     protected: true,

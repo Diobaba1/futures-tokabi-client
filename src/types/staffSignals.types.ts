@@ -113,7 +113,7 @@ export interface StaffSignalDetailResponse extends StaffSignalResponse {
 export interface UpdateHistoryEntry {
   updated_by: string;
   updated_at: string;
-  changes: Record<string, { old: any; new: any }>;
+  changes: Record<string, any>; // Can be direct values or { old, new } format
 }
 
 export interface StaffSignalListResponse {

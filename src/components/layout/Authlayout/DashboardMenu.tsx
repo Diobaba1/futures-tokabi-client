@@ -96,8 +96,8 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
           icon: <Zap size={20} />,
         },
         {
-          path: "/dashboard/trading-signals",
-          label: "Trading Signals",
+          path: "/dashboard/professional-signals",
+          label: "Professional Signals",
           icon: <Radio size={20} />,
           badge: "Live",
           badgeColor: "bg-green-500",

@@ -78,6 +78,7 @@ const StaffSignalsPage: React.FC = () => {
   useEffect(() => {
     fetchSignals(filters);
     fetchStats(30);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handlers
@@ -105,11 +106,14 @@ const StaffSignalsPage: React.FC = () => {
 
   const handleCreateSubmit = async (data: StaffSignalCreateRequest) => {
     try {
+      console.log("Creating signal with data:", data);
       await createSignal(data);
+      console.log("Signal created successfully");
       setShowCreateModal(false);
       setEditSignal(null);
-    } catch (err) {
-      // Error handled by hook
+    } catch (err: any) {
+      console.error("Error creating signal:", err);
+      // Error is already handled by the hook and displayed via the error state
     }
   };
 
@@ -396,7 +400,7 @@ const StaffSignalsPage: React.FC = () => {
                 : "space-y-4"
             }
           >
-            {signals.map((signal: any) => (
+            {signals.map((signal: StaffSignalResponse) => (
               <SignalCard
                 key={signal.id}
                 signal={signal}
