@@ -1,4 +1,7 @@
-// src/pages/Register.tsx
+// ============================================================================
+// FILE: src/pages/Register.tsx (WITH DEBUGGING & FIXES)
+// ============================================================================
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../components/contexts/AuthContext';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
@@ -14,11 +17,17 @@ const Register: React.FC = () => {
   const [searchParams] = useSearchParams();
   const refParam = searchParams.get('ref');
   
+  // ✅ DEBUG: Log the referral parameter
+  useEffect(() => {
+    console.log('🔍 DEBUG: URL Search Params:', searchParams.toString());
+    console.log('🔍 DEBUG: Referral Param:', refParam);
+  }, [searchParams, refParam]);
+  
   const [formData, setFormData] = useState<RegisterFormData>({ 
     email: '', 
     full_name: '', 
     password: '',
-    referral_code: refParam || ''
+    referral_code: refParam || '' // ✅ Initialize with URL param
   });
   
   const [hasShownReferralToast, setHasShownReferralToast] = useState(false);
@@ -37,11 +46,20 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // ✅ DEBUG: Log what we're sending
+    console.log('🚀 Submitting registration with data:', {
+      ...formData,
+      password: '****' // Don't log actual password
+    });
+    
     try {
       await register(formData);
       showToast('Registration successful! Redirecting...', 'success', 3000);
       navigate('/dashboard');
     } catch (err: any) {
+      console.error('❌ Registration error:', err);
+      
       let errorMsg = 'Registration failed';
       if (err.response?.data?.detail) {
         if (Array.isArray(err.response.data.detail)) {
@@ -148,7 +166,9 @@ const Register: React.FC = () => {
               <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
               </svg>
-              <span className="text-cyan-300 text-sm font-medium">Referred by a friend</span>
+              <span className="text-cyan-300 text-sm font-medium">
+                Referred by: {refParam}
+              </span>
             </motion.div>
           )}
         </motion.div>
@@ -224,6 +244,7 @@ const Register: React.FC = () => {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
+                minLength={8}
                 className="block w-full pl-12 pr-4 py-3.5 bg-gray-700/40 border border-cyan-500/20 rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:border-cyan-400/60 transition-all duration-200 backdrop-blur-sm font-light tracking-wide hover:border-cyan-500/30"
               />
             </motion.div>
@@ -244,7 +265,11 @@ const Register: React.FC = () => {
                 type="text"
                 placeholder="Referral Code (Optional)"
                 value={formData.referral_code}
-                onChange={(e) => setFormData({ ...formData, referral_code: e.target.value.toUpperCase() })}
+                onChange={(e) => {
+                  const code = e.target.value.toUpperCase();
+                  setFormData({ ...formData, referral_code: code });
+                  console.log('🔍 DEBUG: Referral code updated:', code);
+                }}
                 className="block w-full pl-12 pr-4 py-3.5 bg-gray-700/40 border border-cyan-500/20 rounded-xl placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:border-cyan-400/60 transition-all duration-200 backdrop-blur-sm font-light tracking-wide hover:border-cyan-500/30 uppercase"
               />
               {formData.referral_code && (
@@ -259,6 +284,13 @@ const Register: React.FC = () => {
                 </motion.div>
               )}
             </motion.div>
+
+            {/* ✅ DEBUG: Show what will be sent */}
+            {process.env.NODE_ENV === 'development' && formData.referral_code && (
+              <div className="text-xs text-cyan-400 bg-cyan-500/10 p-2 rounded border border-cyan-500/20">
+                <strong>DEBUG:</strong> Will send referral_code: {formData.referral_code}
+              </div>
+            )}
           </div>
 
           {/* Terms Agreement */}

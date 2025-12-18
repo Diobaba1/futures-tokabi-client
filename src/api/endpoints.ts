@@ -57,6 +57,7 @@ export const API_ENDPOINTS = {
     STATS: "/affiliates/stats",
     COMMISSIONS: "/affiliates/commissions",
 
+    
 
     // ========================================
     // Referral Endpoints (General)
@@ -73,6 +74,32 @@ export const API_ENDPOINTS = {
     WEBHOOK_PAYMENT_SUBSCRIPTION: "/webhooks/payment/subscription",
     WEBHOOK_ADMIN_MANUAL_PROCESS: "/webhooks/admin/subscription/manual-process",
   },
+
+  // ============================================================================
+    // STAFF SIGNALS SYSTEM
+    // ============================================================================
+    STAFF_SIGNALS: {
+      // Base CRUD
+      LIST: "/staff-signals/",
+      CREATE: "/staff-signals/",
+      DETAIL: (signalId: string) => `/staff-signals/${signalId}`,
+      UPDATE: (signalId: string) => `/staff-signals/${signalId}`,
+
+      // Active signals
+      ACTIVE: "/staff-signals/active",
+
+      // Status management
+      UPDATE_STATUS: (signalId: string) => `/staff-signals/${signalId}/status`,
+      DEACTIVATE: (signalId: string) => `/staff-signals/${signalId}/deactivate`,
+      ACTIVATE: (signalId: string) => `/staff-signals/${signalId}/activate`,
+
+      // Execution tracking
+      MARK_TP_HIT: (signalId: string) => `/staff-signals/${signalId}/tp-hit`,
+      MARK_SL_HIT: (signalId: string) => `/staff-signals/${signalId}/sl-hit`,
+
+      // Statistics
+      STATS_SUMMARY: "/staff-signals/stats/summary",
+    },
 
   // Trades
   TRADES: {

@@ -6,6 +6,8 @@ export interface UserResponse {
   is_subscribed: boolean;
   is_active: boolean;
   is_verified: boolean;
+  is_staff: boolean;
+  is_admin: boolean;
   created_at: string;
   updated_at: string;
   last_login?: string;

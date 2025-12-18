@@ -30,12 +30,16 @@ import ResetPasswordPage from "./pages/Auth/settings/password/ResetPasswordPage"
 import { SignalsDashboard } from "./pages/signals";
 import ReferredUsersList from "./pages/Users/ReferredUsersList";
 
+// Staff Signals Pages
+import { StaffSignalsPage, ActiveSignalsPage } from "./pages/StaffSignals";
+
 interface RouteConfig {
   path: string;
   element: React.ReactNode;
   layout: React.ComponentType<{ children: React.ReactNode }>;
   protected?: boolean;
   requireAuth?: boolean;
+  requireStaff?: boolean;
 }
 
 const publicRoutes: RouteConfig[] = [
@@ -149,10 +153,25 @@ const dashboardRoutes: RouteConfig[] = [
     layout: DashboardLayout,
     protected: true,
   },
-
   {
     path: "/dashboard/referals",
     element: <ReferredUsersList />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  // =========================================================================
+  // Staff Signals Routes
+  // =========================================================================
+  {
+    path: "/dashboard/staff-signals",
+    element: <StaffSignalsPage />,
+    layout: DashboardLayout,
+    protected: true,
+    requireStaff: true,
+  },
+  {
+    path: "/dashboard/trading-signals",
+    element: <ActiveSignalsPage />,
     layout: DashboardLayout,
     protected: true,
   },
@@ -164,6 +183,7 @@ function renderRoute({
   layout: Layout,
   protected: isProtected,
   requireAuth,
+  requireStaff,
 }: RouteConfig) {
   const content = <Layout>{element}</Layout>;
 
@@ -173,7 +193,9 @@ function renderRoute({
         key={path}
         path={path}
         element={
-          <ProtectedRoute requireAuth={requireAuth}>{content}</ProtectedRoute>
+          <ProtectedRoute requireAuth={requireAuth} requireStaff={requireStaff}>
+            {content}
+          </ProtectedRoute>
         }
       />
     );
