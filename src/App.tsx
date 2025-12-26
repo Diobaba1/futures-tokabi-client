@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./components/contexts/AuthContext";
 import { AnalyticsProvider } from "./components/contexts/AnalyticsContext";
 import { ToastProvider } from "./components/ui/Toast";
+import { QueryProvider } from "./providers/QueryProvider";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
 import PublicLayout from "./components/layout/PublicLayout";
 import DashboardLayout from "./components/layout/DashboardLayout";
@@ -18,7 +19,6 @@ import Profile from "./pages/Profile";
 import "./App.css";
 import CommunityPage from "./pages/pageComponents/Community";
 import APIKeyManager from "./pages/walletpages/APIKeyManager";
-import Billing from "./pages/Billing/Billing";
 import TgConfigPage from "./pages/config/tgConfigPage";
 import { SymbolSearchPage } from "./pages/analytics/SymbolSearchPage";
 import AffiliatePage from "./pages/Users/AffiliatePage";
@@ -32,6 +32,21 @@ import ReferredUsersList from "./pages/Users/ReferredUsersList";
 
 // Staff Signals Pages
 import { StaffSignalsPage, ActiveSignalsPage } from "./pages/StaffSignals";
+
+// =========================================================================
+// Billing Pages
+// =========================================================================
+import {
+  PricingPage,
+  BillingDashboard,
+  SubscriptionPage,
+  PaymentsPage,
+  InvoicesPage,
+  PaymentSuccess,
+  PaymentFailed,
+  PaymentPartial,
+  PaymentPending,
+} from "./pages/billing2";
 
 interface RouteConfig {
   path: string;
@@ -78,6 +93,35 @@ const publicRoutes: RouteConfig[] = [
     element: <CommunityPage />,
     layout: PublicLayout,
   },
+  // =========================================================================
+  // Public Billing Routes
+  // =========================================================================
+  {
+    path: "/pricing",
+    element: <PricingPage />,
+    layout: PublicLayout,
+  },
+  // Payment Status Pages (users redirected from NOWPayments)
+  {
+    path: "/billing/success",
+    element: <PaymentSuccess />,
+    layout: PublicLayout,
+  },
+  {
+    path: "/billing/failed",
+    element: <PaymentFailed />,
+    layout: PublicLayout,
+  },
+  {
+    path: "/billing/partial",
+    element: <PaymentPartial />,
+    layout: PublicLayout,
+  },
+  {
+    path: "/billing/pending",
+    element: <PaymentPending />,
+    layout: PublicLayout,
+  },
 ];
 
 const dashboardRoutes: RouteConfig[] = [
@@ -99,12 +143,34 @@ const dashboardRoutes: RouteConfig[] = [
     layout: DashboardLayout,
     protected: true,
   },
+  // =========================================================================
+  // Billing Dashboard Routes
+  // =========================================================================
   {
     path: "/dashboard/billing",
-    element: <Billing />,
+    element: <BillingDashboard />,
     layout: DashboardLayout,
     protected: true,
   },
+  {
+    path: "/dashboard/billing/subscription",
+    element: <SubscriptionPage />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  {
+    path: "/dashboard/billing/payments",
+    element: <PaymentsPage />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  {
+    path: "/dashboard/billing/invoices",
+    element: <InvoicesPage />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  // =========================================================================
   {
     path: "/dashboard/trading",
     element: <Trades />,
@@ -206,39 +272,41 @@ function renderRoute({
 
 function App() {
   return (
-    <AuthProvider>
-      <ToastProvider>
-        <AnalyticsProvider>
-          <Router>
-            <div className="relative">
-              <Routes>
-                {publicRoutes.map(renderRoute)}
-                {dashboardRoutes.map(renderRoute)}
+    <QueryProvider>
+      <AuthProvider>
+        <ToastProvider>
+          <AnalyticsProvider>
+            <Router>
+              <div className="relative">
+                <Routes>
+                  {publicRoutes.map(renderRoute)}
+                  {dashboardRoutes.map(renderRoute)}
 
-                {/* 404 Page */}
-                <Route
-                  path="*"
-                  element={
-                    <PublicLayout>
-                      <div className="min-h-screen flex items-center justify-center">
-                        <div className="text-center">
-                          <h1 className="text-4xl font-bold text-white mb-4">
-                            404
-                          </h1>
-                          <p className="text-gray-400 text-lg">
-                            Page not found
-                          </p>
+                  {/* 404 Page */}
+                  <Route
+                    path="*"
+                    element={
+                      <PublicLayout>
+                        <div className="min-h-screen flex items-center justify-center">
+                          <div className="text-center">
+                            <h1 className="text-4xl font-bold text-white mb-4">
+                              404
+                            </h1>
+                            <p className="text-gray-400 text-lg">
+                              Page not found
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </PublicLayout>
-                  }
-                />
-              </Routes>
-            </div>
-          </Router>
-        </AnalyticsProvider>
-      </ToastProvider>
-    </AuthProvider>
+                      </PublicLayout>
+                    }
+                  />
+                </Routes>
+              </div>
+            </Router>
+          </AnalyticsProvider>
+        </ToastProvider>
+      </AuthProvider>
+    </QueryProvider>
   );
 }
 

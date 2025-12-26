@@ -1,5 +1,5 @@
 // ============================================================================
-// FILE: src/api/endpoints.ts (UPDATED - Referral System Section)
+// FILE: src/api/endpoints.ts (UPDATED - Fixed Billing Endpoints)
 // ============================================================================
 
 export const API_ENDPOINTS = {
@@ -44,6 +44,69 @@ export const API_ENDPOINTS = {
   },
 
   // ============================================================================
+  // BILLING SYSTEM
+  // ============================================================================
+  BILLING: {
+    // ========================================
+    // Plans (under /subscriptions router)
+    // Backend: subscriptions.router prefix="/subscriptions"
+    // ========================================
+    PLANS: {
+      LIST: "/subscriptions/plans",                              // GET /api/subscriptions/plans
+      FEATURED: "/subscriptions/plans/featured",                 // GET /api/subscriptions/plans/featured
+    },
+
+    // ========================================
+    // Subscriptions
+    // Backend: subscriptions.router prefix="/subscriptions"
+    // ========================================
+    SUBSCRIPTIONS: {
+      CURRENT: "/subscriptions/me",                              // GET /api/subscriptions/me
+      CREATE: "/subscriptions/",                                 // POST /api/subscriptions/
+      CREATE_EMAIL: "/subscriptions/email",                      // POST /api/subscriptions/email
+      HISTORY: "/subscriptions/history",                         // GET /api/subscriptions/history
+      CANCEL: (subscriptionId: string) => 
+        `/subscriptions/${subscriptionId}/cancel`,               // POST /api/subscriptions/{id}/cancel
+      RENEW: (subscriptionId: string) => 
+        `/subscriptions/${subscriptionId}/renew`,                // POST /api/subscriptions/{id}/renew
+    },
+
+    // ========================================
+    // Payments
+    // Backend: payments.router prefix="/payments"
+    // ========================================
+    PAYMENTS: {
+      LIST: "/payments/",                                        // GET /api/payments/
+      DETAIL: (paymentId: string) => `/payments/${paymentId}`,   // GET /api/payments/{id}
+      STATUS: (paymentId: string) => 
+        `/payments/${paymentId}/status`,                         // GET /api/payments/{id}/status
+      CREATE_INVOICE: "/payments/create-invoice",                // POST /api/payments/create-invoice
+    },
+
+    // ========================================
+    // Invoices
+    // Backend: invoices.router prefix="/invoices"
+    // ========================================
+    INVOICES: {
+      LIST: "/invoices/",                                        // GET /api/invoices/
+      UNPAID: "/invoices/unpaid",                                // GET /api/invoices/unpaid
+      DETAIL: (invoiceId: string) => `/invoices/${invoiceId}`,   // GET /api/invoices/{id}
+      PAY: (invoiceId: string) => `/invoices/${invoiceId}/pay`,  // POST /api/invoices/{id}/pay
+    },
+
+    // ========================================
+    // Webhooks (internal use)
+    // Backend: nowpayments_webhooks.router prefix="/billing/webhooks"
+    // ========================================
+    WEBHOOKS: {
+      NOWPAYMENTS_IPN: "/billing/webhooks/nowpayments",          // POST /api/billing/webhooks/nowpayments
+      NOWPAYMENTS_TEST: "/billing/webhooks/nowpayments/test",    // GET /api/billing/webhooks/nowpayments/test
+      RESYNC: (paymentId: string) => 
+        `/billing/webhooks/nowpayments/resync/${paymentId}`,     // POST /api/billing/webhooks/nowpayments/resync/{id}
+    },
+  },
+
+  // ============================================================================
   // REFERRAL & AFFILIATE SYSTEM
   // ============================================================================
   REFERAL_SYSTEM: {
@@ -56,8 +119,6 @@ export const API_ENDPOINTS = {
     REFERRAL_URL: "/affiliates/referral-url",
     STATS: "/affiliates/stats",
     COMMISSIONS: "/affiliates/commissions",
-
-    
 
     // ========================================
     // Referral Endpoints (General)
@@ -76,30 +137,30 @@ export const API_ENDPOINTS = {
   },
 
   // ============================================================================
-    // STAFF SIGNALS SYSTEM
-    // ============================================================================
-    STAFF_SIGNALS: {
-      // Base CRUD
-      LIST: "/staff-signals/",
-      CREATE: "/staff-signals/",
-      DETAIL: (signalId: string) => `/staff-signals/${signalId}`,
-      UPDATE: (signalId: string) => `/staff-signals/${signalId}`,
+  // STAFF SIGNALS SYSTEM
+  // ============================================================================
+  STAFF_SIGNALS: {
+    // Base CRUD
+    LIST: "/staff-signals/",
+    CREATE: "/staff-signals/",
+    DETAIL: (signalId: string) => `/staff-signals/${signalId}`,
+    UPDATE: (signalId: string) => `/staff-signals/${signalId}`,
 
-      // Active signals
-      ACTIVE: "/staff-signals/active",
+    // Active signals
+    ACTIVE: "/staff-signals/active",
 
-      // Status management
-      UPDATE_STATUS: (signalId: string) => `/staff-signals/${signalId}/status`,
-      DEACTIVATE: (signalId: string) => `/staff-signals/${signalId}/deactivate`,
-      ACTIVATE: (signalId: string) => `/staff-signals/${signalId}/activate`,
+    // Status management
+    UPDATE_STATUS: (signalId: string) => `/staff-signals/${signalId}/status`,
+    DEACTIVATE: (signalId: string) => `/staff-signals/${signalId}/deactivate`,
+    ACTIVATE: (signalId: string) => `/staff-signals/${signalId}/activate`,
 
-      // Execution tracking
-      MARK_TP_HIT: (signalId: string) => `/staff-signals/${signalId}/tp-hit`,
-      MARK_SL_HIT: (signalId: string) => `/staff-signals/${signalId}/sl-hit`,
+    // Execution tracking
+    MARK_TP_HIT: (signalId: string) => `/staff-signals/${signalId}/tp-hit`,
+    MARK_SL_HIT: (signalId: string) => `/staff-signals/${signalId}/sl-hit`,
 
-      // Statistics
-      STATS_SUMMARY: "/staff-signals/stats/summary",
-    },
+    // Statistics
+    STATS_SUMMARY: "/staff-signals/stats/summary",
+  },
 
   // Trades
   TRADES: {

@@ -22,6 +22,9 @@ import {
   Shield,
   Radio,
   UserPlus,
+  Receipt,
+  History,
+  FileText,
 } from "lucide-react";
 
 interface DashboardMenuProps {
@@ -114,13 +117,33 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
       ],
     },
     {
-      title: "Account",
+      title: "Billing",
       items: [
         {
           path: "/dashboard/billing",
-          label: "Billing",
+          label: "Overview",
           icon: <CreditCard size={20} />,
         },
+        {
+          path: "/dashboard/billing/subscription",
+          label: "Subscription",
+          icon: <Receipt size={20} />,
+        },
+        {
+          path: "/dashboard/billing/payments",
+          label: "Payments",
+          icon: <History size={20} />,
+        },
+        {
+          path: "/dashboard/billing/invoices",
+          label: "Invoices",
+          icon: <FileText size={20} />,
+        },
+      ],
+    },
+    {
+      title: "Account",
+      items: [
         {
           path: "/dashboard/api-key",
           label: "API Keys",
@@ -176,6 +199,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
     <NavLink
       key={item.path}
       to={item.path}
+      end={item.path === "/dashboard/billing"} // Exact match for billing overview
       onClick={() => onClose()}
       className={({ isActive }) =>
         `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group ${
@@ -221,7 +245,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
               <Zap size={20} className="text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white">TradingBot</h1>
+              <h1 className="text-lg font-bold text-white">TOKABI</h1>
               <p className="text-xs text-cyan-400/60">AI-Powered Trading</p>
             </div>
           </div>
@@ -258,6 +282,26 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
               </div>
             </div>
           </div>
+          
+          {/* Subscription Status Badge */}
+          {user?.is_subscribed ? (
+            <div className="mt-3 px-3 py-2 bg-gradient-to-r from-purple-500/20 to-purple-600/10 rounded-lg border border-purple-500/30">
+              <div className="flex items-center gap-2">
+                <Zap size={14} className="text-purple-400" />
+                <span className="text-xs font-medium text-purple-400">Pro Subscriber</span>
+              </div>
+            </div>
+          ) : (
+            <NavLink
+              to="/pricing"
+              className="mt-3 flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-cyan-500/20 to-cyan-600/10 rounded-lg border border-cyan-500/30 hover:border-cyan-400/50 transition-all group"
+            >
+              <Zap size={14} className="text-cyan-400" />
+              <span className="text-xs font-medium text-cyan-400 group-hover:text-cyan-300">
+                Upgrade to Pro
+              </span>
+            </NavLink>
+          )}
         </div>
       )}
 
@@ -281,6 +325,19 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
           );
         })}
       </nav>
+
+      {/* Upgrade CTA (collapsed mode) */}
+      {isCollapsed && !user?.is_subscribed && (
+        <div className="px-3 py-4 border-t border-cyan-500/10">
+          <NavLink
+            to="/pricing"
+            className="w-full flex items-center justify-center p-2.5 rounded-xl bg-gradient-to-r from-cyan-500/20 to-cyan-600/10 border border-cyan-500/30 hover:border-cyan-400/50 transition-all"
+            title="Upgrade to Pro"
+          >
+            <Zap size={18} className="text-cyan-400" />
+          </NavLink>
+        </div>
+      )}
 
       {/* Logout Button */}
       <div className="p-4 border-t border-cyan-500/10">

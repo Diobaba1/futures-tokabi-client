@@ -15,7 +15,8 @@ import {
   Sparkles,
   Shield,
   Zap,
-  Globe
+  Globe,
+  CreditCard
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserResponse } from '../../../types';
@@ -120,8 +121,9 @@ const Header: React.FC = () => {
 
   const userMenuItems = [
     { name: 'Trading Desk', href: '/dashboard', icon: BarChart3, description: 'Start trading' },
+    { name: 'Billing', href: '/dashboard/billing', icon: CreditCard, description: 'Manage subscription' },
     { name: 'Account Settings', href: '/dashboard/settings', icon: Settings, description: 'Manage account' },
-    { name: 'Security', href: '/dashboard/security', icon: Shield, description: 'Privacy & security' },
+    { name: 'Security', href: '/dashboard/settings/security', icon: Shield, description: 'Privacy & security' },
   ];
 
   const getDisplayName = (user: UserResponse | null): string => {
@@ -546,6 +548,26 @@ const Header: React.FC = () => {
                               <div className="flex flex-col">
                                 <span className="font-medium text-sm">Trading Desk</span>
                                 <span className="text-gray-400 text-xs">Start trading</span>
+                              </div>
+                            </Link>
+                          </motion.div>
+
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.35 }}
+                          >
+                            <Link
+                              to="/dashboard/billing"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-cyan-500/10 transition-all duration-200 group"
+                            >
+                              <div className="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center group-hover:bg-cyan-500/20 transition-all">
+                                <CreditCard className="w-4 h-4 text-cyan-400" />
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="font-medium text-sm">Billing</span>
+                                <span className="text-gray-400 text-xs">Manage subscription</span>
                               </div>
                             </Link>
                           </motion.div>

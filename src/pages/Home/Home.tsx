@@ -6,6 +6,7 @@ import HowItWorks from './HomeItems/HowItWorks';
 import SecuritySection from './HomeItems/SecuritySection';
 import PricingSection from './HomeItems/PricingSection';
 import CTASection from './HomeItems/CTASection';
+import { PricingPage } from '../billing2';
 
 const HomePage: React.FC = () => {
   return (
@@ -13,7 +14,7 @@ const HomePage: React.FC = () => {
       <HeroSection />
       <FeaturesSection />
       <div className="#pricing">
-      <PricingSection />
+      <PricingPage />
       </div>
       <HowItWorks />
       <SecuritySection />
