@@ -1,4 +1,10 @@
-// FILE: src/components/SymbolAnalysisCard.tsx
+// =============================================================================
+// FILE: src/pages/analytics/SymbolAnalysisCard.tsx
+// =============================================================================
+// Enhanced Symbol Analysis Card with improved UI/UX
+// Aligned with backend signal response structure
+// =============================================================================
+
 import React, { useState } from "react";
 import {
   TrendingUpIcon,
@@ -7,17 +13,14 @@ import {
   ClockIcon,
   AlertCircleIcon,
   DollarSignIcon,
-  ArrowUpIcon,
-  ArrowDownIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  BarChart3Icon,
-  ActivityIcon,
   ShieldIcon,
   TargetIcon,
+  ActivityIcon,
+  ZapIcon,
 } from "lucide-react";
 import { SymbolAnalysisResult } from "../../types/userSymbolSearch.types";
-import { userSymbolSearchService } from "../../api/services/userSymbolSearchService";
 
 interface SymbolAnalysisCardProps {
   analysis: SymbolAnalysisResult;
@@ -25,27 +28,53 @@ interface SymbolAnalysisCardProps {
   onToggleExpand?: () => void;
 }
 
-// Safe formatting functions
+// =============================================================================
+// Utility Functions
+// =============================================================================
+
 const formatPrice = (price?: number | null): string => {
-  if (price === null || price === undefined || isNaN(price))
-    return "Not provided";
+  if (price === null || price === undefined || isNaN(price)) return "—";
   if (price >= 1000) {
-    return `$${price.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+    return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
-  return `$${price.toFixed(4)}`;
+  return `$${price.toFixed(price >= 1 ? 2 : 6)}`;
 };
 
 const formatPercentage = (value?: number | null): string => {
-  if (value === null || value === undefined || isNaN(value))
-    return "Not provided";
+  if (value === null || value === undefined || isNaN(value)) return "—";
   return `${value > 0 ? "+" : ""}${value.toFixed(2)}%`;
 };
 
-const formatNumber = (value?: number | null, decimals: number = 4): string => {
-  if (value === null || value === undefined || isNaN(value))
-    return "Not provided";
+const formatNumber = (value?: number | null, decimals: number = 2): string => {
+  if (value === null || value === undefined || isNaN(value)) return "—";
   return value.toFixed(decimals);
 };
+
+const getDecisionColor = (decision?: string | null): string => {
+  switch (decision?.toLowerCase()) {
+    case "long":
+      return "#10B981";
+    case "short":
+      return "#EF4444";
+    default:
+      return "#6B7280";
+  }
+};
+
+const getDecisionBgClass = (decision?: string | null): string => {
+  switch (decision?.toLowerCase()) {
+    case "long":
+      return "bg-emerald-500/10 border-emerald-500/30 text-emerald-400";
+    case "short":
+      return "bg-rose-500/10 border-rose-500/30 text-rose-400";
+    default:
+      return "bg-slate-500/10 border-slate-500/30 text-slate-400";
+  }
+};
+
+// =============================================================================
+// Main Component
+// =============================================================================
 
 export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
   analysis,
@@ -54,33 +83,35 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(expanded);
 
-  const { symbol, status } = analysis;
+  const { symbol, status, final_decision, consensus_strength, risk_metrics, market_data_summary, indicators_summary } = analysis;
 
   const handleToggle = () => {
     setIsExpanded(!isExpanded);
     onToggleExpand?.();
   };
 
-  // Loading state
+  // =========================================================================
+  // Loading State
+  // =========================================================================
   if (status === "pending") {
     return (
-      <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 mb-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:bg-gray-800/70">
+      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6 shadow-xl">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-            <ClockIcon className="w-6 h-6 text-amber-400" />
+          <div className="w-14 h-14 bg-amber-500/20 rounded-xl flex items-center justify-center">
+            <ClockIcon className="w-7 h-7 text-amber-400 animate-pulse" />
           </div>
           <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-lg font-semibold text-white">{symbol}</h3>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                Processing
+            <div className="flex items-center gap-3 mb-3">
+              <h3 className="text-xl font-bold text-white">{symbol}</h3>
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                Analyzing...
               </span>
             </div>
-            <div className="w-full bg-gray-700 rounded-full h-2">
-              <div className="bg-amber-500 h-2 rounded-full animate-pulse shadow-lg shadow-amber-500/25"></div>
+            <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+              <div className="bg-gradient-to-r from-amber-500 to-amber-400 h-2 rounded-full animate-pulse w-2/3"></div>
             </div>
-            <p className="text-sm text-gray-400 mt-2">
-              Analysis in progress... This may take a few moments.
+            <p className="text-sm text-slate-400 mt-2">
+              AI models are analyzing market data...
             </p>
           </div>
         </div>
@@ -88,361 +119,267 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
     );
   }
 
-  // Error state
+  // =========================================================================
+  // Error State
+  // =========================================================================
   if (status === "error") {
     return (
-      <div className="bg-gray-800/50 backdrop-blur-sm border border-red-500/30 rounded-xl p-6 mb-4 shadow-lg">
+      <div className="bg-slate-800/50 backdrop-blur-sm border border-rose-500/30 rounded-2xl p-6 shadow-xl">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-            <AlertCircleIcon className="w-6 h-6 text-red-400" />
+          <div className="w-14 h-14 bg-rose-500/20 rounded-xl flex items-center justify-center">
+            <AlertCircleIcon className="w-7 h-7 text-rose-400" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-lg font-semibold text-white">{symbol}</h3>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/20 text-red-300 border border-red-500/30">
+              <h3 className="text-xl font-bold text-white">{symbol}</h3>
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-rose-500/20 text-rose-300 border border-rose-500/30">
                 Error
               </span>
             </div>
-            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 backdrop-blur-sm">
-              <p className="text-red-300 text-sm">
-                {analysis.error || "Unknown error occurred"}
-              </p>
-            </div>
+            <p className="text-sm text-rose-300">{analysis.error || "Analysis failed"}</p>
           </div>
         </div>
       </div>
     );
   }
 
-  // Success state - with proper null checks for new structure
-  const {
-    final_decision,
-    consensus_strength,
-    risk_metrics,
-    market_data_summary,
-    indicators_summary,
-  } = analysis;
-
-  const decisionColor = userSymbolSearchService.getDecisionColor(
-    final_decision || "hold"
-  );
+  // =========================================================================
+  // Success State
+  // =========================================================================
+  const decision = final_decision?.toLowerCase() || "hold";
 
   const getDecisionIcon = () => {
-    const iconClass = "w-5 h-5";
-    switch (final_decision) {
+    switch (decision) {
       case "long":
-        return <TrendingUpIcon className={`${iconClass} text-emerald-400`} />;
+        return <TrendingUpIcon className="w-5 h-5" />;
       case "short":
-        return <TrendingDownIcon className={`${iconClass} text-red-400`} />;
+        return <TrendingDownIcon className="w-5 h-5" />;
       default:
-        return <HelpCircleIcon className={`${iconClass} text-gray-400`} />;
+        return <HelpCircleIcon className="w-5 h-5" />;
     }
   };
 
-  const getTrendIcon = (trend?: string) => {
-    const iconClass = "w-4 h-4";
-    if (trend === "bullish")
-      return <ArrowUpIcon className={`${iconClass} text-emerald-400`} />;
-    if (trend === "bearish")
-      return <ArrowDownIcon className={`${iconClass} text-red-400`} />;
-    return <HelpCircleIcon className={`${iconClass} text-gray-400`} />;
+  const getConsensusColor = (strength?: number | null) => {
+    if (!strength) return "text-slate-400";
+    if (strength >= 85) return "text-emerald-400";
+    if (strength >= 70) return "text-amber-400";
+    return "text-rose-400";
   };
 
-  const getPercentageColor = (value?: number | null) => {
-    if (value === undefined || value === null) return "text-gray-400";
-    return value >= 0 ? "text-emerald-400" : "text-red-400";
+  const getLeverageColor = (leverage?: number | null) => {
+    if (!leverage) return "text-slate-400";
+    if (leverage >= 5) return "text-rose-400";
+    if (leverage >= 3) return "text-amber-400";
+    return "text-emerald-400";
   };
 
-  const getRSIColor = (rsi?: number | null) => {
-    if (rsi === undefined || rsi === null) return "text-gray-400";
-    return rsi > 70
-      ? "text-red-400"
-      : rsi < 30
-      ? "text-emerald-400"
-      : "text-gray-400";
-  };
-
-  const getConsensusStrengthColor = (strength?: number | null) => {
-    if (strength === undefined || strength === null) return "text-gray-400";
-    if (strength >= 80) return "text-emerald-400";
-    if (strength >= 60) return "text-amber-400";
-    return "text-red-400";
+  const getRRColor = (rr?: number | null) => {
+    if (!rr) return "text-slate-400";
+    if (rr >= 2) return "text-emerald-400";
+    if (rr >= 1.5) return "text-amber-400";
+    return "text-slate-400";
   };
 
   return (
-    <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 mb-6 hover:bg-gray-800/70">
+    <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:border-slate-600">
       {/* Header - Always Visible */}
       <div className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-4 flex-1">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-              <DollarSignIcon className="w-6 h-6 text-blue-400" />
+            {/* Symbol Icon */}
+            <div className="w-14 h-14 bg-gradient-to-br from-sky-500/20 to-sky-600/20 rounded-xl flex items-center justify-center flex-shrink-0">
+              <DollarSignIcon className="w-7 h-7 text-sky-400" />
             </div>
 
-            <div className="flex-1">
-              <div className="flex flex-col lg:flex-row lg:items-center gap-3 mb-3">
-                <h2 className="text-xl font-bold text-white">{symbol}</h2>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-white font-semibold backdrop-blur-sm shadow-lg"
-                    style={{ backgroundColor: decisionColor }}
-                  >
-                    {getDecisionIcon()}
-                    {final_decision?.toUpperCase() || "HOLD"}
-                  </div>
-
-                  {consensus_strength !== undefined &&
-                    consensus_strength !== null && (
-                      <div className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-gray-700 text-gray-300 text-sm font-medium border border-gray-600">
-                        <ShieldIcon className="w-4 h-4" />
-                        <span className={getConsensusStrengthColor(consensus_strength)}>
-                          {consensus_strength}% Consensus
-                        </span>
-                      </div>
-                    )}
+            <div className="flex-1 min-w-0">
+              {/* Symbol & Decision */}
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                <h2 className="text-2xl font-bold text-white">{symbol}</h2>
+                <div
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl font-bold border ${getDecisionBgClass(decision)}`}
+                >
+                  {getDecisionIcon()}
+                  {decision.toUpperCase()}
                 </div>
+                {consensus_strength !== undefined && consensus_strength !== null && (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-700/50 border border-slate-600">
+                    <ShieldIcon className="w-4 h-4 text-slate-400" />
+                    <span className={`font-semibold ${getConsensusColor(consensus_strength)}`}>
+                      {consensus_strength.toFixed(0)}%
+                    </span>
+                  </div>
+                )}
               </div>
 
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-400">Current Price</span>
-                  <div className="font-semibold text-white">
-                    {formatPrice(market_data_summary?.current_price)}
-                  </div>
-                </div>
-                <div>
-                  <span className="text-gray-400">24h Change</span>
-                  <div
-                    className={`font-semibold ${getPercentageColor(
-                      market_data_summary?.price_change_24h
-                    )}`}
-                  >
-                    {formatPercentage(market_data_summary?.price_change_24h)}
-                  </div>
-                </div>
-                <div>
-                  <span className="text-gray-400">Risk/Reward</span>
-                  <div className="font-semibold text-white">
-                    {risk_metrics?.risk_reward_ratio
-                      ? `${risk_metrics.risk_reward_ratio.toFixed(2)}:1`
-                      : "Not provided"}
-                  </div>
-                </div>
-                <div>
-                  <span className="text-gray-400">Leverage</span>
-                  <div className="font-semibold text-white">
-                    {risk_metrics?.suggested_leverage
-                      ? `${risk_metrics.suggested_leverage}x`
-                      : "Not provided"}
-                  </div>
-                </div>
+              {/* Quick Stats Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <QuickStat
+                  label="Current Price"
+                  value={formatPrice(market_data_summary?.current_price)}
+                />
+                <QuickStat
+                  label="24h Change"
+                  value={formatPercentage(market_data_summary?.price_change_24h)}
+                  valueClass={
+                    market_data_summary?.price_change_24h && market_data_summary.price_change_24h >= 0
+                      ? "text-emerald-400"
+                      : "text-rose-400"
+                  }
+                />
+                <QuickStat
+                  label="Leverage"
+                  value={risk_metrics?.suggested_leverage ? `${risk_metrics.suggested_leverage}x` : "—"}
+                  valueClass={getLeverageColor(risk_metrics?.suggested_leverage)}
+                />
+                <QuickStat
+                  label="R:R Ratio"
+                  value={risk_metrics?.risk_reward_ratio ? `1:${risk_metrics.risk_reward_ratio.toFixed(1)}` : "—"}
+                  valueClass={getRRColor(risk_metrics?.risk_reward_ratio)}
+                />
               </div>
             </div>
           </div>
 
-          {/* Expand Button */}
+          {/* Expand Toggle */}
           <button
             onClick={handleToggle}
-            className="flex-shrink-0 ml-4 p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-200 hover:shadow-lg"
+            className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors ml-4"
           >
             {isExpanded ? (
-              <ChevronUpIcon className="w-5 h-5" />
+              <ChevronUpIcon className="w-6 h-6" />
             ) : (
-              <ChevronDownIcon className="w-5 h-5" />
+              <ChevronDownIcon className="w-6 h-6" />
             )}
           </button>
         </div>
       </div>
 
-      {/* Expandable Content */}
+      {/* Expandable Details */}
       {isExpanded && (
-        <div className="border-t border-gray-700">
-          <div className="p-6 space-y-6">
-            {/* Market Data & Indicators */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Market Data */}
-              <Section
-                title="Market Data"
-                icon={<BarChart3Icon className="w-4 h-4" />}
-              >
-                <Metric
-                  label="Current Price"
-                  value={formatPrice(market_data_summary?.current_price)}
+        <div className="border-t border-slate-700 p-6 space-y-6 bg-slate-800/30">
+          {/* Price Levels */}
+          {risk_metrics && (
+            <Section title="Price Levels" icon={<TargetIcon className="w-4 h-4" />}>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <PriceCard
+                  title="Entry"
+                  value={risk_metrics.entry_price}
+                  color="sky"
                 />
-                <Metric
-                  label="24h Change"
-                  value={formatPercentage(
-                    market_data_summary?.price_change_24h
-                  )}
-                  valueClass={getPercentageColor(
-                    market_data_summary?.price_change_24h
-                  )}
+                <PriceCard
+                  title="Stop Loss"
+                  value={risk_metrics.stop_loss_price}
+                  color="rose"
+                  percent={risk_metrics.estimated_sl_percent ? -Math.abs(risk_metrics.estimated_sl_percent) : undefined}
                 />
-                <Metric
-                  label="24h Volume"
-                  value={formatPrice(market_data_summary?.volume_24h)}
+                <PriceCard
+                  title="Take Profit"
+                  value={risk_metrics.take_profit_price}
+                  color="emerald"
+                  percent={risk_metrics.estimated_tp_percent ?? undefined}
                 />
-                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-700">
-                  <div>
-                    <span className="text-xs text-gray-400">24h High</span>
-                    <div className="text-sm font-semibold text-white">
-                      {market_data_summary?.high_24h
-                        ? formatPrice(market_data_summary.high_24h)
-                        : "Not provided"}
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-xs text-gray-400">24h Low</span>
-                    <div className="text-sm font-semibold text-white">
-                      {market_data_summary?.low_24h
-                        ? formatPrice(market_data_summary.low_24h)
-                        : "Not provided"}
-                    </div>
-                  </div>
-                </div>
-              </Section>
-
-              {/* Technical Indicators */}
-              <Section
-                title="Technical Indicators"
-                icon={<ActivityIcon className="w-4 h-4" />}
-              >
-                <Metric
-                  label="RSI"
-                  value={formatNumber(indicators_summary?.rsi, 2)}
-                  valueClass={getRSIColor(indicators_summary?.rsi)}
-                />
-                <Metric
-                  label="MACD"
-                  value={formatNumber(indicators_summary?.macd)}
-                />
-                <Metric
-                  label="Signal Line"
-                  value={formatNumber(indicators_summary?.signal_line)}
-                />
-                <Metric
-                  label="ATR"
-                  value={formatNumber(indicators_summary?.atr)}
-                />
-                <Metric
-                  label="Trend"
-                  value={
-                    indicators_summary?.trend
-                      ? indicators_summary.trend.toUpperCase()
-                      : "Not provided"
-                  }
-                  icon={getTrendIcon(indicators_summary?.trend)}
-                  valueClass={
-                    indicators_summary?.trend === "bullish"
-                      ? "text-emerald-400"
-                      : indicators_summary?.trend === "bearish"
-                      ? "text-red-400"
-                      : "text-gray-400"
-                  }
-                />
-              </Section>
-            </div>
-
-            {/* Risk Metrics & Price Levels */}
-            {risk_metrics && (
-              <Section
-                title="Risk Parameters & Price Levels"
-                icon={<TargetIcon className="w-4 h-4" />}
-              >
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Risk Metrics */}
-                  <div className="space-y-4">
-                    <h4 className="text-white font-semibold">Risk Metrics</h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <Metric
-                        label="Stop Loss %"
-                        value={
-                          risk_metrics.estimated_sl_percent
-                            ? `-${risk_metrics.estimated_sl_percent.toFixed(2)}%`
-                            : "Not provided"
-                        }
-                        valueClass="text-red-400"
-                      />
-                      <Metric
-                        label="Take Profit %"
-                        value={
-                          risk_metrics.estimated_tp_percent
-                            ? `+${risk_metrics.estimated_tp_percent.toFixed(2)}%`
-                            : "Not provided"
-                        }
-                        valueClass="text-emerald-400"
-                      />
-                      <Metric
-                        label="Risk/Reward"
-                        value={
-                          risk_metrics.risk_reward_ratio
-                            ? `${risk_metrics.risk_reward_ratio.toFixed(2)}:1`
-                            : "Not provided"
-                        }
-                        valueClass={
-                          risk_metrics.risk_reward_ratio && risk_metrics.risk_reward_ratio >= 1.5
-                            ? "text-emerald-400"
-                            : risk_metrics.risk_reward_ratio && risk_metrics.risk_reward_ratio >= 1
-                            ? "text-amber-400"
-                            : "text-red-400"
-                        }
-                      />
-                      <Metric
-                        label="Leverage"
-                        value={
-                          risk_metrics.suggested_leverage
-                            ? `${risk_metrics.suggested_leverage}x`
-                            : "Not provided"
-                        }
-                        valueClass={
-                          risk_metrics.suggested_leverage && risk_metrics.suggested_leverage >= 5
-                            ? "text-red-400"
-                            : risk_metrics.suggested_leverage && risk_metrics.suggested_leverage >= 3
-                            ? "text-amber-400"
-                            : "text-emerald-400"
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  {/* Price Levels */}
-                  <div className="space-y-4">
-                    <h4 className="text-white font-semibold">Price Levels</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <PriceCard
-                        title="Entry"
-                        color="blue"
-                        value={risk_metrics.entry_price}
-                      />
-                      <PriceCard
-                        title="Stop Loss"
-                        color="red"
-                        value={risk_metrics.stop_loss_price}
-                      />
-                      <PriceCard
-                        title="Take Profit"
-                        color="emerald"
-                        value={risk_metrics.take_profit_price}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Section>
-            )}
-
-            {/* Additional Information */}
-            <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600/30">
-              <div className="flex items-center gap-2 mb-2">
-                <ClockIcon className="w-4 h-4 text-gray-400" />
-                <span className="text-sm text-gray-400">Analysis Timestamp</span>
               </div>
-              <p className="text-white text-sm">
-                {analysis.timestamp
-                  ? new Date(analysis.timestamp).toLocaleString()
-                  : "Not available"}
-              </p>
+            </Section>
+          )}
+
+          {/* Risk Metrics */}
+          {risk_metrics && (
+            <Section title="Risk Analysis" icon={<ShieldIcon className="w-4 h-4" />}>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <MetricBox
+                  label="Stop Loss %"
+                  value={risk_metrics.estimated_sl_percent ? `-${Math.abs(risk_metrics.estimated_sl_percent).toFixed(2)}%` : "—"}
+                  color="rose"
+                />
+                <MetricBox
+                  label="Take Profit %"
+                  value={risk_metrics.estimated_tp_percent ? `+${risk_metrics.estimated_tp_percent.toFixed(2)}%` : "—"}
+                  color="emerald"
+                />
+                <MetricBox
+                  label="Risk/Reward"
+                  value={risk_metrics.risk_reward_ratio ? `1:${risk_metrics.risk_reward_ratio.toFixed(2)}` : "—"}
+                  color={risk_metrics.risk_reward_ratio && risk_metrics.risk_reward_ratio >= 2 ? "emerald" : risk_metrics.risk_reward_ratio && risk_metrics.risk_reward_ratio >= 1.5 ? "amber" : "slate"}
+                />
+                <MetricBox
+                  label="Suggested Leverage"
+                  value={risk_metrics.suggested_leverage ? `${risk_metrics.suggested_leverage}x` : "—"}
+                  color={risk_metrics.suggested_leverage && risk_metrics.suggested_leverage >= 5 ? "rose" : risk_metrics.suggested_leverage && risk_metrics.suggested_leverage >= 3 ? "amber" : "emerald"}
+                />
+              </div>
+            </Section>
+          )}
+
+          {/* Technical Indicators */}
+          {indicators_summary && (
+            <Section title="Technical Indicators" icon={<ActivityIcon className="w-4 h-4" />}>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                <IndicatorBox
+                  label="RSI"
+                  value={formatNumber(indicators_summary.rsi)}
+                  status={
+                    indicators_summary.rsi > 70 ? "overbought" :
+                    indicators_summary.rsi < 30 ? "oversold" : "neutral"
+                  }
+                />
+                <IndicatorBox
+                  label="MACD"
+                  value={formatNumber(indicators_summary.macd, 4)}
+                />
+                <IndicatorBox
+                  label="Signal Line"
+                  value={formatNumber(indicators_summary.signal_line, 4)}
+                />
+                <IndicatorBox
+                  label="ATR"
+                  value={formatNumber(indicators_summary.atr, 4)}
+                />
+                <IndicatorBox
+                  label="Trend"
+                  value={indicators_summary.trend?.toUpperCase() || "—"}
+                  status={indicators_summary.trend}
+                />
+              </div>
+            </Section>
+          )}
+
+          {/* Market Data */}
+          {market_data_summary && (
+            <Section title="Market Data" icon={<ZapIcon className="w-4 h-4" />}>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <MetricBox
+                  label="Current Price"
+                  value={formatPrice(market_data_summary.current_price)}
+                  color="sky"
+                />
+                <MetricBox
+                  label="24h Change"
+                  value={formatPercentage(market_data_summary.price_change_24h)}
+                  color={market_data_summary.price_change_24h >= 0 ? "emerald" : "rose"}
+                />
+                <MetricBox
+                  label="24h Volume"
+                  value={market_data_summary.volume_24h ? `$${(market_data_summary.volume_24h / 1e6).toFixed(1)}M` : "—"}
+                  color="slate"
+                />
+                {market_data_summary.high_24h && market_data_summary.low_24h && (
+                  <MetricBox
+                    label="24h Range"
+                    value={`${formatPrice(market_data_summary.low_24h)} - ${formatPrice(market_data_summary.high_24h)}`}
+                    color="slate"
+                  />
+                )}
+              </div>
+            </Section>
+          )}
+
+          {/* Timestamp */}
+          <div className="pt-4 border-t border-slate-700/50 flex items-center justify-between text-sm text-slate-500">
+            <div className="flex items-center gap-2">
+              <ClockIcon className="w-4 h-4" />
+              <span>Analysis completed</span>
             </div>
+            <span>{analysis.timestamp ? new Date(analysis.timestamp).toLocaleString() : "—"}</span>
           </div>
         </div>
       )}
@@ -450,70 +387,108 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
   );
 };
 
-// Reusable Components with proper typing
+// =============================================================================
+// Helper Components
+// =============================================================================
+
 const Section: React.FC<{
   title: string;
   icon?: React.ReactNode;
   children: React.ReactNode;
-  className?: string;
-}> = ({ title, icon, children, className = "" }) => (
-  <div className={className}>
+}> = ({ title, icon, children }) => (
+  <div>
     <div className="flex items-center gap-2 mb-4">
-      {icon}
-      <h3 className="text-lg font-semibold text-white">{title}</h3>
+      {icon && <span className="text-slate-400">{icon}</span>}
+      <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">{title}</h3>
     </div>
     {children}
   </div>
 );
 
-const Metric: React.FC<{
+const QuickStat: React.FC<{
   label: string;
-  value: React.ReactNode;
-  icon?: React.ReactNode;
+  value: string;
   valueClass?: string;
-  className?: string;
-}> = ({ label, value, icon, valueClass = "text-white", className = "" }) => {
-  const displayValue = value === "N/A" ? "Not provided" : value;
+}> = ({ label, value, valueClass = "text-white" }) => (
+  <div>
+    <p className="text-xs text-slate-500 mb-1">{label}</p>
+    <p className={`text-sm font-semibold ${valueClass}`}>{value}</p>
+  </div>
+);
 
-  return (
-    <div
-      className={`flex justify-between items-center py-2 border-b border-gray-700 last:border-b-0 ${className}`}
-    >
-      <span className="text-sm text-gray-400">{label}</span>
-      <div className="flex items-center gap-1">
-        {icon}
-        <span className={`text-sm font-semibold ${valueClass}`}>
-          {displayValue}
-        </span>
-      </div>
-    </div>
-  );
-};
-
-// Enhanced PriceCard component
 const PriceCard: React.FC<{
   title: string;
-  color: string;
   value?: number | null;
-  className?: string;
-}> = ({ title, color, value, className = "" }) => {
-  const displayValue =
-    value === null || value === undefined ? "Not provided" : formatPrice(value);
-
+  color: "sky" | "rose" | "emerald";
+  percent?: number;
+}> = ({ title, value, color, percent }) => {
   const colorClasses = {
-    blue: "bg-blue-500/20 border-blue-500/30 text-blue-300",
-    red: "bg-red-500/20 border-red-500/30 text-red-300",
-    emerald: "bg-emerald-500/20 border-emerald-500/30 text-emerald-300",
+    sky: "bg-sky-500/10 border-sky-500/30 text-sky-400",
+    rose: "bg-rose-500/10 border-rose-500/30 text-rose-400",
+    emerald: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
   };
 
   return (
-    <div
-      className={`border rounded-lg p-3 text-center backdrop-blur-sm ${
-        colorClasses[color as keyof typeof colorClasses]
-      } ${className}`}
-    >
-      <div className="text-sm font-medium mb-1">{title}</div>
-      <div className="text-lg font-bold">{displayValue}</div>
+    <div className={`p-4 rounded-xl border ${colorClasses[color]}`}>
+      <p className="text-xs opacity-70 mb-1">{title}</p>
+      <p className="text-xl font-bold font-mono">{formatPrice(value)}</p>
+      {percent !== undefined && (
+        <p className="text-xs opacity-70 mt-1">{formatPercentage(percent)}</p>
+      )}
     </div>
   );
 };
+
+const MetricBox: React.FC<{
+  label: string;
+  value: string;
+  color?: "emerald" | "rose" | "amber" | "sky" | "slate";
+}> = ({ label, value, color = "slate" }) => {
+  const colorClasses = {
+    emerald: "text-emerald-400",
+    rose: "text-rose-400",
+    amber: "text-amber-400",
+    sky: "text-sky-400",
+    slate: "text-slate-300",
+  };
+
+  return (
+    <div className="p-3 bg-slate-700/30 rounded-xl border border-slate-700/50">
+      <p className="text-xs text-slate-500 mb-1">{label}</p>
+      <p className={`text-sm font-semibold ${colorClasses[color]}`}>{value}</p>
+    </div>
+  );
+};
+
+const IndicatorBox: React.FC<{
+  label: string;
+  value: string;
+  status?: string;
+}> = ({ label, value, status }) => {
+  const getStatusColor = () => {
+    switch (status) {
+      case "bullish":
+        return "text-emerald-400";
+      case "bearish":
+        return "text-rose-400";
+      case "overbought":
+        return "text-rose-400";
+      case "oversold":
+        return "text-emerald-400";
+      default:
+        return "text-slate-300";
+    }
+  };
+
+  return (
+    <div className="p-3 bg-slate-700/30 rounded-xl border border-slate-700/50">
+      <p className="text-xs text-slate-500 mb-1">{label}</p>
+      <p className={`text-sm font-semibold ${getStatusColor()}`}>{value}</p>
+      {status && (status === "overbought" || status === "oversold") && (
+        <p className="text-xs mt-1 opacity-70 capitalize">{status}</p>
+      )}
+    </div>
+  );
+};
+
+export default SymbolAnalysisCard;

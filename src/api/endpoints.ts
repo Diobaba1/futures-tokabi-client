@@ -192,6 +192,9 @@ export const API_ENDPOINTS = {
     // GET /signals/symbols - Get available symbols
     SYMBOLS: "/signals/symbols",
 
+    // GET /signals/leverage-recommendations - Get leverage recommendations
+    LEVERAGE_RECOMMENDATIONS: "/signals/leverage-recommendations",
+
     // GET /signals/{signal_id} - Get signal detail
     DETAIL: (signalId: string) => `/signals/${signalId}`,
 

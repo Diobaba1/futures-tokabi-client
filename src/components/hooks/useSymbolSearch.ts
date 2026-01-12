@@ -26,11 +26,15 @@ export const useSymbolSearch = () => {
       const history = await userSymbolSearchService.getSearchHistory(limit);
       setState((prev) => ({
         ...prev,
-        searchHistory: history.search_history,
+        searchHistory: history.search_history || [],
       }));
     } catch (error: any) {
       console.error('Failed to fetch search history:', error);
-      throw error;
+      // Don't throw - just log and continue with empty history
+      setState((prev) => ({
+        ...prev,
+        searchHistory: [],
+      }));
     }
   }, []);
 
@@ -43,7 +47,15 @@ export const useSymbolSearch = () => {
       }));
     } catch (error: any) {
       console.error('Failed to fetch rate limit:', error);
-      throw error;
+      // Don't throw - set default rate limit
+      setState((prev) => ({
+        ...prev,
+        rateLimit: {
+          searches_remaining: 2,
+          reset_time: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
+          limit_per_4h: 2
+        },
+      }));
     }
   }, []);
 
