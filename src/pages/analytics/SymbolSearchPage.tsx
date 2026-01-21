@@ -8,7 +8,6 @@ import {
   ArrowLeftIcon,
   DownloadIcon,
   ShareIcon,
-  MessageSquareIcon,
   HistoryIcon,
 } from 'lucide-react';
 import { ChatContainer } from '../../components/chat';
@@ -28,9 +27,7 @@ export const SymbolSearchPage: React.FC = () => {
     selectedSearchDetail,
     viewMode: hookViewMode,
     fetchSearchHistory,
-    fetchSearchDetail,
     selectSearchFromHistory,
-    navigateToHistory,
   } = useSymbolSearch();
 
   // Fetch search history on mount

@@ -16,7 +16,7 @@ import {
   getConsensusColor,
   getLeverageColor,
 } from "../../types/signals.types";
-import { Card, Badge, Spinner, Button, EmptyState } from "../ui/index";
+import { Card, Spinner, Button, EmptyState } from "../ui/index";
 
 // =============================================================================
 // Signal Card Component

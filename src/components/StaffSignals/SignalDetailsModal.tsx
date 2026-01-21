@@ -15,7 +15,6 @@ import {
   FileText,
   CheckCircle,
   XCircle,
-  ExternalLink,
 } from "lucide-react";
 import {
   StaffSignalDetailResponse,

@@ -27,14 +27,13 @@ import type {
   ProfileStatusResponse,
   AffiliateStatsResponse,
   ReferralUrlResponse,
-  AffiliateCommissionResponse,
-  AffiliateApplicationResponse
+  AffiliateCommissionResponse
 } from '../../types/userAffiliate.types';
 
 type TabType = 'overview' | 'application' | 'referral' | 'commissions' | 'profile';
 
 const AffiliatePage: React.FC = () => {
-  const { user } = useAuth();
+  useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [loading, setLoading] = useState(true);

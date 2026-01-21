@@ -53,12 +53,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         e.preventDefault();
         if (inputValue.trim()) {
           addSymbol();
-        } else if (symbols.length > 0) {
-          handleSend();
+        } else if (symbols.length > 0 && !disabled && !isLoading) {
+          onSend(symbols);
         }
       }
     },
-    [inputValue, symbols, addSymbol]
+    [inputValue, symbols, addSymbol, disabled, isLoading, onSend]
   );
 
   const handleSend = useCallback(() => {

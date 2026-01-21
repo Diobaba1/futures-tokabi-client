@@ -20,7 +20,7 @@ import {
   Copy,
   Check
 } from 'lucide-react';
-import { ReferredUser, MyReferralsResponse, ReferralUrlResponse } from '../../types/userAffiliate.types';
+import { MyReferralsResponse, ReferralUrlResponse } from '../../types/userAffiliate.types';
 import { UserAffiliateService } from '../../api/services/UserAffiliateService';
 
 const ReferredUsersList: React.FC = () => {
@@ -32,8 +32,8 @@ const ReferredUsersList: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [subscriptionFilter, setSubscriptionFilter] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [sortBy] = useState('created_at');
+  const [sortOrder] = useState('desc');
   
   // Referral URL
   const [referralUrl, setReferralUrl] = useState<ReferralUrlResponse | null>(null);
@@ -41,6 +41,7 @@ const ReferredUsersList: React.FC = () => {
 
   useEffect(() => {
     loadReferredUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, subscriptionFilter, sortBy, sortOrder]);
 
   const loadReferredUsers = async () => {

@@ -19,14 +19,9 @@ import {
   billingService,
 } from '../../api/services/billingService';
 import type {
-  SubscriptionPlan,
-  Subscription,
   SubscriptionCreateRequest,
   SubscriptionCancelRequest,
-  Payment,
-  Invoice,
   InvoiceListParams,
-  BillingStats,
 } from '../../types/billings.types';
 
 // ============================================================================

@@ -2,12 +2,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Menu, 
+import {
+  Menu,
   X,
-  TrendingUp, 
-  User, 
-  LogOut, 
+  TrendingUp,
+  User,
+  LogOut,
   Settings,
   Briefcase,
   BarChart3,
@@ -15,7 +15,6 @@ import {
   Sparkles,
   Shield,
   Zap,
-  Globe,
   CreditCard
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';

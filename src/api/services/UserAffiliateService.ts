@@ -21,7 +21,6 @@ import type {
   ReferralResponse,
   ReferralRewardResponse,
   ReferredUserParams,
-  ReferredUser,
   MyReferralsResponse,
 } from "../../types/userAffiliate.types";
 

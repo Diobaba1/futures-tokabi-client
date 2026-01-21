@@ -13,8 +13,6 @@ const Input: React.FC<InputProps> = ({
   required = false,
   ...props
 }) => {
-  const hasIcons = leftIcon || rightIcon;
-
   return (
     <div className={`${fullWidth ? 'w-full' : 'w-auto'} ${containerClassName}`}>
       {label && (

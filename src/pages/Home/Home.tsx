@@ -4,7 +4,6 @@ import HeroSection from './HomeItems/HeroSection';
 import FeaturesSection from './HomeItems/FeaturesSection';
 import HowItWorks from './HomeItems/HowItWorks';
 import SecuritySection from './HomeItems/SecuritySection';
-import PricingSection from './HomeItems/PricingSection';
 import CTASection from './HomeItems/CTASection';
 import { PricingPage } from '../billing2';
 

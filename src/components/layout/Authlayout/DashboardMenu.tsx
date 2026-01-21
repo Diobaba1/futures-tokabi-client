@@ -6,7 +6,6 @@ import { useAuth } from "../../contexts/AuthContext";
 import {
   LayoutDashboard,
   TrendingUp,
-  Wallet,
   Settings,
   Bell,
   CreditCard,
@@ -16,7 +15,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Users,
-  BarChart3,
   Activity,
   Zap,
   Shield,

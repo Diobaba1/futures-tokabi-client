@@ -434,6 +434,7 @@ export const useStaffSignals = (
     if (initialFilters) {
       fetchSignals(initialFilters);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // =========================================================================

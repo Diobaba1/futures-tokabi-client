@@ -6,7 +6,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import {
   Plus,
   RefreshCw,
-  Filter,
   Search,
   BarChart3,
   List,
@@ -16,7 +15,6 @@ import {
   AlertCircle,
   X,
   TrendingUp,
-  TrendingDown,
 } from "lucide-react";
 import { useStaffSignals } from "../../components/hooks/useStaffSignals";
 import {
@@ -37,7 +35,6 @@ import {
 const StaffSignalsPage: React.FC = () => {
   // State
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [showFilters, setShowFilters] = useState(false);
   const [showStats, setShowStats] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);

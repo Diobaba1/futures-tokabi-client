@@ -50,17 +50,6 @@ const formatNumber = (value?: number | null, decimals: number = 2): string => {
   return value.toFixed(decimals);
 };
 
-const getDecisionColor = (decision?: string | null): string => {
-  switch (decision?.toLowerCase()) {
-    case "long":
-      return "#10B981";
-    case "short":
-      return "#EF4444";
-    default:
-      return "#6B7280";
-  }
-};
-
 const getDecisionBgClass = (decision?: string | null): string => {
   switch (decision?.toLowerCase()) {
     case "long":
