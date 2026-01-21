@@ -43,6 +43,11 @@ export const API_ENDPOINTS = {
     RATE_LIMITS: "/search_symbol/rate-limit",
   },
 
+  // WebSocket
+  WEBSOCKET: {
+    CHAT: "/ws/chat",
+  },
+
   // ============================================================================
   // BILLING SYSTEM
   // ============================================================================
