@@ -219,7 +219,6 @@ const CurrencyModal: React.FC<CurrencyModalProps> = ({
 };
 
 const PricingPage: React.FC = () => {
-  const navigate = useNavigate();
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
 

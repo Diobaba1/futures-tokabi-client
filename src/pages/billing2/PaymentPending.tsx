@@ -54,6 +54,7 @@ const PaymentPending: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(checkPaymentStatus, 30000);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentId]);
   
   return (

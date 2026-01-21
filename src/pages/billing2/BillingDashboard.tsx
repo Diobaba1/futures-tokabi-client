@@ -14,7 +14,6 @@ import {
   CreditCard,
   FileText,
   TrendingUp,
-  Calendar,
   Clock,
   CheckCircle,
   AlertTriangle,
@@ -24,7 +23,6 @@ import {
   Zap,
 } from 'lucide-react';
 import { useBillingDashboard } from '../../components/hooks/useBilling';
-import { SubscriptionStatus, PaymentStatus } from '../../types/billings.types';
 
 // Stat Card Component
 interface StatCardProps {

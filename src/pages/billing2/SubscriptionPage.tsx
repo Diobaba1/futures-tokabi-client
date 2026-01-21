@@ -27,7 +27,6 @@ import {
   useCurrentSubscription,
   useCancelSubscription,
   useRenewSubscription,
-  usePlans,
 } from '../../components/hooks/useBilling';
 import { SubscriptionStatus } from '../../types/billings.types';
 
@@ -178,7 +177,6 @@ const SubscriptionPage: React.FC = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
 
   const { data: subscription, isLoading, refetch } = useCurrentSubscription();
-  const { data: plans } = usePlans();
   const cancelSubscription = useCancelSubscription();
   const renewSubscription = useRenewSubscription();
 
