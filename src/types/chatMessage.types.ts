@@ -3,7 +3,7 @@
 // Chat message type definitions for WebSocket communication
 // ============================================================================
 
-import { SymbolAnalysisResult, RateLimitInfo } from './userSymbolSearch.types';
+import { SymbolAnalysisResult, RateLimitInfo, AnalysisStatus } from './userSymbolSearch.types';
 
 /**
  * Types of messages in the chat system
@@ -166,6 +166,74 @@ export interface ChatState {
 }
 
 /**
+ * Transform API analysis result to frontend expected structure.
+ * The API returns data in a nested `signal` object, but frontend expects
+ * `final_decision`, `risk_metrics`, `market_data_summary`, etc.
+ */
+function transformAnalysisResult(apiResult: any): SymbolAnalysisResult {
+  // If already in expected format (has final_decision) or is an error/pending, return as-is
+  if (apiResult.final_decision !== undefined || !apiResult.signal) {
+    // Already transformed or no signal data
+    if (!apiResult.signal && apiResult.status !== 'success') {
+      return {
+        symbol: apiResult.symbol,
+        status: apiResult.status || 'pending',
+        error: apiResult.error,
+        timestamp: apiResult.timestamp || new Date().toISOString(),
+      };
+    }
+    // Already has final_decision - minimal transformation needed
+    return apiResult as SymbolAnalysisResult;
+  }
+
+  const signal = apiResult.signal || {};
+  const marketData = signal.market_data || {};
+  const indicators = signal.indicators || marketData.indicators || {};
+
+  return {
+    symbol: apiResult.symbol || signal.symbol,
+    status: apiResult.status as AnalysisStatus,
+    final_decision: signal.decision || null,
+    consensus_strength: signal.consensus_strength || null,
+    risk_metrics: signal.entry_price ? {
+      entry_price: signal.entry_price || null,
+      stop_loss_price: signal.stop_loss_price || null,
+      take_profit_price: signal.take_profit_price || null,
+      estimated_sl_percent: signal.stop_loss_percent || null,
+      estimated_tp_percent: signal.take_profit_percent || null,
+      risk_reward_ratio: signal.risk_reward_ratio || null,
+      suggested_leverage: signal.suggested_leverage || null,
+    } : null,
+    market_data_summary: {
+      current_price: signal.current_price || marketData.current_price || 0,
+      price_change_24h: marketData.price_change_24h || marketData.priceChangePercent || 0,
+      volume_24h: marketData.volume_24h || marketData.volume || 0,
+      high_24h: marketData.high_24h || marketData.highPrice,
+      low_24h: marketData.low_24h || marketData.lowPrice,
+    },
+    indicators_summary: indicators.rsi ? {
+      rsi: indicators.rsi || 0,
+      macd: indicators.macd || 0,
+      signal_line: indicators.signal_line || indicators.macd_signal || 0,
+      atr: indicators.atr || 0,
+      trend: indicators.trend || 'neutral',
+    } : undefined,
+    error: apiResult.error,
+    timestamp: apiResult.timestamp || signal.created_at || new Date().toISOString(),
+  };
+}
+
+/**
+ * Transform array of API results to frontend format
+ */
+function transformAnalysisResults(apiResults: any[] | null | undefined): SymbolAnalysisResult[] {
+  if (!apiResults || !Array.isArray(apiResults)) {
+    return [];
+  }
+  return apiResults.map(transformAnalysisResult);
+}
+
+/**
  * Parse raw message from server into typed ChatMessage
  */
 export function parseRawMessage(raw: RawChatMessage): ChatMessage {
@@ -176,7 +244,10 @@ export function parseRawMessage(raw: RawChatMessage): ChatMessage {
     if (raw.metadata.search_id) metadata.searchId = raw.metadata.search_id;
     if (raw.metadata.progress !== undefined) metadata.progress = raw.metadata.progress;
     if (raw.metadata.symbol) metadata.symbol = raw.metadata.symbol;
-    if (raw.metadata.analysis_results) metadata.analysisResults = raw.metadata.analysis_results;
+    // Transform analysis results from API format to frontend format
+    if (raw.metadata.analysis_results) {
+      metadata.analysisResults = transformAnalysisResults(raw.metadata.analysis_results);
+    }
     if (raw.metadata.error_code) metadata.errorCode = raw.metadata.error_code;
     if (raw.metadata.rate_limit) {
       metadata.rateLimit = {
