@@ -15,6 +15,10 @@ export const API_ENDPOINTS = {
     RESET_PASSWORD: "/auth/reset-password",
     VALIDATE_RESET_TOKEN: "/auth/validate-reset-token",
     CHANGE_PASSWORD: "/auth/change-password",
+
+    // Referral Code Management (NEW)
+    CREATE_REFERRAL_CODE: "/auth/referral-codes",
+    VALIDATE_REFERRAL_CODE: (code: string) => `/auth/referral/validate/${code}`,
   },
 
   // Users
@@ -127,7 +131,8 @@ export const API_ENDPOINTS = {
     REFERRAL_STATS: "/referrals/stats",
     REFERRALS_LIST: "/referrals/referrals",
     REFERRAL_REWARDS: "/referrals/rewards",
-    MY_REFERALS: "/referrals/referrals/my-referrals",
+    MY_REFERALS: "/referrals/my-referrals",  // FIXED: Removed duplicate "referrals"
+    REFERRAL_SUMMARY: "/referrals/summary",  // NEW: Comprehensive referral summary
 
     // ========================================
     // Webhook Integration
@@ -191,6 +196,9 @@ export const API_ENDPOINTS = {
 
     // GET /signals/symbols - Get available symbols
     SYMBOLS: "/signals/symbols",
+
+    // GET /signals/leverage-recommendations - Get leverage recommendations
+    LEVERAGE_RECOMMENDATIONS: "/signals/leverage-recommendations",
 
     // GET /signals/{signal_id} - Get signal detail
     DETAIL: (signalId: string) => `/signals/${signalId}`,

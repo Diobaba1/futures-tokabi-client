@@ -22,6 +22,7 @@ import type {
   ReferralRewardResponse,
   ReferredUserParams,
   MyReferralsResponse,
+  ReferralSummary,
 } from "../../types/userAffiliate.types";
 
 export const UserAffiliateService = {
@@ -180,6 +181,23 @@ export const UserAffiliateService = {
     const response = await axiosInstance.get(
       API_ENDPOINTS.REFERAL_SYSTEM.REFERRAL_REWARDS,
       { params }
+    );
+    return response.data;
+  },
+
+  /**
+   * Get comprehensive referral summary
+   * GET /referrals/summary
+   *
+   * Returns:
+   * - Total statistics (total_referrals, active_users, subscribed_users, etc.)
+   * - Reward summary (total_earned, pending, processed)
+   * - Recent referrals (last 5)
+   * - Referral code performance
+   */
+  getReferralSummary: async (): Promise<ReferralSummary> => {
+    const response = await axiosInstance.get(
+      API_ENDPOINTS.REFERAL_SYSTEM.REFERRAL_SUMMARY
     );
     return response.data;
   },

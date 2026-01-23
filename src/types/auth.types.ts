@@ -22,6 +22,7 @@ export interface RegisterRequest {
   email: string;
   full_name: string;
   password: string;
+  referral_code?: string;  // Optional referral code for registration
 }
 
 export interface TokenResponse {
