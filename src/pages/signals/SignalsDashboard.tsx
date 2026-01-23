@@ -16,7 +16,7 @@ import { signalsService } from "../../api/services/userSignalsService";
 import { Card, Spinner } from "../../components/ui";
 import { SignalCard, SignalFilters, SignalDetailModal } from "../../components/signals";
 import UpgradePrompt from "../../components/common/UpgradePrompt";
-import { isSubscriptionError, SubscriptionErrorCode } from "../../types/billings.types";
+import { SubscriptionErrorCode } from "../../types/billings.types";
 
 // =============================================================================
 // Stat Card Component
