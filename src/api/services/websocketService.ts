@@ -19,10 +19,12 @@ class WebSocketService {
   private errorHandlers: Set<ErrorHandler> = new Set();
 
   private reconnectAttempts = 0;
-  private maxReconnectAttempts = 10;
+  private maxReconnectAttempts = 5; // Reduced from 10
   private reconnectDelay = 1000; // Start with 1 second
-  private maxReconnectDelay = 30000; // Max 30 seconds
+  private maxReconnectDelay = 10000; // Reduced from 30 seconds
   private reconnectTimeout: NodeJS.Timeout | null = null;
+  private connectionTimeout: NodeJS.Timeout | null = null;
+  private connectionTimeoutMs = 15000; // 15 second connection timeout
   private pingInterval: NodeJS.Timeout | null = null;
   private pingIntervalMs = 25000; // 25 seconds
 
@@ -56,6 +58,13 @@ class WebSocketService {
       return;
     }
 
+    // Clean up any existing socket in connecting state
+    if (this.socket?.readyState === WebSocket.CONNECTING) {
+      console.log('WebSocket already connecting, closing stale connection');
+      this.socket.close();
+      this.socket = null;
+    }
+
     const token = localStorage.getItem('accessToken');
     if (!token) {
       this.notifyError('No authentication token found. Please log in.');
@@ -67,7 +76,22 @@ class WebSocketService {
 
     try {
       const wsUrl = `${this.getWebSocketUrl()}?token=${token}`;
+      console.log('Connecting to WebSocket:', wsUrl.replace(/token=.*/, 'token=***'));
+
       this.socket = new WebSocket(wsUrl);
+
+      // Set connection timeout
+      this.clearConnectionTimeout();
+      this.connectionTimeout = setTimeout(() => {
+        if (this.socket?.readyState === WebSocket.CONNECTING) {
+          console.error('WebSocket connection timeout');
+          this.socket.close();
+          this.socket = null;
+          this.updateStatus('error');
+          this.notifyError('Connection timeout. Server may be unavailable.');
+          this.scheduleReconnect();
+        }
+      }, this.connectionTimeoutMs);
 
       this.socket.onopen = this.handleOpen.bind(this);
       this.socket.onmessage = this.handleMessage.bind(this);
@@ -86,6 +110,7 @@ class WebSocketService {
   disconnect(): void {
     this.isIntentionalClose = true;
     this.clearReconnectTimeout();
+    this.clearConnectionTimeout();
     this.stopPing();
 
     if (this.socket) {
@@ -176,7 +201,8 @@ class WebSocketService {
   // =========================================================================
 
   private handleOpen(): void {
-    console.log('WebSocket connected');
+    console.log('WebSocket connected successfully');
+    this.clearConnectionTimeout();
     this.reconnectAttempts = 0;
     this.reconnectDelay = 1000;
     this.updateStatus('connected');
@@ -207,6 +233,7 @@ class WebSocketService {
 
   private handleClose(event: CloseEvent): void {
     console.log(`WebSocket closed: ${event.code} - ${event.reason}`);
+    this.clearConnectionTimeout();
     this.stopPing();
 
     if (this.isIntentionalClose) {
@@ -227,6 +254,7 @@ class WebSocketService {
 
   private handleError(event: Event): void {
     console.error('WebSocket error:', event);
+    this.clearConnectionTimeout();
     this.updateStatus('error');
   }
 
@@ -260,6 +288,13 @@ class WebSocketService {
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
       this.reconnectTimeout = null;
+    }
+  }
+
+  private clearConnectionTimeout(): void {
+    if (this.connectionTimeout) {
+      clearTimeout(this.connectionTimeout);
+      this.connectionTimeout = null;
     }
   }
 
