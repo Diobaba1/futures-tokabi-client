@@ -8,7 +8,7 @@
  * attempt to access features that require a subscription or higher tier.
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, Lock, Crown, ArrowRight } from 'lucide-react';
 import {
@@ -16,7 +16,11 @@ import {
   SUBSCRIPTION_ERROR_MESSAGES,
   SubscriptionTier,
 } from '../../types/billings.types';
-import { getSubscriptionCTA } from '../../utils/subscriptionErrorHandler';
+import {
+  getSubscriptionCTA,
+  onSubscriptionError,
+  SubscriptionErrorEvent,
+} from '../../utils/subscriptionErrorHandler';
 
 // ============================================================================
 // TYPES
@@ -215,12 +219,6 @@ export default UpgradePrompt;
 // ============================================================================
 // HOOK FOR GLOBAL SUBSCRIPTION ERROR HANDLING
 // ============================================================================
-
-import { useState, useEffect } from 'react';
-import {
-  onSubscriptionError,
-  SubscriptionErrorEvent,
-} from '../../utils/subscriptionErrorHandler';
 
 /**
  * Hook to listen for subscription errors globally
