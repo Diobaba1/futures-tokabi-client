@@ -6,6 +6,7 @@
 // =============================================================================
 
 import { useState, useCallback, useEffect } from "react";
+import axios from "axios";
 import { signalsService } from "../../api/services";
 import type {
   UserSignal,
@@ -13,6 +14,30 @@ import type {
   UserSignalStats,
   SignalStatus,
 } from "../../types/signals.types";
+import { isSubscriptionError } from "../../types/billings.types";
+
+/**
+ * Extract error message from various error types
+ */
+function extractErrorMessage(err: unknown): string {
+  if (axios.isAxiosError(err)) {
+    // Check for subscription error
+    if (isSubscriptionError(err)) {
+      return err.response?.data?.message || "Subscription required to access this feature";
+    }
+    // Standard axios error
+    return (
+      err.response?.data?.detail ||
+      err.response?.data?.message ||
+      err.message ||
+      "An error occurred"
+    );
+  }
+  if (err instanceof Error) {
+    return err.message;
+  }
+  return "An unknown error occurred";
+}
 
 /**
  * Hook for fetching user signals with limited visibility
@@ -34,7 +59,7 @@ export function useSignals(initialFilters?: UserSignalFilters) {
         setSignals(response.signals);
         setHasMore(response.hasMore);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch signals");
+        setError(extractErrorMessage(err));
       } finally {
         setIsLoading(false);
       }
@@ -53,7 +78,7 @@ export function useSignals(initialFilters?: UserSignalFilters) {
       setHasMore(response.hasMore);
       setFilters((prev) => ({ ...prev, offset: newOffset }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load more signals");
+      setError(extractErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +124,7 @@ export function useActiveSignals(symbol?: string, limit: number = 50) {
       const data = await signalsService.getActiveSignals(symbol, limit);
       setSignals(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch active signals");
+      setError(extractErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -132,7 +157,7 @@ export function useSignalStats(timeframe: "1h" | "24h" | "7d" | "30d" | "all" = 
       const data = await signalsService.getStats(timeframe);
       setStats(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch stats");
+      setError(extractErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -166,7 +191,7 @@ export function useSignalDetail(signalId: string | null) {
         const data = await signalsService.getSignalById(signalId);
         setSignal(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch signal");
+        setError(extractErrorMessage(err));
       } finally {
         setIsLoading(false);
       }
@@ -193,7 +218,7 @@ export function useAvailableSymbols() {
       const data = await signalsService.getSymbols();
       setSymbols(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch symbols");
+      setError(extractErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -220,7 +245,7 @@ export function useSignalStatusUpdate() {
       const result = await signalsService.updateSignalStatus(signalId, status);
       return result;
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to update status";
+      const message = extractErrorMessage(err);
       setError(message);
       throw new Error(message);
     } finally {

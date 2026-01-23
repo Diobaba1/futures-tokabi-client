@@ -1,5 +1,7 @@
-// src/api/services/axiosConfig.ts (updated from provided)
+// src/api/services/axiosConfig.ts
 import axios from 'axios';
+import { isSubscriptionError } from '../types/billings.types';
+import { handleSubscriptionError } from '../utils/subscriptionErrorHandler';
 
 const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL,
@@ -27,6 +29,7 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Handle 401 Unauthorized - Token expired or invalid
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -46,6 +49,13 @@ axiosInstance.interceptors.response.use(
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }
+    }
+
+    // Handle 403 Forbidden - Check for subscription errors
+    if (error.response?.status === 403 && isSubscriptionError(error)) {
+      // Dispatch subscription error event for UI handling
+      handleSubscriptionError(error);
+      // Still reject the promise so the calling code can handle it
     }
 
     return Promise.reject(error);

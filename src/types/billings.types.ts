@@ -319,6 +319,86 @@ export interface BillingStats {
 }
 
 // ============================================================================
+// SUBSCRIPTION ERROR TYPES
+// ============================================================================
+
+/**
+ * Subscription error codes returned by the backend
+ */
+export enum SubscriptionErrorCode {
+  NO_SUBSCRIPTION = 'NO_SUBSCRIPTION',
+  SUBSCRIPTION_EXPIRED = 'SUBSCRIPTION_EXPIRED',
+  SUBSCRIPTION_SUSPENDED = 'SUBSCRIPTION_SUSPENDED',
+  SUBSCRIPTION_PAST_DUE = 'SUBSCRIPTION_PAST_DUE',
+  SUBSCRIPTION_CANCELLED = 'SUBSCRIPTION_CANCELLED',
+  TIER_INSUFFICIENT = 'TIER_INSUFFICIENT',
+  FEATURE_NOT_AVAILABLE = 'FEATURE_NOT_AVAILABLE',
+  TRIAL_EXPIRED = 'TRIAL_EXPIRED',
+  RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED',
+}
+
+/**
+ * Subscription error response from backend 403 errors
+ */
+export interface SubscriptionErrorResponse {
+  error_code: SubscriptionErrorCode;
+  message: string;
+  upgrade_url?: string;
+  required_tier?: SubscriptionTier;
+  current_tier?: SubscriptionTier;
+  feature?: string;
+}
+
+/**
+ * Check if an error is a subscription error
+ */
+export function isSubscriptionError(error: unknown): error is { response: { status: number; data: SubscriptionErrorResponse } } {
+  if (!error || typeof error !== 'object') return false;
+  const err = error as { response?: { status?: number; data?: SubscriptionErrorResponse } };
+  return (
+    err.response?.status === 403 &&
+    err.response?.data?.error_code !== undefined &&
+    Object.values(SubscriptionErrorCode).includes(err.response.data.error_code)
+  );
+}
+
+/**
+ * User-friendly messages for subscription errors
+ */
+export const SUBSCRIPTION_ERROR_MESSAGES: Record<SubscriptionErrorCode, string> = {
+  [SubscriptionErrorCode.NO_SUBSCRIPTION]: 'You need an active subscription to access this feature.',
+  [SubscriptionErrorCode.SUBSCRIPTION_EXPIRED]: 'Your subscription has expired. Please renew to continue.',
+  [SubscriptionErrorCode.SUBSCRIPTION_SUSPENDED]: 'Your subscription has been suspended. Please contact support.',
+  [SubscriptionErrorCode.SUBSCRIPTION_PAST_DUE]: 'Your payment is past due. Please update your payment method.',
+  [SubscriptionErrorCode.SUBSCRIPTION_CANCELLED]: 'Your subscription has been cancelled. Please resubscribe.',
+  [SubscriptionErrorCode.TIER_INSUFFICIENT]: 'This feature requires a higher subscription tier.',
+  [SubscriptionErrorCode.FEATURE_NOT_AVAILABLE]: 'This feature is not available on your current plan.',
+  [SubscriptionErrorCode.TRIAL_EXPIRED]: 'Your trial has expired. Please subscribe to continue.',
+  [SubscriptionErrorCode.RATE_LIMIT_EXCEEDED]: 'You have exceeded your usage limit. Please upgrade for more.',
+};
+
+// ============================================================================
+// USER FEATURE LIMITS (from subscription status endpoint)
+// ============================================================================
+
+export interface UserFeatureLimits {
+  tier: SubscriptionTier | null;
+  is_admin: boolean;
+  has_subscription: boolean;
+  status: string | null;
+  days_remaining: number | null;
+  features: {
+    max_trades_per_day: number;
+    max_open_positions: number;
+    signals_access: boolean;
+    telegram_alerts: boolean;
+    priority_support: boolean;
+    api_access: boolean;
+    custom_analysis: boolean;
+  };
+}
+
+// ============================================================================
 // API RESPONSE TYPES
 // ============================================================================
 
