@@ -21,7 +21,10 @@ export const useSymbolSearch = () => {
 
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
-  const fetchSearchHistory = useCallback(async (limit: number = 10) => {
+  const fetchSearchHistory = useCallback(async (limitOrEvent?: number | Event) => {
+    // Handle case where event is passed from onClick handler
+    const limit = typeof limitOrEvent === 'number' ? limitOrEvent : 10;
+
     try {
       const history = await userSymbolSearchService.getSearchHistory(limit);
       setState((prev) => ({
