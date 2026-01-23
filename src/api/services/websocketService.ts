@@ -40,9 +40,10 @@ class WebSocketService {
       .replace(/^https:\/\//, 'wss://')
       .replace(/^http:\/\//, 'ws://');
 
-    // Remove /api suffix if present
-    wsUrl = wsUrl.replace(/\/api\/?$/, '');
+    // Remove trailing slash if present, but keep /api
+    wsUrl = wsUrl.replace(/\/$/, '');
 
+    // WebSocket endpoint is at /api/ws/chat
     return `${wsUrl}/ws/chat`;
   }
 
