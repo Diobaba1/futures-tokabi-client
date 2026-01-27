@@ -3,18 +3,19 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { userService } from '../../api/services/userService';
 import { APIKeyAdd, APIKeyResponse } from '../../types/user.types';
+import { useToast } from '../../components/ui/Toast';
+import { getUserFriendlyError } from '../../utils/errorHandler';
 
 interface APIKeyManagerProps {
   onKeysUpdate?: (keys: APIKeyResponse[]) => void;
 }
 
 const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
+  const { showSuccess, showError } = useToast();
   const [apiKeys, setApiKeys] = useState<APIKeyResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
 
   // Form state
@@ -29,16 +30,15 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
   const loadApiKeys = useCallback(async () => {
     try {
       setIsLoading(true);
-      setError(null);
       const response = await userService.getApiKeys();
       setApiKeys(response.api_keys);
       onKeysUpdate?.(response.api_keys);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load API keys');
+    } catch (err: unknown) {
+      showError(getUserFriendlyError(err), { title: 'Failed to Load' });
     } finally {
       setIsLoading(false);
     }
-  }, [onKeysUpdate]);
+  }, [onKeysUpdate, showError]);
 
   // Load API keys on component mount
   useEffect(() => {
@@ -47,23 +47,21 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
 
   const handleAddKey = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.api_key.trim() || !formData.api_secret.trim()) {
-      setError('Both API Key and Secret are required');
+      showError('Both API Key and Secret are required', { title: 'Validation Error' });
       return;
     }
 
     try {
       setIsAdding(true);
-      setError(null);
-      setSuccess(null);
 
       await userService.addApiKey({
         ...formData,
         label: formData.label?.trim() || `API Key ${new Date().toLocaleDateString()}`,
       });
 
-      setSuccess('API key added successfully!');
+      showSuccess('API key added successfully!', { title: 'Key Added' });
       setFormData({
         api_key: '',
         api_secret: '',
@@ -71,11 +69,11 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
         testnet: false,
       });
       setShowAddForm(false);
-      
+
       // Reload the keys list
       await loadApiKeys();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to add API key');
+    } catch (err: unknown) {
+      showError(getUserFriendlyError(err), { title: 'Failed to Add Key' });
     } finally {
       setIsAdding(false);
     }
@@ -88,23 +86,17 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
 
     try {
       setIsDeleting(keyId);
-      setError(null);
-      
+
       await userService.deleteApiKey(keyId);
-      setSuccess('API key deleted successfully!');
-      
+      showSuccess('API key deleted successfully!', { title: 'Key Deleted' });
+
       // Reload the keys list
       await loadApiKeys();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to delete API key');
+    } catch (err: unknown) {
+      showError(getUserFriendlyError(err), { title: 'Failed to Delete' });
     } finally {
       setIsDeleting(null);
     }
-  };
-
-  const clearMessages = () => {
-    setError(null);
-    setSuccess(null);
   };
 
   const resetForm = () => {
@@ -115,16 +107,7 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
       testnet: false,
     });
     setShowAddForm(false);
-    clearMessages();
   };
-
-  // Auto-clear messages after 5 seconds
-  useEffect(() => {
-    if (error || success) {
-      const timer = setTimeout(clearMessages, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [error, success]);
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
@@ -284,51 +267,6 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
                 </motion.button>
               </div>
             </form>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Status Messages */}
-      <AnimatePresence>
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 flex items-center justify-between"
-          >
-            <div className="flex items-center space-x-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{error}</span>
-            </div>
-            <button onClick={clearMessages} className="text-red-400 hover:text-red-300">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </motion.div>
-        )}
-
-        {success && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-green-400 flex items-center justify-between"
-          >
-            <div className="flex items-center space-x-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{success}</span>
-            </div>
-            <button onClick={clearMessages} className="text-green-400 hover:text-green-300">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
           </motion.div>
         )}
       </AnimatePresence>

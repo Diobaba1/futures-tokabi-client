@@ -4,13 +4,12 @@
 
 /**
  * Billing React Query Hooks
- * 
+ *
  * Custom hooks for billing operations using React Query.
  * Aligned with backend API routes.
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'react-hot-toast';
 import {
   planService,
   subscriptionService,
@@ -23,6 +22,27 @@ import type {
   SubscriptionCancelRequest,
   InvoiceListParams,
 } from '../../types/billings.types';
+import { getUserFriendlyError } from '../../utils/errorHandler';
+
+// ============================================================================
+// TOAST NOTIFICATION HELPER
+// ============================================================================
+
+/**
+ * Dispatch toast notification via custom event
+ * This allows React Query hooks to show toasts without useContext
+ */
+const showNotification = (
+  type: 'success' | 'error' | 'warning' | 'info',
+  message: string,
+  title?: string
+) => {
+  window.dispatchEvent(
+    new CustomEvent('notification:show', {
+      detail: { type, title, message },
+    })
+  );
+};
 
 // ============================================================================
 // QUERY KEYS
@@ -30,29 +50,29 @@ import type {
 
 export const billingKeys = {
   all: ['billing'] as const,
-  
+
   // Plans
   plans: () => [...billingKeys.all, 'plans'] as const,
   plansList: () => [...billingKeys.plans(), 'list'] as const,
   plansFeatured: () => [...billingKeys.plans(), 'featured'] as const,
-  
+
   // Subscriptions
   subscriptions: () => [...billingKeys.all, 'subscriptions'] as const,
   subscriptionCurrent: () => [...billingKeys.subscriptions(), 'current'] as const,
   subscriptionHistory: () => [...billingKeys.subscriptions(), 'history'] as const,
-  
+
   // Payments
   payments: () => [...billingKeys.all, 'payments'] as const,
   paymentsList: () => [...billingKeys.payments(), 'list'] as const,
   paymentDetail: (id: string) => [...billingKeys.payments(), 'detail', id] as const,
   paymentStatus: (id: string) => [...billingKeys.payments(), 'status', id] as const,
-  
+
   // Invoices
   invoices: () => [...billingKeys.all, 'invoices'] as const,
   invoicesList: (params?: InvoiceListParams) => [...billingKeys.invoices(), 'list', params] as const,
   invoicesUnpaid: () => [...billingKeys.invoices(), 'unpaid'] as const,
   invoiceDetail: (id: string) => [...billingKeys.invoices(), 'detail', id] as const,
-  
+
   // Stats
   stats: () => [...billingKeys.all, 'stats'] as const,
 };
@@ -125,15 +145,15 @@ export function useCreateSubscription() {
       subscriptionService.createSubscription(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: billingKeys.subscriptions() });
-      toast.success('Subscription created! Redirecting to payment...');
-      
+      showNotification('success', 'Subscription created! Redirecting to payment...', 'Success');
+
       // Redirect to payment URL if provided
       if (data.payment_url) {
         window.location.href = data.payment_url;
       }
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.detail || 'Failed to create subscription');
+    onError: (error: unknown) => {
+      showNotification('error', getUserFriendlyError(error), 'Subscription Failed');
     },
   });
 }
@@ -155,10 +175,10 @@ export function useCancelSubscription() {
     }) => subscriptionService.cancelSubscription(subscriptionId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: billingKeys.subscriptions() });
-      toast.success('Subscription cancelled successfully');
+      showNotification('success', 'Your subscription has been cancelled successfully.', 'Subscription Cancelled');
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.detail || 'Failed to cancel subscription');
+    onError: (error: unknown) => {
+      showNotification('error', getUserFriendlyError(error), 'Cancellation Failed');
     },
   });
 }
@@ -180,14 +200,14 @@ export function useRenewSubscription() {
     }) => subscriptionService.renewSubscription(subscriptionId, payCurrency),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: billingKeys.subscriptions() });
-      toast.success('Renewal initiated! Redirecting to payment...');
-      
+      showNotification('success', 'Renewal initiated! Redirecting to payment...', 'Renewal Started');
+
       if (data.payment_url) {
         window.location.href = data.payment_url;
       }
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.detail || 'Failed to renew subscription');
+    onError: (error: unknown) => {
+      showNotification('error', getUserFriendlyError(error), 'Renewal Failed');
     },
   });
 }
@@ -240,25 +260,25 @@ export function useCreateInvoicePayment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ 
-      amount, 
-      currency, 
-      description 
-    }: { 
-      amount: number; 
-      currency?: string; 
-      description?: string; 
+    mutationFn: ({
+      amount,
+      currency,
+      description
+    }: {
+      amount: number;
+      currency?: string;
+      description?: string;
     }) => paymentService.createInvoicePayment(amount, currency, description),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: billingKeys.payments() });
-      toast.success('Payment created! Redirecting...');
-      
+      showNotification('success', 'Payment created! Redirecting to checkout...', 'Payment Ready');
+
       if (data.invoice_url) {
         window.location.href = data.invoice_url;
       }
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.detail || 'Failed to create payment');
+    onError: (error: unknown) => {
+      showNotification('error', getUserFriendlyError(error), 'Payment Failed');
     },
   });
 }
@@ -319,15 +339,15 @@ export function usePayInvoice() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: billingKeys.invoices() });
       queryClient.invalidateQueries({ queryKey: billingKeys.payments() });
-      toast.success('Payment initiated!');
-      
+      showNotification('success', 'Payment initiated! Redirecting...', 'Invoice Payment');
+
       // If there's a hosted invoice URL, redirect there
       if (data.invoice_url) {
         window.location.href = data.invoice_url;
       }
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.detail || 'Failed to pay invoice');
+    onError: (error: unknown) => {
+      showNotification('error', getUserFriendlyError(error), 'Payment Failed');
     },
   });
 }
@@ -389,7 +409,7 @@ export function useBillingDashboard() {
  */
 export function useHasActiveSubscription() {
   const { data: subscription, isLoading } = useCurrentSubscription();
-  
+
   return {
     hasSubscription: subscription?.status === 'active' || subscription?.status === 'trial',
     isLoading,
@@ -402,21 +422,21 @@ export function useHasActiveSubscription() {
  */
 export function useCanAccessFeature(feature: keyof import('../../types/billings.types').PlanFeatures) {
   const { data: subscription, isLoading } = useCurrentSubscription();
-  
+
   if (isLoading) return { canAccess: false, isLoading: true };
   if (!subscription?.plan?.features) return { canAccess: false, isLoading: false };
-  
+
   const featureValue = subscription.plan.features[feature];
-  
+
   // Boolean features
   if (typeof featureValue === 'boolean') {
     return { canAccess: featureValue, isLoading: false };
   }
-  
+
   // Numeric features (-1 = unlimited, 0 = disabled, >0 = limited)
   if (typeof featureValue === 'number') {
     return { canAccess: featureValue !== 0, isLoading: false };
   }
-  
+
   return { canAccess: !!featureValue, isLoading: false };
 }
