@@ -7,7 +7,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { isSubscriptionError } from '../types/billings.types';
 import { handleSubscriptionError } from '../utils/subscriptionErrorHandler';
-import { parseError, requiresReAuth, formatErrorForToast, logError } from '../utils/errorHandler';
+import { logError } from '../utils/errorHandler';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
 
@@ -65,7 +65,7 @@ axiosInstance.interceptors.response.use(
       // Dispatch auth logout event
       window.dispatchEvent(new CustomEvent('auth:logout'));
 
-      // Show user-friendly notification
+      // Show user-friendly notification for session expiry only
       dispatchNotification('warning', 'Session Expired', 'Your session has expired. Please log in again.');
 
       // Redirect to login
@@ -85,22 +85,9 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Handle other errors with user-friendly messages
-    if (status && !originalRequest._retry) {
-      const parsed = parseError(error);
-
-      // Only show toast for errors that aren't handled above
-      if (!requiresReAuth(error) && !isSubscriptionError(error)) {
-        const toast = formatErrorForToast(error);
-        dispatchNotification(toast.type, parsed.title, toast.message);
-      }
-    }
-
-    // Handle network errors
-    if (!error.response) {
-      const parsed = parseError(error);
-      dispatchNotification('error', parsed.title, parsed.message);
-    }
+    // Note: General errors are NOT toasted here to avoid duplicates.
+    // Components should handle their own error toasts with context-specific messages.
+    // Only session expiry (401) and subscription errors (403) are handled here.
 
     return Promise.reject(error);
   }
