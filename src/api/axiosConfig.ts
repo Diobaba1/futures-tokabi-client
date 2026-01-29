@@ -7,7 +7,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { isSubscriptionError } from '../types/billings.types';
 import { handleSubscriptionError } from '../utils/subscriptionErrorHandler';
-import { logError } from '../utils/errorHandler';
+import { logError, parseError } from '../utils/errorHandler';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
 
