@@ -56,9 +56,9 @@ const Dashboard: React.FC = () => {
     const winningPositions = positions.filter((p) => (p.unrealized_pnl || 0) > 0).length;
     const losingPositions = positions.filter((p) => (p.unrealized_pnl || 0) < 0).length;
     const totalNotional = positions.reduce((sum, p) => sum + Math.abs(p.position_amount || 0) * (p.mark_price || 0), 0);
-    const walletBalance = tradingPortfolio?.total_wallet_balance || analyticsPortfolio?.total_wallet_balance || 0;
-    const marginBalance = tradingPortfolio?.total_margin_balance || analyticsPortfolio?.total_margin_balance || 0;
-    const availableBalance = tradingPortfolio?.available_balance || analyticsPortfolio?.available_balance || 0;
+    const walletBalance = tradingPortfolio?.total_wallet_balance || analyticsPortfolio?.balance?.total_balance_usd || 0;
+    const marginBalance = tradingPortfolio?.total_margin_balance || analyticsPortfolio?.balance?.current_balance_usd || 0;
+    const availableBalance = tradingPortfolio?.available_balance || analyticsPortfolio?.balance?.current_balance_usd || 0;
 
     return {
       totalPnL,

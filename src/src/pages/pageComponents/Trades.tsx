@@ -682,9 +682,9 @@ const Trades: React.FC = () => {
                       </p>
                     </div>
                     <div className="p-4 rounded-xl bg-slate-800/50">
-                      <p className="text-xs text-slate-500 mb-1">Exit Price</p>
+                      <p className="text-xs text-slate-500 mb-1">Quantity</p>
                       <p className="text-lg font-semibold text-white font-mono">
-                        ${selectedTrade.exit_price ? formatPrice(selectedTrade.exit_price) : "—"}
+                        {selectedTrade.quantity ? selectedTrade.quantity.toFixed(4) : "—"}
                       </p>
                     </div>
                   </div>
