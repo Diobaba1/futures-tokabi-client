@@ -10,3 +10,6 @@ export {
   useAvailableSymbols,
   useSignalStatusUpdate,
 } from "./userSignals";
+
+export { useTradingWebSocket } from "./useTradingWebSocket";
+export type { TradingState, UseTradingWebSocketReturn } from "./useTradingWebSocket";
