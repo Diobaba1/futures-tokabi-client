@@ -82,6 +82,11 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
           icon: <TrendingUp size={20} />,
         },
         {
+          path: "/dashboard/trading-config",
+          label: "Trading Config",
+          icon: <Settings size={20} />,
+        },
+        {
           path: "/dashboard/symbol-analysis",
           label: "Analysis",
           icon: <Activity size={20} />,

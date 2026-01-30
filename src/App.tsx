@@ -33,6 +33,9 @@ import ReferredUsersList from "./pages/Users/ReferredUsersList";
 // Staff Signals Pages
 import { StaffSignalsPage, ActiveSignalsPage } from "./pages/StaffSignals";
 
+// Trading Config Page
+import TradingConfigPage from "./pages/trading/TradingConfigPage";
+
 // =========================================================================
 // Billing Pages
 // =========================================================================
@@ -174,6 +177,12 @@ const dashboardRoutes: RouteConfig[] = [
   {
     path: "/dashboard/trading",
     element: <Trades />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  {
+    path: "/dashboard/trading-config",
+    element: <TradingConfigPage />,
     layout: DashboardLayout,
     protected: true,
   },
