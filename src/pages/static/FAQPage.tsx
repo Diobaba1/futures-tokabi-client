@@ -185,7 +185,7 @@ const FAQPage: React.FC = () => {
                   Contact on Telegram
                 </motion.button>
               </a>
-              <a href="mailto:support@tokabi.com">
+              <a href="mailto:support@tokabi.io">
                 <motion.button
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}

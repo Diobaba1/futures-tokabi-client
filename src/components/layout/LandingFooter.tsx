@@ -41,7 +41,7 @@ const LandingFooter: React.FC = () => {
     {
       title: 'Support',
       links: [
-        { name: 'support@tokabi.com', href: 'mailto:support@tokabi.com', isEmail: true },
+        { name: 'support@tokabi.io', href: 'mailto:support@tokabi.io', isEmail: true },
         { name: 'Documentation', href: '#', comingSoon: true },
       ],
     },
