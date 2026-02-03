@@ -241,13 +241,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
       <div className="flex items-center justify-between p-4 border-b border-cyan-500/10">
         {!isCollapsed && (
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-xl flex items-center justify-center">
-              <Zap size={20} className="text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-white">TOKABI</h1>
-              <p className="text-xs text-cyan-400/60">AI-Powered Trading</p>
-            </div>
+          
           </div>
         )}
         {isCollapsed && (
