@@ -30,6 +30,14 @@ import ResetPasswordPage from "./pages/Auth/settings/password/ResetPasswordPage"
 import { SignalsDashboard } from "./pages/signals";
 import ReferredUsersList from "./pages/Users/ReferredUsersList";
 
+// Static Pages
+import {
+  AboutPage,
+  HowItWorksPage,
+  SpatialIntelligencePage,
+  FAQPage,
+} from "./pages/static";
+
 // Staff Signals Pages
 import { StaffSignalsPage, ActiveSignalsPage } from "./pages/StaffSignals";
 
@@ -94,6 +102,29 @@ const publicRoutes: RouteConfig[] = [
   {
     path: "/community",
     element: <CommunityPage />,
+    layout: PublicLayout,
+  },
+  // =========================================================================
+  // Static Pages (About, How It Works, etc.)
+  // =========================================================================
+  {
+    path: "/about",
+    element: <AboutPage />,
+    layout: PublicLayout,
+  },
+  {
+    path: "/how-it-works",
+    element: <HowItWorksPage />,
+    layout: PublicLayout,
+  },
+  {
+    path: "/spatial-intelligence",
+    element: <SpatialIntelligencePage />,
+    layout: PublicLayout,
+  },
+  {
+    path: "/faq",
+    element: <FAQPage />,
     layout: PublicLayout,
   },
   // =========================================================================
@@ -296,14 +327,23 @@ function App() {
                     path="*"
                     element={
                       <PublicLayout>
-                        <div className="min-h-screen flex items-center justify-center">
-                          <div className="text-center">
-                            <h1 className="text-4xl font-bold text-white mb-4">
+                        <div className="min-h-screen flex items-center justify-center bg-tokabi-light">
+                          <div className="text-center px-4">
+                            <h1 className="text-6xl font-bold text-tokabi-accent mb-4">
                               404
                             </h1>
-                            <p className="text-gray-400 text-lg">
+                            <h2 className="text-2xl font-semibold text-tokabi-primary mb-4">
                               Page not found
+                            </h2>
+                            <p className="text-tokabi-secondary mb-8">
+                              The page you're looking for doesn't exist or has been moved.
                             </p>
+                            <a
+                              href="/"
+                              className="inline-flex items-center justify-center px-6 py-3 bg-tokabi-accent text-white font-semibold rounded-btn hover:bg-tokabi-accent-hover transition-colors"
+                            >
+                              Back to Home
+                            </a>
                           </div>
                         </div>
                       </PublicLayout>

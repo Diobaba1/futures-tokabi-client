@@ -1,5 +1,6 @@
 // src/pages/analytics/PortfolioAnalytics.tsx
 import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../components/contexts/AuthContext";
 import { portfolioService } from "../../api/services/portfolioService";
 import { PortfolioResponse } from "../../types/portfolio.types";
@@ -26,10 +27,23 @@ import {
   Layers,
   Zap,
   Eye,
+  EyeOff,
   AlertCircle,
-} from 'lucide-react';
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  Lock,
+  Percent,
+  Scale,
+  LineChart,
+  ArrowUp,
+  ArrowDown,
+  CheckCircle2,
+  XCircle,
+  Circle,
+} from "lucide-react";
 
-// Asset icon mapping
+// Asset icon mapping with enhanced styling
 const ASSET_ICONS: { [key: string]: React.ElementType } = {
   BTC: Bitcoin,
   ETH: Sparkles,
@@ -37,6 +51,17 @@ const ASSET_ICONS: { [key: string]: React.ElementType } = {
   USDC: Coins,
   SOL: Zap,
   ADA: Layers,
+};
+
+// Asset colors for visual distinction
+const ASSET_COLORS: { [key: string]: { gradient: string; border: string; text: string } } = {
+  BTC: { gradient: "from-orange-500 to-amber-500", border: "border-orange-500/30", text: "text-orange-400" },
+  ETH: { gradient: "from-violet-500 to-purple-500", border: "border-violet-500/30", text: "text-violet-400" },
+  USDT: { gradient: "from-emerald-500 to-green-500", border: "border-emerald-500/30", text: "text-emerald-400" },
+  USDC: { gradient: "from-blue-500 to-cyan-500", border: "border-blue-500/30", text: "text-blue-400" },
+  SOL: { gradient: "from-purple-500 to-pink-500", border: "border-purple-500/30", text: "text-purple-400" },
+  ADA: { gradient: "from-blue-600 to-indigo-500", border: "border-blue-500/30", text: "text-blue-400" },
+  default: { gradient: "from-gray-500 to-gray-600", border: "border-gray-500/30", text: "text-gray-400" },
 };
 
 interface PositionMetrics {
@@ -47,6 +72,85 @@ interface PositionMetrics {
   averageLeverage: number;
 }
 
+// Animated Counter Component
+const AnimatedCounter: React.FC<{
+  value: number;
+  prefix?: string;
+  suffix?: string;
+  decimals?: number;
+  className?: string;
+}> = ({ value, prefix = "", suffix = "", decimals = 2, className = "" }) => {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    const duration = 1000;
+    const steps = 60;
+    const increment = value / steps;
+    let current = 0;
+    let step = 0;
+
+    const timer = setInterval(() => {
+      step++;
+      current = Math.min(value, increment * step);
+      setDisplayValue(current);
+      if (step >= steps) clearInterval(timer);
+    }, duration / steps);
+
+    return () => clearInterval(timer);
+  }, [value]);
+
+  return (
+    <span className={className}>
+      {prefix}
+      {displayValue.toLocaleString("en-US", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      })}
+      {suffix}
+    </span>
+  );
+};
+
+// Progress Ring Component
+const ProgressRing: React.FC<{
+  progress: number;
+  size?: number;
+  strokeWidth?: number;
+  color?: string;
+}> = ({ progress, size = 60, strokeWidth = 6, color = "text-cyan-400" }) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const offset = circumference - (progress / 100) * circumference;
+
+  return (
+    <svg width={size} height={size} className="transform -rotate-90">
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        className="text-white/5"
+      />
+      <motion.circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        className={color}
+        initial={{ strokeDashoffset: circumference }}
+        animate={{ strokeDashoffset: offset }}
+        transition={{ duration: 1, ease: "easeOut" }}
+        style={{ strokeDasharray: circumference }}
+      />
+    </svg>
+  );
+};
+
 const PortfolioAnalyticsComponent: React.FC = () => {
   const { user } = useAuth();
   const [portfolio, setPortfolio] = useState<PortfolioResponse | null>(null);
@@ -54,28 +158,27 @@ const PortfolioAnalyticsComponent: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [showAllAssets, setShowAllAssets] = useState(false);
+  const [showAllPositions, setShowAllPositions] = useState(false);
   const hasLoadedRef = useRef(false);
 
-  const loadData = useCallback(
-    async (isRetry = false) => {
-      try {
-        setIsLoading(true);
-        if (!isRetry) setError(null);
-        const portfolioData = await portfolioService.getPortfolio();
-        setPortfolio(portfolioData);
-        setLastRefresh(new Date());
-      } catch (err: any) {
-        const errorMsg = isRetry
-          ? "Failed to load portfolio data (retry failed)"
-          : "Failed to load portfolio data";
-        setError(errorMsg);
-        console.error("Portfolio analytics error:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    []
-  );
+  const loadData = useCallback(async (isRetry = false) => {
+    try {
+      setIsLoading(true);
+      if (!isRetry) setError(null);
+      const portfolioData = await portfolioService.getPortfolio();
+      setPortfolio(portfolioData);
+      setLastRefresh(new Date());
+    } catch (err: any) {
+      const errorMsg = isRetry
+        ? "Failed to load portfolio data (retry failed)"
+        : "Failed to load portfolio data";
+      setError(errorMsg);
+      console.error("Portfolio analytics error:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (hasLoadedRef.current) return;
@@ -85,107 +188,125 @@ const PortfolioAnalyticsComponent: React.FC = () => {
     }
   }, [loadData, user]);
 
-  // Auto-refresh every 30 seconds
   useEffect(() => {
     if (!autoRefresh || !user) return;
-    
-    const interval = setInterval(() => {
-      loadData();
-    }, 30000);
-
+    const interval = setInterval(() => loadData(), 30000);
     return () => clearInterval(interval);
   }, [autoRefresh, user, loadData]);
 
-  // Calculate position metrics from actual positions array
+  // Calculate position metrics
   const positionMetrics = useMemo((): PositionMetrics => {
     if (!portfolio?.positions || !Array.isArray(portfolio.positions)) {
       return {
         totalNotional: 0,
         winningPositions: 0,
         losingPositions: 0,
-        largestPosition: 'N/A',
+        largestPosition: "N/A",
         averageLeverage: 0,
       };
     }
 
     const positions = portfolio.positions;
-    const totalNotional = positions.reduce((sum: number, pos: any) => sum + (parseFloat(pos.notional) || 0), 0);
-    
-    const winningPositions = positions.filter((pos: any) => (parseFloat(pos.unRealizedProfit) || 0) > 0).length;
-    const losingPositions = positions.filter((pos: any) => (parseFloat(pos.unRealizedProfit) || 0) < 0).length;
-    
-    const largestPosition = positions.reduce((largest: any, pos: any) => 
-      (parseFloat(pos.notional) || 0) > (parseFloat(largest.notional) || 0) ? pos : largest, positions[0] || {}
+    const totalNotional = positions.reduce(
+      (sum: number, pos: any) => sum + (parseFloat(pos.notional) || 0),
+      0
     );
-    
-    const averageLeverage = positions.length > 0 ? 
-      positions.reduce((sum: number, pos: any) => {
-        const leverage = parseFloat(pos.leverage) || 
-                        (parseFloat(pos.initialMargin) > 0 ? 
-                         (parseFloat(pos.notional) / parseFloat(pos.initialMargin)) : 0);
-        return sum + leverage;
-      }, 0) / positions.length : 0;
+
+    const winningPositions = positions.filter(
+      (pos: any) => (parseFloat(pos.unRealizedProfit) || 0) > 0
+    ).length;
+    const losingPositions = positions.filter(
+      (pos: any) => (parseFloat(pos.unRealizedProfit) || 0) < 0
+    ).length;
+
+    const largestPosition = positions.reduce(
+      (largest: any, pos: any) =>
+        (parseFloat(pos.notional) || 0) > (parseFloat(largest.notional) || 0)
+          ? pos
+          : largest,
+      positions[0] || {}
+    );
+
+    const averageLeverage =
+      positions.length > 0
+        ? positions.reduce((sum: number, pos: any) => {
+            const leverage =
+              parseFloat(pos.leverage) ||
+              (parseFloat(pos.initialMargin) > 0
+                ? parseFloat(pos.notional) / parseFloat(pos.initialMargin)
+                : 0);
+            return sum + leverage;
+          }, 0) / positions.length
+        : 0;
 
     return {
       totalNotional,
       winningPositions,
       losingPositions,
-      largestPosition: largestPosition.symbol || 'N/A',
+      largestPosition: largestPosition.symbol || "N/A",
       averageLeverage,
     };
   }, [portfolio?.positions]);
 
-  // Calculate asset allocation from assets array
+  // Calculate asset allocation
   const assetAllocation = useMemo(() => {
     if (!portfolio?.assets || !Array.isArray(portfolio.assets)) return [];
-    
-    return portfolio.assets.map((asset: any) => ({
-      asset: asset.asset,
-      walletBalance: parseFloat(asset.walletBalance) || 0,
-      unrealizedProfit: parseFloat(asset.unrealizedProfit) || 0,
-      marginBalance: parseFloat(asset.marginBalance) || 0,
-      maintMargin: parseFloat(asset.maintMargin) || 0,
-      initialMargin: parseFloat(asset.initialMargin) || 0,
-      positionInitialMargin: parseFloat(asset.positionInitialMargin) || 0,
-      openOrderInitialMargin: parseFloat(asset.openOrderInitialMargin) || 0,
-      maxWithdrawAmount: parseFloat(asset.maxWithdrawAmount) || 0,
-      crossWalletBalance: parseFloat(asset.crossWalletBalance) || 0,
-      crossUnPnl: parseFloat(asset.crossUnPnl) || 0,
-      availableBalance: parseFloat(asset.availableBalance) || 0,
-      marginAvailable: asset.marginAvailable,
-      updateTime: asset.updateTime,
-      percentage: portfolio.total_wallet_balance > 0 ? 
-        (parseFloat(asset.walletBalance) / portfolio.total_wallet_balance) * 100 : 0,
-    })).filter(asset => asset.walletBalance > 0);
+
+    return portfolio.assets
+      .map((asset: any) => ({
+        asset: asset.asset,
+        walletBalance: parseFloat(asset.walletBalance) || 0,
+        unrealizedProfit: parseFloat(asset.unrealizedProfit) || 0,
+        marginBalance: parseFloat(asset.marginBalance) || 0,
+        maintMargin: parseFloat(asset.maintMargin) || 0,
+        initialMargin: parseFloat(asset.initialMargin) || 0,
+        positionInitialMargin: parseFloat(asset.positionInitialMargin) || 0,
+        openOrderInitialMargin: parseFloat(asset.openOrderInitialMargin) || 0,
+        maxWithdrawAmount: parseFloat(asset.maxWithdrawAmount) || 0,
+        crossWalletBalance: parseFloat(asset.crossWalletBalance) || 0,
+        crossUnPnl: parseFloat(asset.crossUnPnl) || 0,
+        availableBalance: parseFloat(asset.availableBalance) || 0,
+        marginAvailable: asset.marginAvailable,
+        updateTime: asset.updateTime,
+        percentage:
+          portfolio.total_wallet_balance > 0
+            ? (parseFloat(asset.walletBalance) / portfolio.total_wallet_balance) * 100
+            : 0,
+      }))
+      .filter((asset) => asset.walletBalance > 0)
+      .sort((a, b) => b.walletBalance - a.walletBalance);
   }, [portfolio?.assets, portfolio?.total_wallet_balance]);
 
   // Calculate risk metrics
   const riskMetrics = useMemo(() => {
     if (!portfolio) return null;
-    
-    const marginUtilization = portfolio.total_margin_balance > 0 ? 
-      (portfolio.total_initial_margin / portfolio.total_margin_balance) * 100 : 0;
+
+    const marginUtilization =
+      portfolio.total_margin_balance > 0
+        ? (portfolio.total_initial_margin / portfolio.total_margin_balance) * 100
+        : 0;
     const availableLeverage = portfolio.leverage || 0;
-    const pnlPercentage = portfolio.total_wallet_balance > 0 ? 
-      (portfolio.total_unrealized_profit / portfolio.total_wallet_balance) * 100 : 0;
-    
+    const pnlPercentage =
+      portfolio.total_wallet_balance > 0
+        ? (portfolio.total_unrealized_profit / portfolio.total_wallet_balance) * 100
+        : 0;
+
     return {
       marginUtilization,
       availableLeverage,
       pnlPercentage,
-      riskLevel: marginUtilization > 80 ? 'High' : marginUtilization > 50 ? 'Medium' : 'Low',
+      riskLevel:
+        marginUtilization > 80 ? "Critical" : marginUtilization > 50 ? "Elevated" : "Normal",
+      riskColor:
+        marginUtilization > 80 ? "text-red-400" : marginUtilization > 50 ? "text-amber-400" : "text-emerald-400",
     };
   }, [portfolio]);
 
   const getPnLColor = (value: number) =>
-    value >= 0 ? "text-cyan-300" : "text-rose-400";
+    value >= 0 ? "text-emerald-400" : "text-red-400";
 
-  const getPnLIcon = (value: number) =>
-    value >= 0 ? (
-      <TrendingUp className="w-4 h-4" />
-    ) : (
-      <TrendingDown className="w-4 h-4" />
-    );
+  const getPnLBgColor = (value: number) =>
+    value >= 0 ? "bg-emerald-500/10 border-emerald-500/20" : "bg-red-500/10 border-red-500/20";
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("en-US", {
@@ -204,497 +325,934 @@ const PortfolioAnalyticsComponent: React.FC = () => {
       maximumFractionDigits: decimals,
     }).format(value);
 
-  const getAssetIcon = (asset: string) => {
-    const IconComponent = ASSET_ICONS[asset] || Coins;
-    return <IconComponent className="w-4 h-4" />;
-  };
+  const getAssetColor = (asset: string) => ASSET_COLORS[asset] || ASSET_COLORS.default;
+  const getAssetIcon = (asset: string) => ASSET_ICONS[asset] || Coins;
 
   const handleRefresh = async () => {
     await loadData(true);
   };
 
+  // Loading State
   if (isLoading && !portfolio) {
     return (
-      <div className="min-h-96 bg-cyan-900/10 backdrop-blur-xl rounded-2xl border border-cyan-500/20 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-cyan-200/80 text-lg font-light">
-            Loading Institutional Analytics...
-          </p>
-        </div>
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="relative w-20 h-20 mx-auto mb-6">
+            <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-xl animate-pulse" />
+            <div className="relative w-20 h-20 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin" />
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-2">Loading Portfolio</h3>
+          <p className="text-gray-500">Fetching your trading data...</p>
+        </motion.div>
       </div>
     );
   }
 
+  // Error State
   if (error && !portfolio) {
     return (
-      <div className="min-h-96 bg-cyan-900/10 backdrop-blur-xl rounded-2xl border border-cyan-500/20 flex items-center justify-center">
-        <div className="text-center">
-          <AlertTriangle className="w-16 h-16 text-rose-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-white mb-2">
-            Data Connection Issue
-          </h3>
-          <p className="text-cyan-200/60 mb-4 max-w-md text-sm font-light">{error}</p>
-          <button
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-md"
+        >
+          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+            <AlertTriangle className="w-10 h-10 text-red-400" />
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-2">Connection Issue</h3>
+          <p className="text-gray-400 mb-6">{error}</p>
+          <motion.button
             onClick={handleRefresh}
             disabled={isLoading}
-            className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium rounded-xl hover:from-cyan-400 hover:to-blue-400 transition-all duration-300 disabled:opacity-50 flex items-center mx-auto text-sm shadow-lg shadow-cyan-500/25"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium rounded-xl hover:from-cyan-400 hover:to-blue-400 transition-all disabled:opacity-50 flex items-center gap-2 mx-auto shadow-lg shadow-cyan-500/25"
           >
-            {isLoading && <RefreshCw className="w-4 h-4 animate-spin mr-2" />}
+            {isLoading && <RefreshCw className="w-4 h-4 animate-spin" />}
             Retry Connection
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       </div>
     );
   }
 
+  // Empty State
   if (!portfolio) {
     return (
-      <div className="min-h-96 bg-cyan-900/10 backdrop-blur-xl rounded-2xl border border-cyan-500/20 flex items-center justify-center">
-        <div className="text-center">
-          <Database className="w-16 h-16 text-cyan-500/50 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-white mb-2">
-            No Portfolio Data
-          </h3>
-          <p className="text-cyan-200/60 mb-4 text-sm font-light">
-            Portfolio data is not available at the moment.
-          </p>
-        </div>
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-md"
+        >
+          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gray-800/50 border border-white/5 flex items-center justify-center">
+            <Database className="w-10 h-10 text-gray-600" />
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-2">No Portfolio Data</h3>
+          <p className="text-gray-500">Connect your exchange to view your portfolio.</p>
+        </motion.div>
       </div>
     );
   }
 
-  const unrealized_pnl_percent = portfolio.total_wallet_balance > 0 ? 
-    (portfolio.total_unrealized_profit / portfolio.total_wallet_balance) * 100 : 0;
+  const unrealized_pnl_percent =
+    portfolio.total_wallet_balance > 0
+      ? (portfolio.total_unrealized_profit / portfolio.total_wallet_balance) * 100
+      : 0;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center">
-              <BarChart3 className="w-4 h-4 text-white" />
-            </div>
-            <h2 className="text-2xl lg:text-3xl font-light bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
-              Portfolio Analytics
-            </h2>
-          </div>
-          <p className="text-cyan-200/60 text-sm font-light">
-            Real-time portfolio monitoring and risk assessment
-          </p>
-          <div className="flex flex-wrap items-center gap-4 mt-2">
-            {lastRefresh && (
-              <p className="text-xs text-cyan-300/50 font-light">
-                Last updated: {lastRefresh.toLocaleTimeString()}
-              </p>
-            )}
-            {portfolio.last_synced && (
-              <p className="text-xs text-cyan-300/50 font-light">
-                System sync: {new Date(portfolio.last_synced).toLocaleString()}
-              </p>
-            )}
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setAutoRefresh(!autoRefresh)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all duration-300 text-sm font-medium ${
-              autoRefresh 
-                ? 'bg-cyan-500/20 border-cyan-400/30 text-cyan-300' 
-                : 'bg-gray-800/30 border-gray-700/30 text-cyan-200/60 hover:text-cyan-300'
-            }`}
-          >
-            <Eye className="w-4 h-4" />
-            Auto-refresh {autoRefresh ? 'On' : 'Off'}
-          </button>
-          <button
-            onClick={handleRefresh}
-            disabled={isLoading}
-            className="flex items-center gap-2 px-4 py-2 bg-cyan-500/10 rounded-xl border border-cyan-400/30 text-cyan-300 hover:bg-cyan-500/20 transition-all duration-300 disabled:opacity-50 text-sm font-medium"
-          >
-            <RefreshCw
-              className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
-            />
-            Refresh
-          </button>
-        </div>
-      </div>
+    <div className="min-h-full">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden mb-8">
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[100px] -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[80px] translate-y-1/2" />
 
-      {/* Key Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Total Wallet Balance */}
-        <div className="bg-cyan-900/10 backdrop-blur-xl rounded-2xl p-6 border border-cyan-500/20 hover:border-cyan-400/40 transition-all duration-300 group">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-xl flex items-center justify-center border border-cyan-400/30 group-hover:border-cyan-400/50 transition-all duration-300">
-              <Wallet className="w-6 h-6 text-cyan-300" />
-            </div>
-            <div
-              className={`flex items-center gap-1 text-sm font-medium ${getPnLColor(
-                portfolio.total_unrealized_profit
-              )}`}
-            >
-              {getPnLIcon(portfolio.total_unrealized_profit)}
-              <span>{formatPercent(unrealized_pnl_percent)}</span>
-            </div>
-          </div>
-          <h3 className="text-2xl font-light text-white mb-2">
-            {formatCurrency(portfolio.total_wallet_balance)}
-          </h3>
-          <p className="text-cyan-200/60 text-sm font-light">Total Wallet Balance</p>
-          <div className="mt-3 text-xs text-cyan-300/50 font-light bg-cyan-500/10 rounded-lg px-3 py-2">
-            Available: {formatCurrency(portfolio.available_balance)}
-          </div>
-        </div>
+        {/* Animated Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
-        {/* Margin Balance */}
-        <div className="bg-cyan-900/10 backdrop-blur-xl rounded-2xl p-6 border border-cyan-500/20 hover:border-cyan-400/40 transition-all duration-300 group">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center border border-emerald-400/30 group-hover:border-emerald-400/50 transition-all duration-300">
-              <Shield className="w-6 h-6 text-emerald-300" />
-            </div>
-            <Gauge className="w-5 h-5 text-cyan-300" />
-          </div>
-          <h3 className="text-2xl font-light text-white mb-2">
-            {formatCurrency(portfolio.total_margin_balance)}
-          </h3>
-          <p className="text-cyan-200/60 text-sm font-light">Margin Balance</p>
-          <div className="mt-3 text-xs text-cyan-300/50 font-light bg-cyan-500/10 rounded-lg px-3 py-2">
-            Initial Margin: {formatCurrency(portfolio.total_initial_margin)}
-          </div>
-        </div>
-
-        {/* Unrealized Profit */}
-        <div className="bg-cyan-900/10 backdrop-blur-xl rounded-2xl p-6 border border-cyan-500/20 hover:border-cyan-400/40 transition-all duration-300 group">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-violet-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center border border-violet-400/30 group-hover:border-violet-400/50 transition-all duration-300">
-              <Activity className="w-6 h-6 text-violet-300" />
-            </div>
-            <div
-              className={`flex items-center gap-1 text-sm font-medium ${getPnLColor(
-                portfolio.total_unrealized_profit
-              )}`}
-            >
-              {getPnLIcon(portfolio.total_unrealized_profit)}
-              <span>{formatCurrency(portfolio.total_unrealized_profit)}</span>
-            </div>
-          </div>
-          <h3 className={`text-2xl font-light mb-2 ${getPnLColor(portfolio.total_unrealized_profit)}`}>
-            {formatPercent(unrealized_pnl_percent)}
-          </h3>
-          <p className="text-cyan-200/60 text-sm font-light">Unrealized P&L</p>
-          <div className="mt-3 text-xs text-cyan-300/50 font-light bg-cyan-500/10 rounded-lg px-3 py-2">
-            {portfolio.total_unrealized_profit >= 0 ? "Profitable" : "Drawdown"}
-          </div>
-        </div>
-
-        {/* Leverage */}
-        <div className="bg-cyan-900/10 backdrop-blur-xl rounded-2xl p-6 border border-cyan-500/20 hover:border-cyan-400/40 transition-all duration-300 group">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center border border-blue-400/30 group-hover:border-blue-400/50 transition-all duration-300">
-              <BarChart3 className="w-6 h-6 text-blue-300" />
-            </div>
-            <Target className="w-5 h-5 text-cyan-300" />
-          </div>
-          <h3 className="text-2xl font-light text-white mb-2">
-            {portfolio.leverage ? `${portfolio.leverage.toFixed(1)}x` : '0x'}
-          </h3>
-          <p className="text-cyan-200/60 text-sm font-light">Portfolio Leverage</p>
-          <div className="mt-3 text-xs text-cyan-300/50 font-light bg-cyan-500/10 rounded-lg px-3 py-2">
-            {positionMetrics.averageLeverage > 10 ? "Aggressive" : "Conservative"}
-          </div>
-        </div>
-      </div>
-
-      {/* Assets & Positions Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Assets Details */}
-        <div className="bg-cyan-900/10 backdrop-blur-xl rounded-2xl p-6 border border-cyan-500/20">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-              <PieChart className="w-5 h-5 text-cyan-300" />
-              Asset Details ({assetAllocation.length})
-            </h3>
-            <div className="text-xs text-cyan-300/50 font-light">
-              Total: {formatCurrency(portfolio.total_wallet_balance)}
-            </div>
-          </div>
-          <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
-            {assetAllocation.map((asset, index) => (
-              <div 
-                key={asset.asset} 
-                className="p-4 bg-cyan-800/10 rounded-xl border border-cyan-500/10 hover:border-cyan-400/30 transition-all duration-200 group"
+        <div className="relative px-6 py-10 lg:py-14">
+          <div className="max-w-6xl mx-auto">
+            {/* Header Row */}
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
               >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-cyan-700/20 rounded-lg flex items-center justify-center border border-cyan-500/20 group-hover:border-cyan-400/30 transition-all duration-200">
-                      {getAssetIcon(asset.asset)}
-                    </div>
-                    <div>
-                      <div className="font-medium text-white text-sm">
-                        {asset.asset}
-                      </div>
-                      <div className="text-xs text-cyan-200/60 font-light">
-                        Allocation: {asset.percentage.toFixed(1)}%
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium text-white">
-                      {formatCurrency(asset.walletBalance)}
-                    </div>
-                    <div className={`text-xs font-light ${getPnLColor(asset.unrealizedProfit)}`}>
-                      {formatCurrency(asset.unrealizedProfit)}
-                    </div>
+                <div className="flex items-center gap-3 mb-3">
+                  <motion.div
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", damping: 15 }}
+                    className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-cyan-600/20 border border-cyan-500/30 flex items-center justify-center"
+                  >
+                    <BarChart3 className="w-6 h-6 text-cyan-400" />
+                  </motion.div>
+                  <div>
+                    <h1 className="text-2xl lg:text-3xl font-bold text-white">
+                      Portfolio Overview
+                    </h1>
+                    <p className="text-gray-500 text-sm">
+                      Real-time portfolio monitoring and analytics
+                    </p>
                   </div>
                 </div>
-                
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-cyan-200/60">Margin Balance:</span>
-                    <span className="text-white">{formatCurrency(asset.marginBalance)}</span>
+              </motion.div>
+
+              {/* Controls */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex flex-wrap items-center gap-3"
+              >
+                {/* Last Updated */}
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 border border-white/5">
+                  <Clock className="w-4 h-4 text-gray-500" />
+                  <span className="text-xs text-gray-400">
+                    {lastRefresh?.toLocaleTimeString() || "Never"}
+                  </span>
+                </div>
+
+                {/* Auto Refresh Toggle */}
+                <button
+                  onClick={() => setAutoRefresh(!autoRefresh)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${
+                    autoRefresh
+                      ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400"
+                      : "bg-white/5 border-white/10 text-gray-400 hover:text-white"
+                  }`}
+                >
+                  {autoRefresh ? (
+                    <Eye className="w-4 h-4" />
+                  ) : (
+                    <EyeOff className="w-4 h-4" />
+                  )}
+                  <span className="text-sm font-medium">Live</span>
+                </button>
+
+                {/* Refresh Button */}
+                <motion.button
+                  onClick={handleRefresh}
+                  disabled={isLoading}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl text-white font-medium text-sm shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
+                  Refresh
+                </motion.button>
+              </motion.div>
+            </div>
+
+            {/* Portfolio Value Hero Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900/80 via-gray-900/60 to-gray-900/80 backdrop-blur-xl border border-white/10"
+            >
+              {/* Inner glow */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-cyan-500/10 rounded-full blur-[80px]" />
+
+              <div className="relative p-8 lg:p-10">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  {/* Main Value */}
+                  <div className="lg:col-span-2">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-gray-400 text-sm font-medium">Total Portfolio Value</span>
+                      <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getPnLBgColor(portfolio.total_unrealized_profit)}`}>
+                        {portfolio.total_unrealized_profit >= 0 ? (
+                          <ArrowUp className="w-3 h-3" />
+                        ) : (
+                          <ArrowDown className="w-3 h-3" />
+                        )}
+                        <span className={getPnLColor(portfolio.total_unrealized_profit)}>
+                          {formatPercent(unrealized_pnl_percent)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4"
+                    >
+                      <AnimatedCounter
+                        value={portfolio.total_wallet_balance}
+                        prefix="$"
+                        decimals={2}
+                      />
+                    </motion.div>
+
+                    {/* Quick Stats */}
+                    <div className="flex flex-wrap gap-6">
+                      <div>
+                        <p className="text-gray-500 text-xs mb-1">Unrealized P&L</p>
+                        <p className={`text-lg font-semibold ${getPnLColor(portfolio.total_unrealized_profit)}`}>
+                          {formatCurrency(portfolio.total_unrealized_profit)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-xs mb-1">Available Balance</p>
+                        <p className="text-lg font-semibold text-white">
+                          {formatCurrency(portfolio.available_balance)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-xs mb-1">Active Positions</p>
+                        <p className="text-lg font-semibold text-white">
+                          {portfolio.positions?.length || 0}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-cyan-200/60">Available:</span>
-                    <span className="text-white">{formatCurrency(asset.availableBalance)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-cyan-200/60">Initial Margin:</span>
-                    <span className="text-white">{formatCurrency(asset.initialMargin)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-cyan-200/60">Max Withdraw:</span>
-                    <span className="text-white">{formatCurrency(asset.maxWithdrawAmount)}</span>
+
+                  {/* Risk Gauge */}
+                  <div className="flex flex-col items-center justify-center p-6 rounded-2xl bg-white/5 border border-white/5">
+                    <div className="relative">
+                      <ProgressRing
+                        progress={Math.min(riskMetrics?.marginUtilization || 0, 100)}
+                        size={100}
+                        strokeWidth={8}
+                        color={
+                          (riskMetrics?.marginUtilization || 0) > 80
+                            ? "text-red-400"
+                            : (riskMetrics?.marginUtilization || 0) > 50
+                            ? "text-amber-400"
+                            : "text-emerald-400"
+                        }
+                      />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className={`text-xl font-bold ${riskMetrics?.riskColor || "text-white"}`}>
+                          {(riskMetrics?.marginUtilization || 0).toFixed(0)}%
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-gray-400 text-sm mt-3">Margin Used</p>
+                    <p className={`text-xs font-medium mt-1 ${riskMetrics?.riskColor || "text-gray-400"}`}>
+                      {riskMetrics?.riskLevel || "Unknown"} Risk
+                    </p>
                   </div>
                 </div>
-                
-                {asset.maintMargin > 0 && (
-                  <div className="mt-3 pt-3 border-t border-cyan-500/10">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-cyan-200/60">Maintenance Margin:</span>
-                      <span className="text-amber-300">{formatCurrency(asset.maintMargin)}</span>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="px-6 pb-10">
+        <div className="max-w-6xl mx-auto space-y-8">
+          {/* Key Metrics Grid */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <Activity className="w-5 h-5 text-cyan-400" />
+              Key Metrics
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Wallet Balance */}
+              <MetricCard
+                icon={Wallet}
+                iconColor="text-cyan-400"
+                iconBg="from-cyan-500/20 to-blue-500/20"
+                borderColor="border-cyan-500/20"
+                title="Wallet Balance"
+                value={formatCurrency(portfolio.total_wallet_balance)}
+                subtitle={`Available: ${formatCurrency(portfolio.available_balance)}`}
+                trend={unrealized_pnl_percent}
+                delay={0}
+              />
+
+              {/* Margin Balance */}
+              <MetricCard
+                icon={Shield}
+                iconColor="text-emerald-400"
+                iconBg="from-emerald-500/20 to-green-500/20"
+                borderColor="border-emerald-500/20"
+                title="Margin Balance"
+                value={formatCurrency(portfolio.total_margin_balance)}
+                subtitle={`Initial: ${formatCurrency(portfolio.total_initial_margin)}`}
+                delay={0.05}
+              />
+
+              {/* Unrealized P&L */}
+              <MetricCard
+                icon={LineChart}
+                iconColor={getPnLColor(portfolio.total_unrealized_profit)}
+                iconBg={
+                  portfolio.total_unrealized_profit >= 0
+                    ? "from-emerald-500/20 to-green-500/20"
+                    : "from-red-500/20 to-rose-500/20"
+                }
+                borderColor={
+                  portfolio.total_unrealized_profit >= 0
+                    ? "border-emerald-500/20"
+                    : "border-red-500/20"
+                }
+                title="Unrealized P&L"
+                value={formatPercent(unrealized_pnl_percent)}
+                valueColor={getPnLColor(portfolio.total_unrealized_profit)}
+                subtitle={formatCurrency(portfolio.total_unrealized_profit)}
+                delay={0.1}
+              />
+
+              {/* Leverage */}
+              <MetricCard
+                icon={Scale}
+                iconColor="text-violet-400"
+                iconBg="from-violet-500/20 to-purple-500/20"
+                borderColor="border-violet-500/20"
+                title="Portfolio Leverage"
+                value={portfolio.leverage ? `${portfolio.leverage.toFixed(1)}x` : "0x"}
+                subtitle={
+                  positionMetrics.averageLeverage > 10 ? "High Exposure" : "Moderate Exposure"
+                }
+                delay={0.15}
+              />
+            </div>
+          </motion.div>
+
+          {/* Two Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Asset Allocation */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="rounded-2xl bg-gray-900/50 backdrop-blur-xl border border-white/5 overflow-hidden"
+            >
+              <div className="p-5 border-b border-white/5">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                    <PieChart className="w-5 h-5 text-cyan-400" />
+                    Asset Allocation
+                  </h3>
+                  <span className="text-xs text-gray-500">
+                    {assetAllocation.length} assets
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-5">
+                {assetAllocation.length > 0 ? (
+                  <>
+                    <div className="space-y-3">
+                      {(showAllAssets ? assetAllocation : assetAllocation.slice(0, 4)).map(
+                        (asset, index) => (
+                          <AssetRow
+                            key={asset.asset}
+                            asset={asset}
+                            index={index}
+                            formatCurrency={formatCurrency}
+                            getAssetColor={getAssetColor}
+                            getAssetIcon={getAssetIcon}
+                            getPnLColor={getPnLColor}
+                          />
+                        )
+                      )}
                     </div>
+
+                    {assetAllocation.length > 4 && (
+                      <button
+                        onClick={() => setShowAllAssets(!showAllAssets)}
+                        className="w-full mt-4 py-2 text-sm text-gray-400 hover:text-white flex items-center justify-center gap-2 transition-colors"
+                      >
+                        {showAllAssets ? (
+                          <>
+                            Show Less <ChevronDown className="w-4 h-4 rotate-180" />
+                          </>
+                        ) : (
+                          <>
+                            Show All ({assetAllocation.length}) <ChevronDown className="w-4 h-4" />
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <Wallet className="w-12 h-12 text-gray-700 mx-auto mb-3" />
+                    <p className="text-gray-500 text-sm">No assets found</p>
                   </div>
                 )}
               </div>
-            ))}
-          </div>
-        </div>
+            </motion.div>
 
-        {/* Active Positions */}
-        <div className="bg-cyan-900/10 backdrop-blur-xl rounded-2xl p-6 border border-cyan-500/20">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-              <Activity className="w-5 h-5 text-violet-300" />
-              Active Positions ({portfolio.positions?.length || 0})
-            </h3>
-            <div className="text-xs text-cyan-300/50 font-light">
-              Total: {formatCurrency(positionMetrics.totalNotional)}
-            </div>
+            {/* Active Positions */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              className="rounded-2xl bg-gray-900/50 backdrop-blur-xl border border-white/5 overflow-hidden"
+            >
+              <div className="p-5 border-b border-white/5">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                    <Activity className="w-5 h-5 text-violet-400" />
+                    Active Positions
+                  </h3>
+                  <div className="flex items-center gap-3 text-xs">
+                    <span className="flex items-center gap-1 text-emerald-400">
+                      <Circle className="w-2 h-2 fill-current" />
+                      {positionMetrics.winningPositions} winning
+                    </span>
+                    <span className="flex items-center gap-1 text-red-400">
+                      <Circle className="w-2 h-2 fill-current" />
+                      {positionMetrics.losingPositions} losing
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-5">
+                {portfolio.positions && portfolio.positions.length > 0 ? (
+                  <>
+                    <div className="space-y-3">
+                      {(showAllPositions
+                        ? portfolio.positions
+                        : portfolio.positions.slice(0, 4)
+                      ).map((position: any, index: number) => (
+                        <PositionRow
+                          key={position.symbol || index}
+                          position={position}
+                          index={index}
+                          formatCurrency={formatCurrency}
+                          formatNumber={formatNumber}
+                          getPnLColor={getPnLColor}
+                        />
+                      ))}
+                    </div>
+
+                    {portfolio.positions.length > 4 && (
+                      <button
+                        onClick={() => setShowAllPositions(!showAllPositions)}
+                        className="w-full mt-4 py-2 text-sm text-gray-400 hover:text-white flex items-center justify-center gap-2 transition-colors"
+                      >
+                        {showAllPositions ? (
+                          <>
+                            Show Less <ChevronDown className="w-4 h-4 rotate-180" />
+                          </>
+                        ) : (
+                          <>
+                            Show All ({portfolio.positions.length}){" "}
+                            <ChevronDown className="w-4 h-4" />
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <Target className="w-12 h-12 text-gray-700 mx-auto mb-3" />
+                    <p className="text-gray-500 text-sm">No active positions</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
           </div>
-          <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
-            {portfolio.positions && portfolio.positions.length > 0 ? (
-              portfolio.positions.map((position: any, index: number) => (
-                <div
-                  key={position.symbol || index}
-                  className="p-4 bg-cyan-800/10 rounded-xl border border-cyan-500/10 hover:border-cyan-400/30 transition-all duration-200 group"
-                >
-                  <div className="flex items-center justify-between mb-3">
+
+          {/* Risk Assessment & Position Overview */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Position Overview */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="rounded-2xl bg-gray-900/50 backdrop-blur-xl border border-white/5 overflow-hidden"
+            >
+              <div className="p-5 border-b border-white/5">
+                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <Target className="w-5 h-5 text-amber-400" />
+                  Position Summary
+                </h3>
+              </div>
+
+              <div className="p-5 space-y-4">
+                <StatRow
+                  label="Total Notional"
+                  value={formatCurrency(positionMetrics.totalNotional)}
+                />
+                <StatRow
+                  label="Winning Positions"
+                  value={positionMetrics.winningPositions.toString()}
+                  valueColor="text-emerald-400"
+                />
+                <StatRow
+                  label="Losing Positions"
+                  value={positionMetrics.losingPositions.toString()}
+                  valueColor="text-red-400"
+                />
+                <StatRow
+                  label="Largest Position"
+                  value={positionMetrics.largestPosition}
+                />
+                <StatRow
+                  label="Average Leverage"
+                  value={`${positionMetrics.averageLeverage.toFixed(1)}x`}
+                  valueColor="text-cyan-400"
+                />
+              </div>
+            </motion.div>
+
+            {/* Risk Assessment */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+              className="rounded-2xl bg-gradient-to-br from-gray-900/80 via-gray-900/60 to-gray-900/80 backdrop-blur-xl border border-white/5 overflow-hidden"
+            >
+              <div className="p-5 border-b border-white/5">
+                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <Cpu className="w-5 h-5 text-cyan-400" />
+                  Risk Assessment
+                </h3>
+              </div>
+
+              <div className="p-5 space-y-5">
+                {/* Margin Utilization */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-gray-400 text-sm">Margin Utilization</span>
+                    <span className={`text-sm font-medium ${riskMetrics?.riskColor || "text-white"}`}>
+                      {(riskMetrics?.marginUtilization || 0).toFixed(1)}%
+                    </span>
+                  </div>
+                  <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.min(riskMetrics?.marginUtilization || 0, 100)}%` }}
+                      transition={{ duration: 1, ease: "easeOut" }}
+                      className={`h-full rounded-full ${
+                        (riskMetrics?.marginUtilization || 0) > 80
+                          ? "bg-gradient-to-r from-red-500 to-red-400"
+                          : (riskMetrics?.marginUtilization || 0) > 50
+                          ? "bg-gradient-to-r from-amber-500 to-amber-400"
+                          : "bg-gradient-to-r from-emerald-500 to-emerald-400"
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                {/* Risk Level */}
+                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div
-                        className={`p-2 rounded-lg ${
-                          parseFloat(position.unRealizedProfit) >= 0
-                            ? "bg-cyan-500/20 border border-cyan-400/30"
-                            : "bg-rose-500/20 border border-rose-400/30"
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                          riskMetrics?.riskLevel === "Critical"
+                            ? "bg-red-500/20"
+                            : riskMetrics?.riskLevel === "Elevated"
+                            ? "bg-amber-500/20"
+                            : "bg-emerald-500/20"
                         }`}
                       >
-                        {parseFloat(position.unRealizedProfit) >= 0 ? (
-                          <ArrowUpRight className="w-3 h-3 text-cyan-300" />
+                        {riskMetrics?.riskLevel === "Critical" ? (
+                          <AlertCircle className="w-5 h-5 text-red-400" />
+                        ) : riskMetrics?.riskLevel === "Elevated" ? (
+                          <AlertTriangle className="w-5 h-5 text-amber-400" />
                         ) : (
-                          <ArrowDownRight className="w-3 h-3 text-rose-300" />
+                          <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                         )}
                       </div>
                       <div>
-                        <div className="font-medium text-white text-sm">
-                          {position.symbol}
-                        </div>
-                        <div className="text-xs text-cyan-200/60 font-light">
-                          {position.positionSide} • {position.positionAmt} units
-                        </div>
+                        <p className={`font-semibold ${riskMetrics?.riskColor || "text-white"}`}>
+                          {riskMetrics?.riskLevel || "Unknown"} Risk
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {riskMetrics?.riskLevel === "Critical"
+                            ? "Reduce exposure immediately"
+                            : riskMetrics?.riskLevel === "Elevated"
+                            ? "Monitor positions closely"
+                            : "Portfolio within safe limits"}
+                        </p>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <div
-                        className={`font-semibold text-sm ${getPnLColor(parseFloat(position.unRealizedProfit))}`}
-                      >
-                        {formatCurrency(parseFloat(position.unRealizedProfit))}
-                      </div>
-                      <div className="text-xs text-cyan-200/60 font-light">
-                        {formatCurrency(parseFloat(position.notional))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 text-xs mb-3">
-                    <div className="flex justify-between">
-                      <span className="text-cyan-200/60">Entry Price:</span>
-                      <span className="text-white">{formatNumber(parseFloat(position.entryPrice))}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-cyan-200/60">Mark Price:</span>
-                      <span className="text-white">{formatNumber(parseFloat(position.markPrice))}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-cyan-200/60">Break Even:</span>
-                      <span className="text-white">{formatNumber(parseFloat(position.breakEvenPrice))}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-cyan-200/60">Liquidation:</span>
-                      <span className="text-rose-300">{formatNumber(parseFloat(position.liquidationPrice))}</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 text-xs pt-3 border-t border-cyan-500/10">
-                    <div className="flex justify-between">
-                      <span className="text-cyan-200/60">Initial Margin:</span>
-                      <span className="text-white">{formatCurrency(parseFloat(position.initialMargin))}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-cyan-200/60">Isolated Margin:</span>
-                      <span className="text-white">{formatCurrency(parseFloat(position.isolatedMargin))}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-cyan-200/60">Maintenance Margin:</span>
-                      <span className="text-amber-300">{formatCurrency(parseFloat(position.maintMargin))}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-cyan-200/60">Leverage:</span>
-                      <span className="text-cyan-300">
-                        {position.leverage ? `${position.leverage}x` : 
-                         parseFloat(position.initialMargin) > 0 ? 
-                         `${(parseFloat(position.notional) / parseFloat(position.initialMargin)).toFixed(1)}x` : '0x'}
-                      </span>
                     </div>
                   </div>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-cyan-200/40 text-sm font-light">
-                No active positions
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
 
-      {/* Risk Management & Position Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Position Overview */}
-        <div className="bg-cyan-900/10 backdrop-blur-xl rounded-2xl p-6 border border-cyan-500/20">
-          <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-            <Target className="w-5 h-5 text-amber-300" />
-            Position Overview
-          </h3>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center p-4 bg-cyan-800/10 rounded-xl border border-cyan-500/10">
-              <span className="text-cyan-200/60 text-sm font-light">Total Notional Value</span>
-              <span className="font-medium text-white text-sm">
-                {formatCurrency(positionMetrics.totalNotional)}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-4 bg-cyan-800/10 rounded-xl border border-cyan-500/10">
-              <span className="text-cyan-200/60 text-sm font-light">Winning Positions</span>
-              <span className="font-medium text-cyan-300 text-sm">
-                {positionMetrics.winningPositions}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-4 bg-cyan-800/10 rounded-xl border border-cyan-500/10">
-              <span className="text-cyan-200/60 text-sm font-light">Losing Positions</span>
-              <span className="font-medium text-rose-300 text-sm">
-                {positionMetrics.losingPositions}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-4 bg-cyan-800/10 rounded-xl border border-cyan-500/10">
-              <span className="text-cyan-200/60 text-sm font-light">Largest Position</span>
-              <span className="font-medium text-white text-sm">
-                {positionMetrics.largestPosition}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-4 bg-cyan-800/10 rounded-xl border border-cyan-500/10">
-              <span className="text-cyan-200/60 text-sm font-light">Average Leverage</span>
-              <span className="font-medium text-cyan-300 text-sm">
-                {positionMetrics.averageLeverage.toFixed(1)}x
-              </span>
-            </div>
+                {/* Quick Stats */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
+                    <p className="text-2xl font-bold text-white">
+                      {portfolio.leverage ? `${portfolio.leverage.toFixed(1)}x` : "0x"}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">Portfolio Leverage</p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
+                    <p className={`text-2xl font-bold ${getPnLColor(portfolio.total_unrealized_profit)}`}>
+                      {formatPercent(unrealized_pnl_percent)}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">P&L Percentage</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
-        </div>
 
-        {/* Risk Management Status */}
-        <div className="bg-gradient-to-br from-cyan-500/10 via-blue-500/5 to-cyan-500/10 backdrop-blur-xl rounded-2xl p-6 border border-cyan-400/30">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-            <Cpu className="w-5 h-5 text-cyan-300" />
-            Risk Assessment
-          </h3>
-          <div className="space-y-4">
-            <div className="text-center p-4 bg-cyan-800/20 rounded-xl border border-cyan-500/20">
-              <div className="text-xl font-light text-cyan-300 mb-1">
-                {formatCurrency(portfolio.total_initial_margin)}
-              </div>
-              <div className="text-sm text-cyan-200 font-light">Total Initial Margin</div>
-              <div className="text-xs text-cyan-200/60 mt-1 font-light">
-                Required collateral across all positions
-              </div>
-            </div>
-            <div className="text-center p-4 bg-cyan-800/20 rounded-xl border border-cyan-500/20">
-              <div className="text-xl font-light text-violet-300 mb-1">
-                {portfolio.leverage ? `${portfolio.leverage.toFixed(1)}x` : '0x'}
-              </div>
-              <div className="text-sm text-cyan-200 font-light">Portfolio Leverage</div>
-              <div className="text-xs text-cyan-200/60 mt-1 font-light">
-                {portfolio.leverage && portfolio.leverage > 5 ? "Elevated Risk" : "Within Limits"}
-              </div>
-            </div>
-            <div className="text-center p-4 bg-cyan-800/20 rounded-xl border border-cyan-500/20">
-              <div className={`text-xl font-light mb-1 ${getPnLColor(portfolio.total_unrealized_profit)}`}>
-                {formatPercent(unrealized_pnl_percent)}
-              </div>
-              <div className="text-sm text-cyan-200 font-light">Portfolio Performance</div>
-              <div className="text-xs text-cyan-200/60 mt-1 font-light">
-                {Math.abs(unrealized_pnl_percent) > 5 ? "Monitor Positions" : "Stable"}
-              </div>
-            </div>
-            <div className="text-center p-4 bg-cyan-800/20 rounded-xl border border-cyan-500/20">
-              <div className={`text-xl font-light mb-1 ${
-                riskMetrics?.riskLevel === 'High' ? 'text-rose-300' : 
-                riskMetrics?.riskLevel === 'Medium' ? 'text-amber-300' : 'text-emerald-300'
-              }`}>
-                {riskMetrics?.riskLevel}
-              </div>
-              <div className="text-sm text-cyan-200 font-light">Risk Level</div>
-              <div className="text-xs text-cyan-200/60 mt-1 font-light">
-                {riskMetrics?.marginUtilization?.toFixed(1)}% margin utilized
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Fallback Notice if Error but Data Available */}
-      {error && portfolio && (
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
-          <div className="flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-amber-300 flex-shrink-0" />
-            <div>
-              <p className="text-amber-300 text-sm font-light">
-                Partial data loaded - {error}. Refreshed at{" "}
-                {lastRefresh?.toLocaleTimeString()}
+          {/* Error Notice */}
+          {error && portfolio && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-3"
+            >
+              <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
+              <p className="text-amber-400 text-sm">
+                Using cached data - {error}. Last updated: {lastRefresh?.toLocaleTimeString()}
               </p>
-            </div>
-          </div>
+            </motion.div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
+
+// Metric Card Component
+interface MetricCardProps {
+  icon: React.ElementType;
+  iconColor: string;
+  iconBg: string;
+  borderColor: string;
+  title: string;
+  value: string;
+  valueColor?: string;
+  subtitle: string;
+  trend?: number;
+  delay?: number;
+}
+
+const MetricCard: React.FC<MetricCardProps> = ({
+  icon: Icon,
+  iconColor,
+  iconBg,
+  borderColor,
+  title,
+  value,
+  valueColor = "text-white",
+  subtitle,
+  trend,
+  delay = 0,
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay }}
+    whileHover={{ y: -2 }}
+    className={`relative overflow-hidden p-5 rounded-2xl bg-gray-900/50 backdrop-blur-xl border ${borderColor} hover:border-white/20 transition-all group`}
+  >
+    {/* Hover glow */}
+    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+    <div className="relative">
+      <div className="flex items-center justify-between mb-4">
+        <div
+          className={`w-12 h-12 rounded-xl bg-gradient-to-br ${iconBg} flex items-center justify-center border border-white/5 group-hover:scale-105 transition-transform`}
+        >
+          <Icon className={`w-6 h-6 ${iconColor}`} />
+        </div>
+        {trend !== undefined && (
+          <div
+            className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${
+              trend >= 0
+                ? "bg-emerald-500/10 text-emerald-400"
+                : "bg-red-500/10 text-red-400"
+            }`}
+          >
+            {trend >= 0 ? (
+              <TrendingUp className="w-3 h-3" />
+            ) : (
+              <TrendingDown className="w-3 h-3" />
+            )}
+            <span>{trend >= 0 ? "+" : ""}{trend.toFixed(2)}%</span>
+          </div>
+        )}
+      </div>
+
+      <h4 className="text-gray-400 text-sm mb-1">{title}</h4>
+      <p className={`text-2xl font-bold ${valueColor} mb-1`}>{value}</p>
+      <p className="text-xs text-gray-500">{subtitle}</p>
+    </div>
+  </motion.div>
+);
+
+// Asset Row Component
+interface AssetRowProps {
+  asset: any;
+  index: number;
+  formatCurrency: (value: number) => string;
+  getAssetColor: (asset: string) => { gradient: string; border: string; text: string };
+  getAssetIcon: (asset: string) => React.ElementType;
+  getPnLColor: (value: number) => string;
+}
+
+const AssetRow: React.FC<AssetRowProps> = ({
+  asset,
+  index,
+  formatCurrency,
+  getAssetColor,
+  getAssetIcon,
+  getPnLColor,
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const colors = getAssetColor(asset.asset);
+  const IconComponent = getAssetIcon(asset.asset);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.05 }}
+      className={`p-4 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-all ${
+        isExpanded ? "ring-1 ring-cyan-500/20" : ""
+      }`}
+    >
+      <div
+        className="flex items-center justify-between cursor-pointer"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className={`w-10 h-10 rounded-xl bg-gradient-to-br ${colors.gradient} flex items-center justify-center text-white shadow-lg`}
+          >
+            <IconComponent className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="font-semibold text-white">{asset.asset}</p>
+            <p className="text-xs text-gray-500">{asset.percentage.toFixed(1)}% allocation</p>
+          </div>
+        </div>
+
+        <div className="text-right">
+          <p className="font-semibold text-white">{formatCurrency(asset.walletBalance)}</p>
+          <p className={`text-xs ${getPnLColor(asset.unrealizedProfit)}`}>
+            {formatCurrency(asset.unrealizedProfit)}
+          </p>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="pt-4 mt-4 border-t border-white/5 grid grid-cols-2 gap-3 text-xs">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Margin Balance</span>
+                <span className="text-white">{formatCurrency(asset.marginBalance)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Available</span>
+                <span className="text-white">{formatCurrency(asset.availableBalance)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Initial Margin</span>
+                <span className="text-white">{formatCurrency(asset.initialMargin)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Max Withdraw</span>
+                <span className="text-white">{formatCurrency(asset.maxWithdrawAmount)}</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
+
+// Position Row Component
+interface PositionRowProps {
+  position: any;
+  index: number;
+  formatCurrency: (value: number) => string;
+  formatNumber: (value: number, decimals?: number) => string;
+  getPnLColor: (value: number) => string;
+}
+
+const PositionRow: React.FC<PositionRowProps> = ({
+  position,
+  index,
+  formatCurrency,
+  formatNumber,
+  getPnLColor,
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const pnl = parseFloat(position.unRealizedProfit) || 0;
+  const isProfit = pnl >= 0;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.05 }}
+      className={`p-4 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-all ${
+        isExpanded ? "ring-1 ring-violet-500/20" : ""
+      }`}
+    >
+      <div
+        className="flex items-center justify-between cursor-pointer"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className={`p-2 rounded-lg ${
+              isProfit
+                ? "bg-emerald-500/20 border border-emerald-500/30"
+                : "bg-red-500/20 border border-red-500/30"
+            }`}
+          >
+            {isProfit ? (
+              <ArrowUpRight className="w-4 h-4 text-emerald-400" />
+            ) : (
+              <ArrowDownRight className="w-4 h-4 text-red-400" />
+            )}
+          </div>
+          <div>
+            <p className="font-semibold text-white">{position.symbol}</p>
+            <div className="flex items-center gap-2 text-xs text-gray-500">
+              <span className={position.positionSide === "LONG" ? "text-emerald-400" : "text-red-400"}>
+                {position.positionSide}
+              </span>
+              <span>•</span>
+              <span>{position.positionAmt} units</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="text-right">
+          <p className={`font-semibold ${getPnLColor(pnl)}`}>{formatCurrency(pnl)}</p>
+          <p className="text-xs text-gray-500">{formatCurrency(parseFloat(position.notional))}</p>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="pt-4 mt-4 border-t border-white/5 space-y-3 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Entry Price</span>
+                  <span className="text-white font-mono">
+                    {formatNumber(parseFloat(position.entryPrice))}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Mark Price</span>
+                  <span className="text-white font-mono">
+                    {formatNumber(parseFloat(position.markPrice))}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Break Even</span>
+                  <span className="text-white font-mono">
+                    {formatNumber(parseFloat(position.breakEvenPrice))}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Liquidation</span>
+                  <span className="text-red-400 font-mono">
+                    {formatNumber(parseFloat(position.liquidationPrice))}
+                  </span>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-white/5 grid grid-cols-2 gap-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Initial Margin</span>
+                  <span className="text-white">{formatCurrency(parseFloat(position.initialMargin))}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Leverage</span>
+                  <span className="text-cyan-400">
+                    {position.leverage
+                      ? `${position.leverage}x`
+                      : parseFloat(position.initialMargin) > 0
+                      ? `${(parseFloat(position.notional) / parseFloat(position.initialMargin)).toFixed(1)}x`
+                      : "0x"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
+
+// Stat Row Component
+interface StatRowProps {
+  label: string;
+  value: string;
+  valueColor?: string;
+}
+
+const StatRow: React.FC<StatRowProps> = ({ label, value, valueColor = "text-white" }) => (
+  <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+    <span className="text-gray-400 text-sm">{label}</span>
+    <span className={`font-medium ${valueColor}`}>{value}</span>
+  </div>
+);
 
 export default PortfolioAnalyticsComponent;

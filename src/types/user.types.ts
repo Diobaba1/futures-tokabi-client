@@ -1,11 +1,14 @@
 // src/types/user.types.ts
 import { UserResponse } from './auth.types';
 
+export type ExchangeType = 'binance' | 'bybit';
+
 export interface APIKeyAdd {
   api_key: string;
   api_secret: string;
   label?: string;
   testnet?: boolean;
+  exchange_type?: ExchangeType;
 }
 
 export interface APIKeyResponse {
@@ -14,6 +17,7 @@ export interface APIKeyResponse {
   is_testnet: boolean;
   is_active: boolean;
   validation_status: 'pending' | 'valid' | 'invalid';
+  exchange_type: ExchangeType;
   created_at: string;
 }
 

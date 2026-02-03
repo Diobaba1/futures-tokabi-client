@@ -2,13 +2,71 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { userService } from '../../api/services/userService';
-import { APIKeyAdd, APIKeyResponse } from '../../types/user.types';
+import { APIKeyAdd, APIKeyResponse, ExchangeType } from '../../types/user.types';
 import { useToast } from '../../components/ui/Toast';
 import { getUserFriendlyError } from '../../utils/errorHandler';
+import {
+  Link2,
+  Shield,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  Trash2,
+  Plus,
+  X,
+  Eye,
+  EyeOff,
+  ExternalLink,
+  ChevronDown,
+  Lock,
+  Key,
+  Zap,
+  RefreshCw,
+  Info,
+  AlertTriangle,
+} from 'lucide-react';
 
 interface APIKeyManagerProps {
   onKeysUpdate?: (keys: APIKeyResponse[]) => void;
 }
+
+// Exchange configuration
+const EXCHANGES = {
+  binance: {
+    name: 'Binance',
+    description: 'World\'s largest crypto exchange',
+    color: 'yellow',
+    gradient: 'from-yellow-500 to-amber-500',
+    bgGradient: 'from-yellow-500/10 to-amber-500/10',
+    borderColor: 'border-yellow-500/30',
+    textColor: 'text-yellow-400',
+    hoverBorder: 'hover:border-yellow-500/50',
+    features: ['Futures Trading', 'Spot Trading', 'Margin'],
+    docUrl: 'https://www.binance.com/en/my/settings/api-management',
+    logo: (
+      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 1.5L5.5 8l2.25 2.25L12 6l4.25 4.25L18.5 8 12 1.5zm-6.5 9L3.25 12.75 5.5 15l2.25-2.25L5.5 10.5zm13 0l-2.25 2.25L18.5 15l2.25-2.25L18.5 10.5zM12 9l-3 3 3 3 3-3-3-3zm0 13.5l6.5-6.5-2.25-2.25L12 18l-4.25-4.25L5.5 16 12 22.5z"/>
+      </svg>
+    ),
+  },
+  bybit: {
+    name: 'Bybit',
+    description: 'Fast & reliable derivatives',
+    color: 'orange',
+    gradient: 'from-orange-500 to-red-500',
+    bgGradient: 'from-orange-500/10 to-red-500/10',
+    borderColor: 'border-orange-500/30',
+    textColor: 'text-orange-400',
+    hoverBorder: 'hover:border-orange-500/50',
+    features: ['USDT Perpetual', 'Inverse Contracts', 'Options'],
+    docUrl: 'https://www.bybit.com/app/user/api-management',
+    logo: (
+      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+    ),
+  },
+} as const;
 
 const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
   const { showSuccess, showError } = useToast();
@@ -16,7 +74,10 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [showConnectModal, setShowConnectModal] = useState(false);
+  const [selectedExchange, setSelectedExchange] = useState<ExchangeType | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [showApiSecret, setShowApiSecret] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState<APIKeyAdd>({
@@ -24,9 +85,10 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
     api_secret: '',
     label: '',
     testnet: false,
+    exchange_type: 'binance',
   });
 
-  // Load API keys with useCallback to prevent infinite re-renders
+  // Load API keys
   const loadApiKeys = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -40,12 +102,30 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
     }
   }, [onKeysUpdate, showError]);
 
-  // Load API keys on component mount
   useEffect(() => {
     loadApiKeys();
   }, [loadApiKeys]);
 
-  const handleAddKey = async (e: React.FormEvent) => {
+  // Get keys by exchange
+  const getKeysByExchange = (exchange: ExchangeType) => {
+    return apiKeys.filter((key) => key.exchange_type === exchange);
+  };
+
+  // Open connect modal
+  const openConnectModal = (exchange: ExchangeType) => {
+    setSelectedExchange(exchange);
+    setFormData({
+      api_key: '',
+      api_secret: '',
+      label: '',
+      testnet: false,
+      exchange_type: exchange,
+    });
+    setShowConnectModal(true);
+  };
+
+  // Handle form submission
+  const handleConnect = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.api_key.trim() || !formData.api_secret.trim()) {
@@ -55,544 +135,729 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
 
     try {
       setIsAdding(true);
-
       await userService.addApiKey({
         ...formData,
-        label: formData.label?.trim() || `API Key ${new Date().toLocaleDateString()}`,
+        label: formData.label?.trim() || `${EXCHANGES[formData.exchange_type as ExchangeType].name} Key`,
       });
 
-      showSuccess('API key added successfully!', { title: 'Key Added' });
+      showSuccess('Exchange connected successfully!', { title: 'Connected' });
+      setShowConnectModal(false);
+      setSelectedExchange(null);
       setFormData({
         api_key: '',
         api_secret: '',
         label: '',
         testnet: false,
+        exchange_type: 'binance',
       });
-      setShowAddForm(false);
-
-      // Reload the keys list
       await loadApiKeys();
     } catch (err: unknown) {
-      showError(getUserFriendlyError(err), { title: 'Failed to Add Key' });
+      showError(getUserFriendlyError(err), { title: 'Connection Failed' });
     } finally {
       setIsAdding(false);
     }
   };
 
-  const handleDeleteKey = async (keyId: string) => {
-    if (!window.confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
-      return;
-    }
-
+  // Handle delete
+  const handleDelete = async (keyId: string) => {
     try {
       setIsDeleting(keyId);
-
       await userService.deleteApiKey(keyId);
-      showSuccess('API key deleted successfully!', { title: 'Key Deleted' });
-
-      // Reload the keys list
+      showSuccess('API key removed successfully', { title: 'Disconnected' });
+      setShowDeleteConfirm(null);
       await loadApiKeys();
     } catch (err: unknown) {
-      showError(getUserFriendlyError(err), { title: 'Failed to Delete' });
+      showError(getUserFriendlyError(err), { title: 'Failed to Remove' });
     } finally {
       setIsDeleting(null);
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      api_key: '',
-      api_secret: '',
-      label: '',
-      testnet: false,
-    });
-    setShowAddForm(false);
-  };
-
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
-      {/* Header */}
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-white mb-4">
-          API Key Management
-        </h1>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-          Securely manage your Binance API keys for trading automation. 
-          Keys are encrypted and stored securely.
-        </p>
+    <div className="min-h-full">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl" />
+
+        <div className="relative px-6 py-10 lg:py-12">
+          <div className="max-w-4xl mx-auto text-center">
+            {/* Icon */}
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", damping: 15 }}
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-cyan-600/20 border border-cyan-500/30 mb-6"
+            >
+              <Link2 className="w-8 h-8 text-cyan-400" />
+            </motion.div>
+
+            {/* Title */}
+            <motion.h1
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="text-3xl lg:text-4xl font-bold text-white mb-4"
+            >
+              Connect Your Exchange
+            </motion.h1>
+
+            {/* Description */}
+            <motion.p
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-gray-400 text-lg max-w-2xl mx-auto mb-8"
+            >
+              Link your exchange accounts to enable automated trading. Your API keys are
+              encrypted with AES-256 and never stored in plain text.
+            </motion.p>
+
+            {/* Security badges */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="flex flex-wrap items-center justify-center gap-4"
+            >
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                <Shield className="w-4 h-4 text-emerald-400" />
+                <span className="text-sm text-emerald-400">Bank-grade Encryption</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20">
+                <Lock className="w-4 h-4 text-cyan-400" />
+                <span className="text-sm text-cyan-400">No Withdrawal Access</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20">
+                <Zap className="w-4 h-4 text-purple-400" />
+                <span className="text-sm text-purple-400">Trade Only</span>
+              </div>
+            </motion.div>
+          </div>
+        </div>
       </div>
 
-      {/* Instructions */}
-      <BinanceAPIInstructions />
-
-      {/* Add API Key Button */}
-      {!showAddForm && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center"
-        >
-          <motion.button
-            onClick={() => setShowAddForm(true)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 bg-gradient-to-r from-cyan-900 to-cyan-900 text-gray-900 font-bold rounded-xl hover:from-cyan-800 hover:to-cyan-900 transition-all duration-300 shadow-lg shadow-cyan-900/25 flex items-center justify-center space-x-3 mx-auto"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            <span className="text-lg">Add New API Key</span>
-          </motion.button>
-          <p className="text-gray-400 text-sm mt-3">
-            Click to add your Binance API keys securely
-          </p>
-        </motion.div>
-      )}
-
-      {/* Add API Key Form */}
-      <AnimatePresence>
-        {showAddForm && (
+      {/* Main Content */}
+      <div className="px-6 pb-10">
+        <div className="max-w-5xl mx-auto space-y-8">
+          {/* Exchange Cards */}
           <motion.div
-            initial={{ opacity: 0, y: 20, height: 0 }}
-            animate={{ opacity: 1, y: 0, height: 'auto' }}
-            exit={{ opacity: 0, y: -20, height: 0 }}
-            className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-6 backdrop-blur-sm overflow-hidden"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
           >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white flex items-center">
-                <svg className="w-6 h-6 mr-2 text-cyan-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                Add New API Key
-              </h2>
-              <button
-                onClick={resetForm}
-                className="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-all duration-200"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span>Supported Exchanges</span>
+              <span className="text-xs text-gray-500 font-normal">({apiKeys.length} connected)</span>
+            </h2>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              {(Object.keys(EXCHANGES) as ExchangeType[]).map((exchangeKey) => {
+                const exchange = EXCHANGES[exchangeKey];
+                const connectedKeys = getKeysByExchange(exchangeKey);
+                const isConnected = connectedKeys.length > 0;
+
+                return (
+                  <ExchangeCard
+                    key={exchangeKey}
+                    exchangeKey={exchangeKey}
+                    exchange={exchange}
+                    connectedKeys={connectedKeys}
+                    isConnected={isConnected}
+                    isLoading={isLoading}
+                    isDeleting={isDeleting}
+                    showDeleteConfirm={showDeleteConfirm}
+                    onConnect={() => openConnectModal(exchangeKey)}
+                    onDelete={handleDelete}
+                    onShowDeleteConfirm={setShowDeleteConfirm}
+                  />
+                );
+              })}
             </div>
-
-            <SecurityWarning />
-
-            <form onSubmit={handleAddKey} className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Label (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.label}
-                    onChange={(e) => setFormData({ ...formData, label: e.target.value })}
-                    placeholder="e.g., Main Trading Account"
-                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/50 focus:border-cyan-900/50 transition-all duration-200"
-                  />
-                </div>
-
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="testnet"
-                    checked={formData.testnet}
-                    onChange={(e) => setFormData({ ...formData, testnet: e.target.checked })}
-                    className="w-4 h-4 text-cyan-900 bg-gray-700 border-gray-600 rounded focus:ring-cyan-900/50 focus:ring-2"
-                  />
-                  <label htmlFor="testnet" className="ml-2 text-sm text-gray-300">
-                    Testnet/Sandbox Key
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  API Key *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.api_key}
-                  onChange={(e) => setFormData({ ...formData, api_key: e.target.value })}
-                  placeholder="Enter your Binance API Key"
-                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/50 focus:border-cyan-900/50 transition-all duration-200 font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  API Secret *
-                </label>
-                <input
-                  type="password"
-                  required
-                  value={formData.api_secret}
-                  onChange={(e) => setFormData({ ...formData, api_secret: e.target.value })}
-                  placeholder="Enter your Binance API Secret"
-                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/50 focus:border-cyan-900/50 transition-all duration-200 font-mono"
-                />
-              </div>
-
-              <div className="flex space-x-4">
-                <motion.button
-                  type="button"
-                  onClick={resetForm}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex-1 py-4 bg-gray-700/50 border border-gray-600/50 text-gray-300 font-bold rounded-xl hover:bg-gray-600/50 hover:text-white transition-all duration-300"
-                >
-                  Cancel
-                </motion.button>
-                <motion.button
-                  type="submit"
-                  disabled={isAdding}
-                  whileHover={{ scale: isAdding ? 1 : 1.02 }}
-                  whileTap={{ scale: isAdding ? 1 : 0.98 }}
-                  className="flex-1 py-4 bg-gradient-to-r from-cyan-900 to-cyan-900 text-gray-900 font-bold rounded-xl hover:from-cyan-800 hover:to-cyan-900 disabled:from-gray-600 disabled:to-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-cyan-900/25 flex items-center justify-center space-x-2"
-                >
-                  {isAdding ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
-                      <span>Adding API Key...</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>Add API Key</span>
-                    </>
-                  )}
-                </motion.button>
-              </div>
-            </form>
           </motion.div>
+
+          {/* Setup Guide */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <SetupGuide />
+          </motion.div>
+
+          {/* Security Info */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            <SecurityInfo />
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Connect Modal */}
+      <AnimatePresence>
+        {showConnectModal && selectedExchange && (
+          <ConnectModal
+            exchange={EXCHANGES[selectedExchange]}
+            formData={formData}
+            setFormData={setFormData}
+            isAdding={isAdding}
+            showApiSecret={showApiSecret}
+            setShowApiSecret={setShowApiSecret}
+            onSubmit={handleConnect}
+            onClose={() => {
+              setShowConnectModal(false);
+              setSelectedExchange(null);
+            }}
+          />
         )}
       </AnimatePresence>
-
-      {/* API Keys List */}
-      <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-6 backdrop-blur-sm">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-white flex items-center">
-            <svg className="w-6 h-6 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-            </svg>
-            Managed API Keys ({apiKeys.length})
-          </h2>
-          
-          {apiKeys.length > 0 && !showAddForm && (
-            <motion.button
-              onClick={() => setShowAddForm(true)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-4 py-2 bg-cyan-900/10 border border-cyan-900/20 text-cyan-800 rounded-xl hover:bg-cyan-900/20 hover:border-cyan-900/30 transition-all duration-200 flex items-center space-x-2 text-sm"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              <span>Add Another</span>
-            </motion.button>
-          )}
-        </div>
-
-        {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="w-8 h-8 border-2 border-cyan-900 border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : apiKeys.length === 0 ? (
-          <div className="text-center py-12 text-gray-400">
-            <svg className="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-            </svg>
-            <p className="text-lg mb-4">No API keys configured</p>
-            <p className="text-sm mb-6">Add your first API key to start automated trading</p>
-            <motion.button
-              onClick={() => setShowAddForm(true)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 bg-gradient-to-r from-cyan-900 to-cyan-900 text-gray-900 font-bold rounded-xl hover:from-cyan-800 hover:to-cyan-900 transition-all duration-300 shadow-lg shadow-cyan-900/25 flex items-center justify-center space-x-2 mx-auto"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              <span>Add Your First API Key</span>
-            </motion.button>
-          </div>
-        ) : (
-          <div className="grid gap-4">
-            {apiKeys.map((apiKey) => (
-              <APIKeyCard
-                key={apiKey.id}
-                apiKey={apiKey}
-                onDelete={handleDeleteKey}
-                isDeleting={isDeleting === apiKey.id}
-              />
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 };
 
-// Security Warning Component
-const SecurityWarning: React.FC = () => {
-  const [isExpanded, setIsExpanded] = useState(true);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: 'auto' }}
-      className="mb-6 p-4 bg-cyan-900/10 border border-cyan-900/20 rounded-xl"
-    >
-      <div className="flex items-start justify-between">
-        <div className="flex items-start space-x-3">
-          <svg className="w-5 h-5 text-cyan-800 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
-          </svg>
-          <div>
-            <h3 className="text-cyan-800 font-semibold">Security Notice</h3>
-            <p className="text-cyan-600/80 text-sm mt-1">
-              Your API keys will be encrypted and stored securely. However, for security reasons:
-            </p>
-            
-            <AnimatePresence>
-              {isExpanded && (
-                <motion.ul
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mt-2 space-y-1 text-cyan-600/70 text-sm"
-                >
-                  <li>• You will not be able to view your API secret after submission</li>
-                  <li>• Ensure you have saved your API secret securely before adding</li>
-                  <li>• Only enable necessary permissions (Read, Trade, Futures)</li>
-                  <li>• Never share your API keys with anyone</li>
-                </motion.ul>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-        
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="text-cyan-800 hover:text-cyan-600 transition-colors duration-200 flex-shrink-0"
-        >
-          <svg 
-            className={`w-5 h-5 transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-      </div>
-    </motion.div>
-  );
-};
-
-// API Key Card Component
-interface APIKeyCardProps {
-  apiKey: APIKeyResponse;
-  onDelete: (keyId: string) => void;
-  isDeleting: boolean;
+// Exchange Card Component
+interface ExchangeCardProps {
+  exchangeKey: ExchangeType;
+  exchange: typeof EXCHANGES[ExchangeType];
+  connectedKeys: APIKeyResponse[];
+  isConnected: boolean;
+  isLoading: boolean;
+  isDeleting: string | null;
+  showDeleteConfirm: string | null;
+  onConnect: () => void;
+  onDelete: (id: string) => void;
+  onShowDeleteConfirm: (id: string | null) => void;
 }
 
-const APIKeyCard: React.FC<APIKeyCardProps> = ({ apiKey, onDelete, isDeleting }) => {
-  // const getStatusColor = (status: string) => {
-  //   switch (status) {
-  //     case 'valid': return 'text-green-400 bg-green-400/10 border-green-400/20';
-  //     case 'invalid': return 'text-red-400 bg-red-400/10 border-red-400/20';
-  //     default: return 'text-cyan-800 bg-cyan-800/10 border-cyan-800/20';
-  //   }
-  // };
-
-  // const getStatusText = (status: string) => {
-  //   switch (status) {
-  //     case 'valid': return 'Valid';
-  //     case 'invalid': return 'Invalid';
-  //     default: return 'Pending Validation';
-  //   }
-  // };
+const ExchangeCard: React.FC<ExchangeCardProps> = ({
+  exchangeKey,
+  exchange,
+  connectedKeys,
+  isConnected,
+  isLoading,
+  isDeleting,
+  showDeleteConfirm,
+  onConnect,
+  onDelete,
+  onShowDeleteConfirm,
+}) => {
+  const [isExpanded, setIsExpanded] = useState(isConnected);
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      className="p-4 bg-gray-700/30 border border-gray-600/30 rounded-xl hover:border-gray-500/50 transition-all duration-200 group"
+      className={`relative overflow-hidden rounded-2xl border transition-all duration-300 ${
+        isConnected
+          ? `bg-gradient-to-br ${exchange.bgGradient} ${exchange.borderColor}`
+          : 'bg-gray-900/50 border-white/5 hover:border-white/10'
+      }`}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center space-x-3 mb-2">
-            <h3 className="text-white font-semibold truncate">{apiKey.label}</h3>
-            
-            {apiKey.is_testnet && (
-              <span className="px-2 py-1 text-xs font-medium text-blue-400 bg-blue-400/10 border border-blue-400/20 rounded-full">
-                Testnet
-              </span>
-            )}
-            <span className={`px-2 py-1 text-xs font-medium rounded-full border ${
-              apiKey.is_active 
-                ? 'text-green-400 bg-green-400/10 border-green-400/20' 
-                : 'text-gray-400 bg-gray-400/10 border-gray-400/20'
-            }`}>
-              {apiKey.is_active ? 'Active' : 'Inactive'}
-            </span>
+      {/* Card Header */}
+      <div className="p-5">
+        <div className="flex items-start justify-between">
+          {/* Exchange Info */}
+          <div className="flex items-center gap-4">
+            <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${exchange.gradient} flex items-center justify-center text-white shadow-lg`}>
+              {exchange.logo}
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                {exchange.name}
+                {isConnected && (
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-medium">
+                    <CheckCircle2 className="w-3 h-3" />
+                    Connected
+                  </span>
+                )}
+              </h3>
+              <p className="text-gray-400 text-sm">{exchange.description}</p>
+            </div>
           </div>
-          
-          <div className="flex items-center space-x-4 text-sm text-gray-400">
-            <span>Created: {new Date(apiKey.created_at).toLocaleDateString()}</span>
-            <span>ID: {apiKey.id.slice(0, 8)}...</span>
-          </div>
+
+          {/* Action Button */}
+          {!isConnected ? (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={onConnect}
+              disabled={isLoading}
+              className={`px-4 py-2 rounded-xl bg-gradient-to-r ${exchange.gradient} text-white font-medium text-sm shadow-lg transition-all hover:shadow-xl disabled:opacity-50`}
+            >
+              Connect
+            </motion.button>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={onConnect}
+              className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white font-medium text-sm hover:bg-white/10 transition-all flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add Key
+            </motion.button>
+          )}
         </div>
 
-        <motion.button
-          onClick={() => onDelete(apiKey.id)}
-          disabled={isDeleting}
-          whileHover={{ scale: isDeleting ? 1 : 1.05 }}
-          whileTap={{ scale: isDeleting ? 1 : 0.95 }}
-          className="ml-4 p-2 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed opacity-0 group-hover:opacity-100"
-          title="Delete API Key"
-        >
-          {isDeleting ? (
-            <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          )}
-        </motion.button>
+        {/* Features */}
+        <div className="flex flex-wrap gap-2 mt-4">
+          {exchange.features.map((feature) => (
+            <span
+              key={feature}
+              className="px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 text-xs"
+            >
+              {feature}
+            </span>
+          ))}
+        </div>
       </div>
-    </motion.div>
-  );
-};
 
-// Binance API Instructions Component
-const BinanceAPIInstructions: React.FC = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
+      {/* Connected Keys */}
+      {isConnected && (
+        <>
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="w-full px-5 py-3 border-t border-white/5 flex items-center justify-between text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+          >
+            <span>{connectedKeys.length} API key{connectedKeys.length !== 1 ? 's' : ''} connected</span>
+            <motion.span animate={{ rotate: isExpanded ? 180 : 0 }}>
+              <ChevronDown className="w-4 h-4" />
+            </motion.span>
+          </button>
 
-  const steps = [
-    {
-      title: "1. Log into Binance",
-      description: "Go to Binance.com and log into your account"
-    },
-    {
-      title: "2. Access API Management",
-      description: "Click on your profile icon → API Management"
-    },
-    {
-      title: "3. Create New API Key",
-      description: "Click 'Create API', complete security verification"
-    },
-    {
-      title: "4. Configure Permissions",
-      description: "Enable ONLY these permissions:",
-      permissions: ["Read Info", "Enable Trading", "Enable Futures"]
-    },
-    {
-      title: "5. Restrict Access",
-      description: "Enable 'Restrict access to trusted IPs only' (recommended)"
-    },
-    {
-      title: "6. Save Your Secret",
-      description: "Copy and securely save your API Key and Secret immediately"
-    }
-  ];
+          <AnimatePresence>
+            {isExpanded && (
+              <motion.div
+                initial={{ height: 0 }}
+                animate={{ height: 'auto' }}
+                exit={{ height: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="px-5 pb-5 space-y-3">
+                  {connectedKeys.map((key) => (
+                    <div
+                      key={key.id}
+                      className="relative p-4 rounded-xl bg-black/20 border border-white/5 group"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Key className="w-4 h-4 text-gray-500" />
+                            <span className="font-medium text-white truncate">{key.label}</span>
+                            {key.is_testnet && (
+                              <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-xs">
+                                Testnet
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 text-xs text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <StatusIndicator status={key.validation_status} />
+                              {key.validation_status === 'valid' ? 'Verified' : key.validation_status === 'invalid' ? 'Invalid' : 'Pending'}
+                            </span>
+                            <span>Added {new Date(key.created_at).toLocaleDateString()}</span>
+                          </div>
+                        </div>
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-6 backdrop-blur-sm"
-    >
-      <div className="flex items-start justify-between">
-        <div className="flex items-start space-x-3">
-          <svg className="w-6 h-6 text-blue-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <h3 className="text-blue-400 font-semibold text-lg mb-2">
-              How to Get Your Binance API Keys
-            </h3>
-            <p className="text-blue-300/80">
-              Follow these steps to create secure API keys for automated trading
-            </p>
-
-            <AnimatePresence>
-              {isExpanded && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mt-4 space-y-3"
-                >
-                  {steps.map((step, index) => (
-                    <div key={index} className="flex items-start space-x-3">
-                      <div className="w-6 h-6 bg-blue-500/20 border border-blue-500/30 rounded-full flex items-center justify-center text-blue-400 text-sm font-semibold mt-0.5 flex-shrink-0">
-                        {index + 1}
-                      </div>
-                      <div>
-                        <h4 className="text-blue-300 font-semibold">{step.title}</h4>
-                        <p className="text-blue-300/70 text-sm mt-1">{step.description}</p>
-                        {step.permissions && (
-                          <ul className="text-blue-300/60 text-sm mt-1 space-y-1">
-                            {step.permissions.map((permission, permIndex) => (
-                              <li key={permIndex}>• {permission}</li>
-                            ))}
-                          </ul>
+                        {/* Delete Button */}
+                        {showDeleteConfirm === key.id ? (
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => onShowDeleteConfirm(null)}
+                              className="px-3 py-1.5 rounded-lg bg-white/5 text-gray-400 text-sm hover:bg-white/10 transition-all"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => onDelete(key.id)}
+                              disabled={isDeleting === key.id}
+                              className="px-3 py-1.5 rounded-lg bg-red-500/20 text-red-400 text-sm hover:bg-red-500/30 transition-all flex items-center gap-1 disabled:opacity-50"
+                            >
+                              {isDeleting === key.id ? (
+                                <RefreshCw className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <Trash2 className="w-3 h-3" />
+                              )}
+                              Remove
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => onShowDeleteConfirm(key.id)}
+                            className="p-2 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         )}
                       </div>
                     </div>
                   ))}
-                  
-                  <div className="mt-4 p-3 bg-cyan-900/10 border border-cyan-900/20 rounded-lg">
-                    <p className="text-cyan-800 text-sm font-semibold">⚠️ Important Security Notes:</p>
-                    <ul className="text-cyan-600/70 text-sm mt-1 space-y-1">
-                      <li>• Never enable "Withdraw" permission for trading bots</li>
-                      <li>• Use IP whitelisting for enhanced security</li>
-                      <li>• Store your API Secret securely - you won't see it again</li>
-                      <li>• Regularly rotate your API keys</li>
-                    </ul>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      )}
+    </motion.div>
+  );
+};
+
+// Status Indicator
+const StatusIndicator: React.FC<{ status: string }> = ({ status }) => {
+  const config = {
+    valid: { color: 'bg-emerald-400', icon: CheckCircle2 },
+    invalid: { color: 'bg-red-400', icon: AlertCircle },
+    pending: { color: 'bg-yellow-400', icon: Clock },
+  }[status] || { color: 'bg-gray-400', icon: Clock };
+
+  return (
+    <span className={`w-2 h-2 rounded-full ${config.color}`} />
+  );
+};
+
+// Connect Modal
+interface ConnectModalProps {
+  exchange: typeof EXCHANGES[ExchangeType];
+  formData: APIKeyAdd;
+  setFormData: (data: APIKeyAdd) => void;
+  isAdding: boolean;
+  showApiSecret: boolean;
+  setShowApiSecret: (show: boolean) => void;
+  onSubmit: (e: React.FormEvent) => void;
+  onClose: () => void;
+}
+
+const ConnectModal: React.FC<ConnectModalProps> = ({
+  exchange,
+  formData,
+  setFormData,
+  isAdding,
+  showApiSecret,
+  setShowApiSecret,
+  onSubmit,
+  onClose,
+}) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+
+      {/* Modal */}
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0, y: 20 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="relative w-full max-w-lg bg-gray-900 rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className={`relative px-6 py-5 bg-gradient-to-r ${exchange.bgGradient} border-b border-white/5`}>
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 rounded-xl bg-black/20 text-white/60 hover:text-white hover:bg-black/30 transition-all"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          <div className="flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${exchange.gradient} flex items-center justify-center text-white shadow-lg`}>
+              {exchange.logo}
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-white">Connect {exchange.name}</h2>
+              <p className="text-white/60 text-sm">Enter your API credentials</p>
+            </div>
           </div>
         </div>
 
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="text-blue-400 hover:text-blue-300 transition-colors duration-200 flex-shrink-0 ml-4"
-        >
-          <svg 
-            className={`w-6 h-6 transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
+        {/* Form */}
+        <form onSubmit={onSubmit} className="p-6 space-y-5">
+          {/* Security Notice */}
+          <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+            <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="text-amber-400 font-medium">Security Reminder</p>
+              <p className="text-amber-400/70 mt-1">
+                Only enable <strong>Read</strong> and <strong>Trade</strong> permissions. Never enable withdrawals.
+              </p>
+            </div>
+          </div>
+
+          {/* Label */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Label <span className="text-gray-500">(optional)</span>
+            </label>
+            <input
+              type="text"
+              value={formData.label}
+              onChange={(e) => setFormData({ ...formData, label: e.target.value })}
+              placeholder={`My ${exchange.name} Account`}
+              className="w-full px-4 py-3 rounded-xl bg-black/30 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all"
+            />
+          </div>
+
+          {/* API Key */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              API Key <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.api_key}
+              onChange={(e) => setFormData({ ...formData, api_key: e.target.value })}
+              placeholder="Enter your API key"
+              className="w-full px-4 py-3 rounded-xl bg-black/30 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all font-mono text-sm"
+            />
+          </div>
+
+          {/* API Secret */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              API Secret <span className="text-red-400">*</span>
+            </label>
+            <div className="relative">
+              <input
+                type={showApiSecret ? 'text' : 'password'}
+                required
+                value={formData.api_secret}
+                onChange={(e) => setFormData({ ...formData, api_secret: e.target.value })}
+                placeholder="Enter your API secret"
+                className="w-full px-4 py-3 pr-12 rounded-xl bg-black/30 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all font-mono text-sm"
+              />
+              <button
+                type="button"
+                onClick={() => setShowApiSecret(!showApiSecret)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-white/10 transition-all"
+              >
+                {showApiSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Testnet Toggle */}
+          <div className="flex items-center justify-between p-4 rounded-xl bg-black/20 border border-white/5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                <Zap className="w-4 h-4 text-blue-400" />
+              </div>
+              <div>
+                <p className="text-white text-sm font-medium">Testnet Mode</p>
+                <p className="text-gray-500 text-xs">Use sandbox environment for testing</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, testnet: !formData.testnet })}
+              className={`relative w-12 h-6 rounded-full transition-all ${
+                formData.testnet ? 'bg-blue-500' : 'bg-gray-700'
+              }`}
+            >
+              <motion.div
+                animate={{ x: formData.testnet ? 24 : 4 }}
+                className="absolute top-1 w-4 h-4 rounded-full bg-white shadow"
+              />
+            </button>
+          </div>
+
+          {/* Help Link */}
+          <a
+            href={exchange.docUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
+            <ExternalLink className="w-4 h-4" />
+            <span>How to get your {exchange.name} API key</span>
+          </a>
+
+          {/* Actions */}
+          <div className="flex gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 font-medium hover:bg-white/10 transition-all"
+            >
+              Cancel
+            </button>
+            <motion.button
+              type="submit"
+              disabled={isAdding}
+              whileHover={{ scale: isAdding ? 1 : 1.01 }}
+              whileTap={{ scale: isAdding ? 1 : 0.99 }}
+              className={`flex-1 px-4 py-3 rounded-xl bg-gradient-to-r ${exchange.gradient} text-white font-medium shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
+            >
+              {isAdding ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <span>Connecting...</span>
+                </>
+              ) : (
+                <>
+                  <Link2 className="w-4 h-4" />
+                  <span>Connect Exchange</span>
+                </>
+              )}
+            </motion.button>
+          </div>
+        </form>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+// Setup Guide Component
+const SetupGuide: React.FC = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState<'binance' | 'bybit'>('binance');
+
+  const steps = {
+    binance: [
+      { title: 'Log into Binance', desc: 'Go to binance.com and sign in' },
+      { title: 'Open API Management', desc: 'Profile → API Management' },
+      { title: 'Create New API Key', desc: 'Click "Create API" and verify' },
+      { title: 'Set Permissions', desc: 'Enable Read, Trade, Futures only' },
+      { title: 'Copy Credentials', desc: 'Save your key and secret securely' },
+    ],
+    bybit: [
+      { title: 'Log into Bybit', desc: 'Go to bybit.com and sign in' },
+      { title: 'Open API Management', desc: 'Account → API Management' },
+      { title: 'Create New API Key', desc: 'Choose "System-generated"' },
+      { title: 'Set Permissions', desc: 'Enable Read-Write, Contracts' },
+      { title: 'Copy Credentials', desc: 'Save your key and secret securely' },
+    ],
+  };
+
+  return (
+    <div className="rounded-2xl border border-white/5 bg-gray-900/30 overflow-hidden">
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-all"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+            <Info className="w-5 h-5 text-blue-400" />
+          </div>
+          <div className="text-left">
+            <h3 className="text-white font-medium">API Key Setup Guide</h3>
+            <p className="text-gray-500 text-sm">Step-by-step instructions</p>
+          </div>
+        </div>
+        <motion.div animate={{ rotate: isExpanded ? 180 : 0 }}>
+          <ChevronDown className="w-5 h-5 text-gray-500" />
+        </motion.div>
+      </button>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0 }}
+            animate={{ height: 'auto' }}
+            exit={{ height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="px-6 pb-6 space-y-4">
+              {/* Tabs */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setActiveTab('binance')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    activeTab === 'binance'
+                      ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                      : 'bg-white/5 text-gray-400 border border-white/5 hover:bg-white/10'
+                  }`}
+                >
+                  Binance
+                </button>
+                <button
+                  onClick={() => setActiveTab('bybit')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    activeTab === 'bybit'
+                      ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                      : 'bg-white/5 text-gray-400 border border-white/5 hover:bg-white/10'
+                  }`}
+                >
+                  Bybit
+                </button>
+              </div>
+
+              {/* Steps */}
+              <div className="space-y-3">
+                {steps[activeTab].map((step, index) => (
+                  <div key={index} className="flex items-start gap-4">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold flex-shrink-0 ${
+                      activeTab === 'binance'
+                        ? 'bg-yellow-500/20 text-yellow-400'
+                        : 'bg-orange-500/20 text-orange-400'
+                    }`}>
+                      {index + 1}
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">{step.title}</p>
+                      <p className="text-gray-500 text-sm">{step.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// Security Info Component
+const SecurityInfo: React.FC = () => {
+  const features = [
+    {
+      icon: Shield,
+      title: 'AES-256 Encryption',
+      desc: 'Your API keys are encrypted with military-grade encryption before storage',
+    },
+    {
+      icon: Lock,
+      title: 'No Withdrawal Access',
+      desc: 'We never request or store withdrawal permissions',
+    },
+    {
+      icon: Key,
+      title: 'Secret Not Stored',
+      desc: 'API secrets are hashed and cannot be retrieved after submission',
+    },
+  ];
+
+  return (
+    <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <Shield className="w-6 h-6 text-emerald-400" />
+        <h3 className="text-white font-semibold">Security Measures</h3>
       </div>
 
-      {!isExpanded && (
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          onClick={() => setIsExpanded(true)}
-          className="mt-4 text-blue-400 hover:text-blue-300 text-sm font-medium flex items-center space-x-1 transition-colors duration-200"
-        >
-          <span>Show detailed instructions</span>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </motion.button>
-      )}
-    </motion.div>
+      <div className="grid md:grid-cols-3 gap-4">
+        {features.map((feature, index) => (
+          <div key={index} className="flex items-start gap-3">
+            <feature.icon className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-white text-sm font-medium">{feature.title}</p>
+              <p className="text-emerald-400/60 text-xs mt-0.5">{feature.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 

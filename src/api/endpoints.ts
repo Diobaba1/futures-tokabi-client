@@ -179,6 +179,10 @@ export const API_ENDPOINTS = {
     CREATE: "/trades/",
     UPDATE: "/trades/{id}",
     DELETE: "/trades/{id}",
+    STATS: "/trades/stats/summary",
+    // Exchange history - fetches directly from connected exchange
+    EXCHANGE_HISTORY: "/trades/exchange/history",
+    EXCHANGE_ORDERS: "/trades/exchange/orders",
   },
 
   // Analytics

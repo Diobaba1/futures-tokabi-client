@@ -1,324 +1,904 @@
-// src/pages/Trades.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+// src/pages/pageComponents/Trades.tsx
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../components/contexts/AuthContext';
 import { tradeService } from '../../api/services';
-import { TradeDetailResponse, TradeListResponse } from '../../types/trades.types';
+import {
+  TradeDetailResponse,
+  TradeListResponse,
+  ExchangeHistoryResponse,
+  ExchangeTrade,
+} from '../../types/trades.types';
+import {
+  TrendingUp,
+  TrendingDown,
+  RefreshCw,
+  Search,
+  Filter,
+  ArrowUpRight,
+  ArrowDownRight,
+  Clock,
+  AlertCircle,
+  ChevronDown,
+  BarChart3,
+  Activity,
+  DollarSign,
+  Percent,
+  Target,
+  Zap,
+  ExternalLink,
+  CheckCircle2,
+  XCircle,
+  Circle,
+  Layers,
+  Eye,
+  EyeOff,
+  History,
+  ArrowUp,
+  ArrowDown,
+  Wallet,
+  Award,
+  Link2,
+} from 'lucide-react';
+
+// Animated Counter Component
+const AnimatedCounter: React.FC<{
+  value: number;
+  prefix?: string;
+  suffix?: string;
+  decimals?: number;
+  className?: string;
+}> = ({ value, prefix = '', suffix = '', decimals = 2, className = '' }) => {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    const duration = 800;
+    const steps = 40;
+    const increment = value / steps;
+    let current = 0;
+    let step = 0;
+
+    const timer = setInterval(() => {
+      step++;
+      current = Math.min(value, increment * step);
+      setDisplayValue(current);
+      if (step >= steps) clearInterval(timer);
+    }, duration / steps);
+
+    return () => clearInterval(timer);
+  }, [value]);
+
+  return (
+    <span className={className}>
+      {prefix}
+      {displayValue.toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      })}
+      {suffix}
+    </span>
+  );
+};
+
+// Tab types
+type TabType = 'platform' | 'exchange';
 
 const Trades: React.FC = () => {
   const { user } = useAuth();
-  const [trades, setTrades] = useState<TradeDetailResponse[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [status, setStatus] = useState<string | undefined>(undefined);
-  const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
 
-  const loadTrades = useCallback(async (isRefresh = false) => {
-    if (isRefresh) {
-      setRefreshing(true);
-    } else {
-      setLoading(true);
-    }
-    setError(null);
-    
+  // Tab state
+  const [activeTab, setActiveTab] = useState<TabType>('exchange');
+
+  // Platform trades state
+  const [platformTrades, setPlatformTrades] = useState<TradeDetailResponse[]>([]);
+  const [platformLoading, setPlatformLoading] = useState(true);
+
+  // Exchange history state
+  const [exchangeData, setExchangeData] = useState<ExchangeHistoryResponse | null>(null);
+  const [exchangeLoading, setExchangeLoading] = useState(true);
+  const [exchangeError, setExchangeError] = useState<string | null>(null);
+
+  // Common state
+  const [refreshing, setRefreshing] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+
+  // Load platform trades
+  const loadPlatformTrades = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setPlatformLoading(true);
+
     try {
-      const params = status ? { status } : {};
+      const params = statusFilter ? { status: statusFilter } : {};
       const data: TradeListResponse = await tradeService.getTrades(params);
-      setTrades(data.trades || []);
+      setPlatformTrades(data.trades || []);
+      setLastRefresh(new Date());
     } catch (error) {
-      console.error('Failed to load trades:', error);
-      setError('Failed to load trades. Please try again.');
-      setTrades([]);
+      console.error('Failed to load platform trades:', error);
+      setPlatformTrades([]);
     } finally {
-      setLoading(false);
+      setPlatformLoading(false);
       setRefreshing(false);
     }
-  }, [status]);
+  }, [statusFilter]);
 
+  // Load exchange history
+  const loadExchangeHistory = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setExchangeLoading(true);
+    setExchangeError(null);
+
+    try {
+      const data = await tradeService.getExchangeHistory({ limit: 200 });
+      setExchangeData(data);
+      setLastRefresh(new Date());
+    } catch (error: any) {
+      console.error('Failed to load exchange history:', error);
+      const errorMsg = error?.response?.data?.detail || 'Failed to fetch exchange history. Please connect your exchange.';
+      setExchangeError(errorMsg);
+      setExchangeData(null);
+    } finally {
+      setExchangeLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  // Initial load
   useEffect(() => {
     if (user) {
-      loadTrades();
+      if (activeTab === 'platform') {
+        loadPlatformTrades();
+      } else {
+        loadExchangeHistory();
+      }
     }
-  }, [user, loadTrades]);
+  }, [user, activeTab, loadPlatformTrades, loadExchangeHistory]);
 
-  const filteredTrades = (trades || []).filter(trade =>
-    trade.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    trade.id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'open': return 'text-green-400 bg-green-400/10 border-green-400/20';
-      case 'closed': return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
-      case 'cancelled': return 'text-red-400 bg-red-400/10 border-red-400/20';
-      default: return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
+  // Refresh handler
+  const handleRefresh = async () => {
+    if (activeTab === 'platform') {
+      await loadPlatformTrades(true);
+    } else {
+      await loadExchangeHistory(true);
     }
   };
 
-  const getSideColor = (side: 'long' | 'short') => {
-    return side === 'long' 
-      ? 'text-green-400 bg-green-400/10 border-green-400/20' 
-      : 'text-red-400 bg-red-400/10 border-red-400/20';
-  };
+  // Filter platform trades
+  const filteredPlatformTrades = useMemo(() => {
+    return (platformTrades || []).filter(
+      (trade) =>
+        trade.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        trade.id.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [platformTrades, searchTerm]);
 
-  const getPnlColor = (pnl: number) => {
-    return pnl >= 0 ? 'text-green-400' : 'text-red-400';
-  };
+  // Filter exchange trades
+  const filteredExchangeTrades = useMemo(() => {
+    if (!exchangeData?.trades) return [];
+    return exchangeData.trades.filter(
+      (trade) =>
+        trade.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        trade.order_id.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [exchangeData, searchTerm]);
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+  // Calculate stats for platform trades
+  const platformStats = useMemo(() => {
+    const trades = platformTrades || [];
+    const total = trades.length;
+    const open = trades.filter((t) => t.status?.toLowerCase() === 'open').length;
+    const closed = trades.filter((t) => t.status?.toLowerCase() === 'closed').length;
+    const totalPnl = trades.reduce((sum, t) => sum + (t.realized_pnl_usd || 0), 0);
+    const winningTrades = trades.filter((t) => (t.realized_pnl_usd || 0) > 0).length;
+    const winRate = closed > 0 ? (winningTrades / closed) * 100 : 0;
+
+    return { total, open, closed, totalPnl, winRate };
+  }, [platformTrades]);
+
+  // Calculate stats for exchange trades
+  const exchangeStats = useMemo(() => {
+    if (!exchangeData) return { total: 0, totalPnl: 0, totalFees: 0, totalVolume: 0, winRate: 0 };
+
+    const trades = exchangeData.trades || [];
+    const total = trades.length;
+    const totalPnl = exchangeData.summary?.total_pnl || 0;
+    const totalFees = exchangeData.summary?.total_fees || 0;
+    const totalVolume = exchangeData.summary?.total_volume || 0;
+    const winningTrades = trades.filter((t) => t.realized_pnl > 0).length;
+    const closedTrades = trades.filter((t) => t.realized_pnl !== 0).length;
+    const winRate = closedTrades > 0 ? (winningTrades / closedTrades) * 100 : 0;
+
+    return { total, totalPnl, totalFees, totalVolume, winRate };
+  }, [exchangeData]);
+
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     }).format(amount);
-  };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 8
+      maximumFractionDigits: 8,
     }).format(price);
-  };
 
-  const formatQuantity = (quantity: number) => {
-    return new Intl.NumberFormat('en-US', {
+  const formatQuantity = (quantity: number) =>
+    new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 4,
-      maximumFractionDigits: 8
+      maximumFractionDigits: 8,
     }).format(quantity);
-  };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
-  };
 
-  if (loading) {
+  const getPnLColor = (pnl: number) => (pnl >= 0 ? 'text-emerald-400' : 'text-red-400');
+  const getPnLBgColor = (pnl: number) =>
+    pnl >= 0 ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-red-500/10 border-red-500/20';
+
+  const isLoading = activeTab === 'platform' ? platformLoading : exchangeLoading;
+
+  // Loading State
+  if (isLoading && !refreshing) {
     return (
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="flex justify-center items-center min-h-96">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-400">Loading your trades...</p>
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="relative w-20 h-20 mx-auto mb-6">
+            <div className="absolute inset-0 bg-violet-500/20 rounded-full blur-xl animate-pulse" />
+            <div className="relative w-20 h-20 border-4 border-violet-500/30 border-t-violet-400 rounded-full animate-spin" />
           </div>
-        </div>
+          <h3 className="text-xl font-semibold text-white mb-2">Loading Trade History</h3>
+          <p className="text-gray-500">Fetching your trading data...</p>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Trade History</h1>
-          <p className="text-gray-400">Monitor and analyze your trading performance</p>
-        </div>
-        
-        <div className="flex items-center space-x-3">
-          <motion.button
-            onClick={() => loadTrades(true)}
-            disabled={refreshing}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="px-4 py-2 bg-gray-800/50 border border-gray-700/50 text-gray-300 rounded-xl hover:bg-gray-700/50 hover:text-white transition-all duration-200 flex items-center space-x-2 disabled:opacity-50"
-          >
-            {refreshing ? (
-              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            )}
-            <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
-          </motion.button>
+    <div className="min-h-full">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden mb-8">
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-cyan-500/5" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-500/10 rounded-full blur-[100px] -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[80px] translate-y-1/2" />
+
+        {/* Animated Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+
+        <div className="relative px-6 py-10 lg:py-14">
+          <div className="max-w-6xl mx-auto">
+            {/* Header Row */}
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+              <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+                <div className="flex items-center gap-3 mb-3">
+                  <motion.div
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: 'spring', damping: 15 }}
+                    className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500/20 to-purple-600/20 border border-violet-500/30 flex items-center justify-center"
+                  >
+                    <History className="w-6 h-6 text-violet-400" />
+                  </motion.div>
+                  <div>
+                    <h1 className="text-2xl lg:text-3xl font-bold text-white">Trade History</h1>
+                    <p className="text-gray-500 text-sm">Monitor and analyze your trading performance</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Controls */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex flex-wrap items-center gap-3"
+              >
+                {/* Last Updated */}
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 border border-white/5">
+                  <Clock className="w-4 h-4 text-gray-500" />
+                  <span className="text-xs text-gray-400">
+                    {lastRefresh?.toLocaleTimeString() || 'Never'}
+                  </span>
+                </div>
+
+                {/* Refresh Button */}
+                <motion.button
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-500 to-purple-500 rounded-xl text-white font-medium text-sm shadow-lg shadow-violet-500/20 hover:shadow-violet-500/30 transition-all disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+                  Refresh
+                </motion.button>
+              </motion.div>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex gap-2 mb-8">
+              <button
+                onClick={() => setActiveTab('exchange')}
+                className={`flex items-center gap-2 px-5 py-3 rounded-xl font-medium text-sm transition-all ${
+                  activeTab === 'exchange'
+                    ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg shadow-violet-500/20'
+                    : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <Link2 className="w-4 h-4" />
+                Exchange History
+                {exchangeData && (
+                  <span className="px-2 py-0.5 rounded-full bg-white/20 text-xs">
+                    {exchangeData.total_trades}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab('platform')}
+                className={`flex items-center gap-2 px-5 py-3 rounded-xl font-medium text-sm transition-all ${
+                  activeTab === 'platform'
+                    ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/20'
+                    : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <Layers className="w-4 h-4" />
+                Platform Trades
+                <span className="px-2 py-0.5 rounded-full bg-white/20 text-xs">
+                  {platformTrades.length}
+                </span>
+              </button>
+            </div>
+
+            {/* Stats Cards */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-4"
+            >
+              {activeTab === 'exchange' ? (
+                <>
+                  <StatCard
+                    icon={Activity}
+                    iconColor="text-violet-400"
+                    iconBg="from-violet-500/20 to-purple-500/20"
+                    title="Total Trades"
+                    value={exchangeStats.total.toString()}
+                  />
+                  <StatCard
+                    icon={DollarSign}
+                    iconColor={getPnLColor(exchangeStats.totalPnl)}
+                    iconBg={
+                      exchangeStats.totalPnl >= 0
+                        ? 'from-emerald-500/20 to-green-500/20'
+                        : 'from-red-500/20 to-rose-500/20'
+                    }
+                    title="Total P&L"
+                    value={formatCurrency(exchangeStats.totalPnl)}
+                    valueColor={getPnLColor(exchangeStats.totalPnl)}
+                  />
+                  <StatCard
+                    icon={Wallet}
+                    iconColor="text-amber-400"
+                    iconBg="from-amber-500/20 to-orange-500/20"
+                    title="Total Volume"
+                    value={formatCurrency(exchangeStats.totalVolume)}
+                  />
+                  <StatCard
+                    icon={Award}
+                    iconColor="text-cyan-400"
+                    iconBg="from-cyan-500/20 to-blue-500/20"
+                    title="Win Rate"
+                    value={`${exchangeStats.winRate.toFixed(1)}%`}
+                  />
+                </>
+              ) : (
+                <>
+                  <StatCard
+                    icon={Activity}
+                    iconColor="text-cyan-400"
+                    iconBg="from-cyan-500/20 to-blue-500/20"
+                    title="Total Trades"
+                    value={platformStats.total.toString()}
+                  />
+                  <StatCard
+                    icon={Target}
+                    iconColor="text-emerald-400"
+                    iconBg="from-emerald-500/20 to-green-500/20"
+                    title="Open"
+                    value={platformStats.open.toString()}
+                  />
+                  <StatCard
+                    icon={DollarSign}
+                    iconColor={getPnLColor(platformStats.totalPnl)}
+                    iconBg={
+                      platformStats.totalPnl >= 0
+                        ? 'from-emerald-500/20 to-green-500/20'
+                        : 'from-red-500/20 to-rose-500/20'
+                    }
+                    title="Total P&L"
+                    value={formatCurrency(platformStats.totalPnl)}
+                    valueColor={getPnLColor(platformStats.totalPnl)}
+                  />
+                  <StatCard
+                    icon={Award}
+                    iconColor="text-amber-400"
+                    iconBg="from-amber-500/20 to-orange-500/20"
+                    title="Win Rate"
+                    value={`${platformStats.winRate.toFixed(1)}%`}
+                  />
+                </>
+              )}
+            </motion.div>
+          </div>
         </div>
       </div>
 
-      {/* Filters and Search */}
-      <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-6 backdrop-blur-sm">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Search Trades
-            </label>
-            <div className="relative">
+      {/* Main Content */}
+      <div className="px-6 pb-10">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Search and Filters */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex flex-col md:flex-row gap-4"
+          >
+            {/* Search */}
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search by symbol or trade ID..."
-                className="w-full pl-10 pr-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all duration-200"
+                placeholder="Search by symbol or order ID..."
+                className="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-900/50 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all"
               />
-              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
             </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Filter by Status
-            </label>
-            <select
-              value={status || ''}
-              onChange={(e) => setStatus(e.target.value || undefined)}
-              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all duration-200"
-            >
-              <option value="">All Statuses</option>
-              <option value="open">Open</option>
-              <option value="closed">Closed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-        </div>
-      </div>
+            {/* Status Filter (Platform trades only) */}
+            {activeTab === 'platform' && (
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-4 py-3 rounded-xl bg-gray-900/50 border border-white/10 text-white focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all"
+              >
+                <option value="">All Status</option>
+                <option value="open">Open</option>
+                <option value="closed">Closed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            )}
 
-      {/* Error Message */}
-      <AnimatePresence>
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 flex items-center justify-between"
-          >
-            <div className="flex items-center space-x-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{error}</span>
-            </div>
-            <button onClick={() => setError(null)} className="text-red-400 hover:text-red-300">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            {/* Exchange info badge */}
+            {activeTab === 'exchange' && exchangeData && (
+              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-violet-500/10 border border-violet-500/20">
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    exchangeData.is_testnet ? 'bg-amber-400' : 'bg-emerald-400'
+                  }`}
+                />
+                <span className="text-sm text-violet-400 capitalize">{exchangeData.exchange}</span>
+                {exchangeData.is_testnet && (
+                  <span className="text-xs text-amber-400">(Testnet)</span>
+                )}
+              </div>
+            )}
           </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* Stats Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 text-center">
-          <div className="text-2xl font-bold text-white mb-1">{(trades || []).length}</div>
-          <div className="text-gray-400 text-sm">Total Trades</div>
-        </div>
-        <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 text-center">
-          <div className="text-2xl font-bold text-green-400 mb-1">
-            {(trades || []).filter(t => t.status.toLowerCase() === 'open').length}
-          </div>
-          <div className="text-gray-400 text-sm">Open Trades</div>
-        </div>
-        <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 text-center">
-          <div className="text-2xl font-bold text-blue-400 mb-1">
-            {(trades || []).filter(t => t.status.toLowerCase() === 'closed').length}
-          </div>
-          <div className="text-gray-400 text-sm">Closed Trades</div>
-        </div>
-        <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 text-center">
-          <div className="text-2xl font-bold text-yellow-400 mb-1">
-            {formatCurrency((trades || []).reduce((sum, trade) => sum + (trade.realized_pnl_usd || 0), 0))}
-          </div>
-          <div className="text-gray-400 text-sm">Total P&L</div>
+          {/* Error State for Exchange */}
+          {activeTab === 'exchange' && exchangeError && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-6 rounded-2xl bg-red-500/10 border border-red-500/20 text-center"
+            >
+              <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-white mb-2">Unable to Fetch Exchange History</h3>
+              <p className="text-red-400/80 mb-4">{exchangeError}</p>
+              <motion.button
+                onClick={() => loadExchangeHistory(true)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-6 py-2 bg-red-500/20 border border-red-500/30 rounded-xl text-red-400 hover:bg-red-500/30 transition-all"
+              >
+                Retry
+              </motion.button>
+            </motion.div>
+          )}
+
+          {/* Trades List */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="rounded-2xl bg-gray-900/50 backdrop-blur-xl border border-white/5 overflow-hidden"
+          >
+            <div className="p-5 border-b border-white/5">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-violet-400" />
+                  {activeTab === 'exchange' ? 'Exchange Fills' : 'Platform Trades'}
+                </h3>
+                <span className="text-sm text-gray-500">
+                  {activeTab === 'exchange'
+                    ? `${filteredExchangeTrades.length} trades`
+                    : `${filteredPlatformTrades.length} trades`}
+                </span>
+              </div>
+            </div>
+
+            {/* Content based on active tab */}
+            {activeTab === 'exchange' ? (
+              <ExchangeTradesList
+                trades={filteredExchangeTrades}
+                formatCurrency={formatCurrency}
+                formatPrice={formatPrice}
+                formatQuantity={formatQuantity}
+                formatDate={formatDate}
+                getPnLColor={getPnLColor}
+              />
+            ) : (
+              <PlatformTradesList
+                trades={filteredPlatformTrades}
+                formatCurrency={formatCurrency}
+                formatPrice={formatPrice}
+                formatQuantity={formatQuantity}
+                formatDate={formatDate}
+                getPnLColor={getPnLColor}
+              />
+            )}
+          </motion.div>
         </div>
       </div>
+    </div>
+  );
+};
 
-      {/* Trades Table */}
-      <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl backdrop-blur-sm overflow-hidden">
-        <div className="p-6 border-b border-gray-700/50">
-          <h2 className="text-xl font-semibold text-white flex items-center">
-            <svg className="w-6 h-6 mr-2 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            Trade History ({filteredTrades.length})
-          </h2>
-        </div>
+// Stat Card Component
+interface StatCardProps {
+  icon: React.ElementType;
+  iconColor: string;
+  iconBg: string;
+  title: string;
+  value: string;
+  valueColor?: string;
+}
 
-        {filteredTrades.length === 0 ? (
-          <div className="text-center py-12 text-gray-400">
-            <svg className="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <p className="text-lg mb-2">No trades found</p>
-            <p className="text-sm">Your trades will appear here once you start trading</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-700/50">
-                  <th className="text-left py-4 px-6 text-gray-400 font-semibold text-sm">Symbol</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-semibold text-sm">Side</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-semibold text-sm">Status</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-semibold text-sm">Quantity</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-semibold text-sm">Entry Price</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-semibold text-sm">P&L</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-semibold text-sm">Created</th>
-                </tr>
-              </thead>
-              <tbody>
-                <AnimatePresence>
-                  {filteredTrades.map((trade, index) => (
-                    <motion.tr
-                      key={trade.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="border-b border-gray-700/30 hover:bg-gray-700/20 transition-colors duration-150"
-                    >
-                      <td className="py-4 px-6">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                            <span className="text-white text-xs font-bold">
-                              {trade.symbol.substring(0, 2)}
-                            </span>
-                          </div>
-                          <div>
-                            <div className="text-white font-semibold">{trade.symbol}</div>
-                            <div className="text-gray-400 text-xs">{trade.id.slice(0, 8)}...</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getSideColor(trade.side)}`}>
-                          {trade.side.toUpperCase()}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(trade.status)}`}>
-                          {trade.status.toUpperCase()}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6 text-white font-medium">
-                        {trade.quantity ? formatQuantity(trade.quantity) : 'N/A'}
-                      </td>
-                      <td className="py-4 px-6 text-white">
-                        {trade.entry_price ? formatPrice(trade.entry_price) : 'N/A'}
-                      </td>
-                      <td className="py-4 px-6">
-                        <span className={`font-bold ${getPnlColor(trade.realized_pnl_usd || 0)}`}>
-                          {formatCurrency(trade.realized_pnl_usd || 0)}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6 text-gray-400 text-sm">
-                        {formatDate(trade.created_at)}
-                      </td>
-                    </motion.tr>
-                  ))}
-                </AnimatePresence>
-              </tbody>
-            </table>
-          </div>
-        )}
+const StatCard: React.FC<StatCardProps> = ({
+  icon: Icon,
+  iconColor,
+  iconBg,
+  title,
+  value,
+  valueColor = 'text-white',
+}) => (
+  <motion.div
+    whileHover={{ y: -2 }}
+    className="p-4 rounded-2xl bg-gray-900/50 backdrop-blur-xl border border-white/5 hover:border-white/10 transition-all"
+  >
+    <div className="flex items-center gap-3">
+      <div
+        className={`w-10 h-10 rounded-xl bg-gradient-to-br ${iconBg} flex items-center justify-center`}
+      >
+        <Icon className={`w-5 h-5 ${iconColor}`} />
       </div>
+      <div>
+        <p className="text-xs text-gray-500">{title}</p>
+        <p className={`text-lg font-bold ${valueColor}`}>{value}</p>
+      </div>
+    </div>
+  </motion.div>
+);
+
+// Exchange Trades List Component
+interface ExchangeTradesListProps {
+  trades: ExchangeTrade[];
+  formatCurrency: (amount: number) => string;
+  formatPrice: (price: number) => string;
+  formatQuantity: (qty: number) => string;
+  formatDate: (date: string) => string;
+  getPnLColor: (pnl: number) => string;
+}
+
+const ExchangeTradesList: React.FC<ExchangeTradesListProps> = ({
+  trades,
+  formatCurrency,
+  formatPrice,
+  formatQuantity,
+  formatDate,
+  getPnLColor,
+}) => {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  if (trades.length === 0) {
+    return (
+      <div className="text-center py-16">
+        <History className="w-16 h-16 text-gray-700 mx-auto mb-4" />
+        <h4 className="text-lg font-medium text-white mb-2">No Exchange Trades Found</h4>
+        <p className="text-gray-500 text-sm">
+          Your exchange trade history will appear here once you make trades.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="divide-y divide-white/5">
+      {trades.map((trade, index) => (
+        <motion.div
+          key={trade.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.02 }}
+          className="p-4 hover:bg-white/5 transition-colors cursor-pointer"
+          onClick={() => setExpandedId(expandedId === trade.id ? null : trade.id)}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {/* Side indicator */}
+              <div
+                className={`p-2 rounded-lg ${
+                  trade.side === 'BUY'
+                    ? 'bg-emerald-500/20 border border-emerald-500/30'
+                    : 'bg-red-500/20 border border-red-500/30'
+                }`}
+              >
+                {trade.side === 'BUY' ? (
+                  <ArrowUpRight className="w-4 h-4 text-emerald-400" />
+                ) : (
+                  <ArrowDownRight className="w-4 h-4 text-red-400" />
+                )}
+              </div>
+
+              {/* Trade info */}
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-white">{trade.symbol}</span>
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full ${
+                      trade.side === 'BUY'
+                        ? 'bg-emerald-500/20 text-emerald-400'
+                        : 'bg-red-500/20 text-red-400'
+                    }`}
+                  >
+                    {trade.side}
+                  </span>
+                  {trade.is_maker && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400">
+                      Maker
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
+                  <span>{formatQuantity(trade.quantity)} @ {formatPrice(trade.price)}</span>
+                  <span>•</span>
+                  <span>{formatDate(trade.time)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* P&L */}
+            <div className="text-right">
+              <p className={`font-semibold ${getPnLColor(trade.realized_pnl)}`}>
+                {trade.realized_pnl >= 0 ? '+' : ''}
+                {formatCurrency(trade.realized_pnl)}
+              </p>
+              <p className="text-xs text-gray-500">
+                Vol: {formatCurrency(trade.quote_quantity)}
+              </p>
+            </div>
+          </div>
+
+          {/* Expanded details */}
+          <AnimatePresence>
+            {expandedId === trade.id && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="pt-4 mt-4 border-t border-white/5 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-500 text-xs">Order ID</p>
+                    <p className="text-white font-mono text-xs">{trade.order_id}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500 text-xs">Commission</p>
+                    <p className="text-amber-400">
+                      {formatPrice(trade.commission)} {trade.commission_asset}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500 text-xs">Position Side</p>
+                    <p className="text-white">{trade.position_side || 'BOTH'}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500 text-xs">Exchange</p>
+                    <p className="text-violet-400 capitalize">{trade.exchange}</p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
+// Platform Trades List Component
+interface PlatformTradesListProps {
+  trades: TradeDetailResponse[];
+  formatCurrency: (amount: number) => string;
+  formatPrice: (price: number) => string;
+  formatQuantity: (qty: number) => string;
+  formatDate: (date: string) => string;
+  getPnLColor: (pnl: number) => string;
+}
+
+const PlatformTradesList: React.FC<PlatformTradesListProps> = ({
+  trades,
+  formatCurrency,
+  formatPrice,
+  formatQuantity,
+  formatDate,
+  getPnLColor,
+}) => {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const getStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'open':
+        return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+      case 'closed':
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+      case 'cancelled':
+        return 'bg-red-500/20 text-red-400 border-red-500/30';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+    }
+  };
+
+  if (trades.length === 0) {
+    return (
+      <div className="text-center py-16">
+        <Layers className="w-16 h-16 text-gray-700 mx-auto mb-4" />
+        <h4 className="text-lg font-medium text-white mb-2">No Platform Trades Found</h4>
+        <p className="text-gray-500 text-sm">
+          Trades executed through our AI signals will appear here.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="divide-y divide-white/5">
+      {trades.map((trade, index) => (
+        <motion.div
+          key={trade.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.02 }}
+          className="p-4 hover:bg-white/5 transition-colors cursor-pointer"
+          onClick={() => setExpandedId(expandedId === trade.id ? null : trade.id)}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {/* Side indicator */}
+              <div
+                className={`p-2 rounded-lg ${
+                  trade.side === 'long'
+                    ? 'bg-emerald-500/20 border border-emerald-500/30'
+                    : 'bg-red-500/20 border border-red-500/30'
+                }`}
+              >
+                {trade.side === 'long' ? (
+                  <ArrowUpRight className="w-4 h-4 text-emerald-400" />
+                ) : (
+                  <ArrowDownRight className="w-4 h-4 text-red-400" />
+                )}
+              </div>
+
+              {/* Trade info */}
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-white">{trade.symbol}</span>
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full ${
+                      trade.side === 'long'
+                        ? 'bg-emerald-500/20 text-emerald-400'
+                        : 'bg-red-500/20 text-red-400'
+                    }`}
+                  >
+                    {trade.side.toUpperCase()}
+                  </span>
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full border ${getStatusColor(
+                      trade.status
+                    )}`}
+                  >
+                    {trade.status?.toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
+                  <span>
+                    {trade.quantity ? formatQuantity(trade.quantity) : 'N/A'} @{' '}
+                    {trade.entry_price ? formatPrice(trade.entry_price) : 'N/A'}
+                  </span>
+                  <span>•</span>
+                  <span>{formatDate(trade.created_at)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* P&L */}
+            <div className="text-right">
+              <p className={`font-semibold ${getPnLColor(trade.realized_pnl_usd || 0)}`}>
+                {(trade.realized_pnl_usd || 0) >= 0 ? '+' : ''}
+                {formatCurrency(trade.realized_pnl_usd || 0)}
+              </p>
+              {trade.realized_pnl_percent !== undefined && (
+                <p
+                  className={`text-xs ${getPnLColor(trade.realized_pnl_percent)}`}
+                >
+                  {trade.realized_pnl_percent >= 0 ? '+' : ''}
+                  {trade.realized_pnl_percent.toFixed(2)}%
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Expanded details */}
+          <AnimatePresence>
+            {expandedId === trade.id && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="pt-4 mt-4 border-t border-white/5 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-500 text-xs">Leverage</p>
+                    <p className="text-cyan-400">{trade.leverage}x</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500 text-xs">Take Profit</p>
+                    <p className="text-emerald-400">
+                      {trade.take_profit_price ? formatPrice(trade.take_profit_price) : 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500 text-xs">Stop Loss</p>
+                    <p className="text-red-400">
+                      {trade.stop_loss_price ? formatPrice(trade.stop_loss_price) : 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500 text-xs">Exit Reason</p>
+                    <p className="text-white">{trade.exit_reason || 'N/A'}</p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      ))}
     </div>
   );
 };

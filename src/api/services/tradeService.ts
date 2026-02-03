@@ -1,14 +1,17 @@
 // src/api/services/tradeService.ts
 import axiosInstance from '../axiosConfig';
 import { API_ENDPOINTS } from '../endpoints';
-import type { 
-  TradeListResponse, 
-  TradeDetailResponse, 
-  CreateTradeRequest, 
-  UpdateTradeRequest 
+import type {
+  TradeListResponse,
+  TradeDetailResponse,
+  CreateTradeRequest,
+  UpdateTradeRequest,
+  ExchangeHistoryResponse,
+  ExchangeOpenOrdersResponse
 } from '../../types/trades.types';
 
 export const tradeService = {
+  // Platform trades
   getTrades: async (params?: {
     status?: string;
     symbol?: string;
@@ -39,5 +42,29 @@ export const tradeService = {
   deleteTrade: async (id: string): Promise<void> => {
     const url = API_ENDPOINTS.TRADES.DELETE.replace('{id}', id);
     await axiosInstance.delete(url);
+  },
+
+  // Exchange history - fetches directly from connected exchange
+  getExchangeHistory: async (params?: {
+    symbol?: string;
+    limit?: number;
+  }): Promise<ExchangeHistoryResponse> => {
+    const response = await axiosInstance.get(API_ENDPOINTS.TRADES.EXCHANGE_HISTORY, { params });
+    return response.data;
+  },
+
+  getExchangeOpenOrders: async (params?: {
+    symbol?: string;
+  }): Promise<ExchangeOpenOrdersResponse> => {
+    const response = await axiosInstance.get(API_ENDPOINTS.TRADES.EXCHANGE_ORDERS, { params });
+    return response.data;
+  },
+
+  // Get trade stats
+  getTradeStats: async (timeframe?: string): Promise<any> => {
+    const response = await axiosInstance.get(API_ENDPOINTS.TRADES.STATS, {
+      params: { timeframe: timeframe || 'all' }
+    });
+    return response.data;
   },
 };
