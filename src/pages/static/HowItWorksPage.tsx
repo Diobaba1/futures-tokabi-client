@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { MessageSquare, Cpu, FileText, Target, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
+import { MessageSquare, Cpu, FileText, Target, CheckCircle2, ArrowRight } from 'lucide-react';
 
 // Glassmorphism Card Component
 interface GlassCardProps {

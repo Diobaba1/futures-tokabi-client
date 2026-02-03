@@ -3,7 +3,7 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Target, Shield, BarChart3, Zap, Users, Brain, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Target, Shield, BarChart3, Zap, Users, Brain, ArrowRight } from 'lucide-react';
 
 // Glassmorphism Card Component
 interface GlassCardProps {

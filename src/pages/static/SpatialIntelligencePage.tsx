@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { BarChart3, Flame, TrendingUp, Layers, Clock, Shield, Lightbulb, ArrowRight, Sparkles } from 'lucide-react';
+import { BarChart3, Flame, TrendingUp, Clock, Shield, Lightbulb, ArrowRight, Sparkles } from 'lucide-react';
 
 // Glassmorphism Card Component
 interface GlassCardProps {
