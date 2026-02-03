@@ -1,6 +1,6 @@
 // src/pages/trading/TradingConfigPage.tsx
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Settings,
   TrendingUp,
@@ -13,13 +13,344 @@ import {
   AlertCircle,
   CheckCircle,
   Info,
-  ChevronDown,
-  ChevronUp,
+  HelpCircle,
+  Target,
+  Scale,
+  Gauge,
+  Layers,
+  Activity,
 } from 'lucide-react';
 import tradingConfigService, {
   TradingConfig,
   TradingConfigUpdate,
 } from '../../api/services/tradingConfigService';
+
+// Tooltip Component
+const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => {
+  const [show, setShow] = useState(false);
+
+  return (
+    <div className="relative inline-flex items-center">
+      <div
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+        className="cursor-help"
+      >
+        {children}
+      </div>
+      <AnimatePresence>
+        {show && (
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 5 }}
+            className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg shadow-xl text-sm text-gray-300 whitespace-nowrap max-w-xs"
+          >
+            {text}
+            <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1">
+              <div className="border-8 border-transparent border-t-gray-900"></div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// Slider Input Component
+interface SliderInputProps {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  min: number;
+  max: number;
+  step?: number;
+  unit?: string;
+  tooltip?: string;
+  recommended?: { min: number; max: number };
+  color?: 'cyan' | 'green' | 'yellow' | 'red';
+}
+
+const SliderInput: React.FC<SliderInputProps> = ({
+  label,
+  value,
+  onChange,
+  min,
+  max,
+  step = 1,
+  unit = '',
+  tooltip,
+  recommended,
+  color = 'cyan',
+}) => {
+  const percentage = ((value - min) / (max - min)) * 100;
+
+  const colorClasses = {
+    cyan: 'from-cyan-500 to-cyan-400',
+    green: 'from-green-500 to-green-400',
+    yellow: 'from-yellow-500 to-yellow-400',
+    red: 'from-red-500 to-red-400',
+  };
+
+  const isInRecommendedRange = recommended
+    ? value >= recommended.min && value <= recommended.max
+    : true;
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-gray-300 text-sm font-medium">{label}</span>
+          {tooltip && (
+            <Tooltip text={tooltip}>
+              <HelpCircle size={14} className="text-gray-500 hover:text-gray-400" />
+            </Tooltip>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            value={value}
+            onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+            min={min}
+            max={max}
+            step={step}
+            className="w-20 bg-gray-800/50 border border-gray-600 rounded-lg px-2 py-1 text-white text-right text-sm focus:border-cyan-500 focus:outline-none"
+          />
+          {unit && <span className="text-gray-400 text-sm min-w-[30px]">{unit}</span>}
+        </div>
+      </div>
+      <div className="relative">
+        <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+          <motion.div
+            className={`h-full bg-gradient-to-r ${colorClasses[color]} rounded-full`}
+            initial={false}
+            animate={{ width: `${percentage}%` }}
+            transition={{ duration: 0.2 }}
+          />
+        </div>
+        <input
+          type="range"
+          value={value}
+          onChange={(e) => onChange(parseFloat(e.target.value))}
+          min={min}
+          max={max}
+          step={step}
+          className="absolute inset-0 w-full h-2 opacity-0 cursor-pointer"
+        />
+      </div>
+      {recommended && (
+        <div className="flex items-center gap-1 text-xs">
+          <span className={isInRecommendedRange ? 'text-green-400' : 'text-yellow-400'}>
+            {isInRecommendedRange ? '✓' : '⚠'}
+          </span>
+          <span className="text-gray-500">
+            Recommended: {recommended.min}{unit} - {recommended.max}{unit}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Toggle Switch Component
+interface ToggleSwitchProps {
+  enabled: boolean;
+  onChange: (enabled: boolean) => void;
+  label: string;
+  description?: string;
+  icon?: React.ReactNode;
+}
+
+const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
+  enabled,
+  onChange,
+  label,
+  description,
+  icon,
+}) => (
+  <div
+    className={`flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer ${
+      enabled
+        ? 'bg-cyan-500/10 border-cyan-500/30'
+        : 'bg-gray-800/30 border-gray-700/50 hover:border-gray-600'
+    }`}
+    onClick={() => onChange(!enabled)}
+  >
+    <div className="flex items-center gap-3">
+      {icon && (
+        <div className={`p-2 rounded-lg ${enabled ? 'bg-cyan-500/20 text-cyan-400' : 'bg-gray-700/50 text-gray-400'}`}>
+          {icon}
+        </div>
+      )}
+      <div>
+        <p className={`font-medium ${enabled ? 'text-white' : 'text-gray-300'}`}>{label}</p>
+        {description && <p className="text-gray-500 text-sm">{description}</p>}
+      </div>
+    </div>
+    <div className="flex items-center gap-3">
+      <span className={`text-sm font-medium ${enabled ? 'text-cyan-400' : 'text-gray-500'}`}>
+        {enabled ? 'ON' : 'OFF'}
+      </span>
+      <div className={`relative w-12 h-6 rounded-full transition-colors ${enabled ? 'bg-cyan-500' : 'bg-gray-600'}`}>
+        <motion.div
+          className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-md"
+          initial={false}
+          animate={{ left: enabled ? '28px' : '4px' }}
+          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+        />
+      </div>
+    </div>
+  </div>
+);
+
+// Risk Meter Component
+const RiskMeter: React.FC<{ riskLevel: number }> = ({ riskLevel }) => {
+  const getRiskInfo = (level: number) => {
+    if (level <= 30) return { label: 'Conservative', color: 'text-green-400', bg: 'bg-green-500' };
+    if (level <= 60) return { label: 'Moderate', color: 'text-yellow-400', bg: 'bg-yellow-500' };
+    return { label: 'Aggressive', color: 'text-red-400', bg: 'bg-red-500' };
+  };
+
+  const riskInfo = getRiskInfo(riskLevel);
+
+  return (
+    <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Gauge className="text-cyan-400" size={20} />
+          <span className="text-white font-medium">Risk Profile</span>
+        </div>
+        <span className={`text-sm font-bold ${riskInfo.color}`}>{riskInfo.label}</span>
+      </div>
+      <div className="relative h-3 bg-gray-700 rounded-full overflow-hidden">
+        <div className="absolute inset-0 flex">
+          <div className="w-1/3 bg-gradient-to-r from-green-600 to-green-500 opacity-30" />
+          <div className="w-1/3 bg-gradient-to-r from-yellow-600 to-yellow-500 opacity-30" />
+          <div className="w-1/3 bg-gradient-to-r from-red-600 to-red-500 opacity-30" />
+        </div>
+        <motion.div
+          className={`absolute top-0 left-0 h-full ${riskInfo.bg} rounded-full`}
+          initial={false}
+          animate={{ width: `${riskLevel}%` }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+        />
+      </div>
+      <div className="flex justify-between mt-2 text-xs text-gray-500">
+        <span>Low Risk</span>
+        <span>High Risk</span>
+      </div>
+    </div>
+  );
+};
+
+// Preset Button Component
+interface PresetButtonProps {
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  onClick: () => void;
+  isActive?: boolean;
+}
+
+const PresetButton: React.FC<PresetButtonProps> = ({
+  label,
+  description,
+  icon,
+  color,
+  onClick,
+  isActive,
+}) => (
+  <motion.button
+    onClick={onClick}
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    className={`flex-1 p-4 rounded-xl border transition-all text-left ${
+      isActive
+        ? `bg-${color}-500/20 border-${color}-500/50`
+        : 'bg-gray-800/30 border-gray-700/50 hover:border-gray-600'
+    }`}
+  >
+    <div className={`inline-flex p-2 rounded-lg mb-2 ${isActive ? `bg-${color}-500/20` : 'bg-gray-700/50'}`}>
+      <span className={isActive ? `text-${color}-400` : 'text-gray-400'}>{icon}</span>
+    </div>
+    <p className={`font-medium ${isActive ? 'text-white' : 'text-gray-300'}`}>{label}</p>
+    <p className="text-gray-500 text-xs mt-1">{description}</p>
+  </motion.button>
+);
+
+// Stat Card Component
+interface StatCardProps {
+  label: string;
+  value: string | number;
+  icon: React.ReactNode;
+  trend?: 'up' | 'down' | 'neutral';
+  color?: string;
+}
+
+const StatCard: React.FC<StatCardProps> = ({ label, value, icon, trend, color = 'cyan' }) => {
+  const trendColors = {
+    up: 'text-green-400',
+    down: 'text-red-400',
+    neutral: 'text-gray-400',
+  };
+
+  return (
+    <motion.div
+      whileHover={{ y: -2 }}
+      className="bg-gradient-to-br from-gray-800/80 to-gray-800/40 border border-gray-700/50 rounded-2xl p-5 backdrop-blur-sm"
+    >
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-gray-400 text-sm mb-1">{label}</p>
+          <p className={`text-2xl font-bold ${trend ? trendColors[trend] : `text-${color}-400`}`}>
+            {value}
+          </p>
+        </div>
+        <div className={`p-3 rounded-xl bg-${color}-500/10`}>
+          <span className={`text-${color}-400`}>{icon}</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// Section Card Component
+interface SectionCardProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  color?: string;
+}
+
+const SectionCard: React.FC<SectionCardProps> = ({
+  title,
+  description,
+  icon,
+  children,
+  color = 'cyan',
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/50 rounded-2xl overflow-hidden backdrop-blur-sm"
+  >
+    <div className={`px-6 py-4 border-b border-gray-700/50 bg-gradient-to-r from-${color}-500/5 to-transparent`}>
+      <div className="flex items-center gap-3">
+        <div className={`p-2 rounded-xl bg-${color}-500/10`}>
+          <span className={`text-${color}-400`}>{icon}</span>
+        </div>
+        <div>
+          <h3 className="text-white font-semibold">{title}</h3>
+          <p className="text-gray-500 text-sm">{description}</p>
+        </div>
+      </div>
+    </div>
+    <div className="p-6">{children}</div>
+  </motion.div>
+);
 
 const TradingConfigPage: React.FC = () => {
   const [config, setConfig] = useState<TradingConfig | null>(null);
@@ -27,7 +358,6 @@ const TradingConfigPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
-  const [expandedSection, setExpandedSection] = useState<string | null>('position');
 
   // Form state
   const [formData, setFormData] = useState<TradingConfigUpdate>({});
@@ -74,17 +404,18 @@ const TradingConfigPage: React.FC = () => {
         trailing_stop_percent: data.trailing_stop_percent,
         trailing_activation_percent: data.trailing_activation_percent,
       });
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to load trading configuration');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { detail?: string } } };
+      setError(error.response?.data?.detail || 'Failed to load trading configuration');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleInputChange = (field: keyof TradingConfigUpdate, value: number | boolean) => {
+  const handleInputChange = useCallback((field: keyof TradingConfigUpdate, value: number | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setHasChanges(true);
-  };
+  }, []);
 
   const handleSave = async () => {
     try {
@@ -94,8 +425,9 @@ const TradingConfigPage: React.FC = () => {
       setConfig(updated);
       setSuccess('Trading configuration saved successfully!');
       setHasChanges(false);
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to save configuration');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { detail?: string } } };
+      setError(error.response?.data?.detail || 'Failed to save configuration');
     } finally {
       setSaving(false);
     }
@@ -129,8 +461,9 @@ const TradingConfigPage: React.FC = () => {
       });
       setSuccess('Configuration reset to defaults');
       setHasChanges(false);
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to reset configuration');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { detail?: string } } };
+      setError(error.response?.data?.detail || 'Failed to reset configuration');
     } finally {
       setSaving(false);
     }
@@ -148,472 +481,582 @@ const TradingConfigPage: React.FC = () => {
         setConfig(data);
         setSuccess('Trading paused');
       }
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to toggle trading');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { detail?: string } } };
+      setError(error.response?.data?.detail || 'Failed to toggle trading');
     } finally {
       setSaving(false);
     }
   };
 
-  const toggleSection = (section: string) => {
-    setExpandedSection(expandedSection === section ? null : section);
+  // Apply preset configurations
+  const applyPreset = (preset: 'conservative' | 'moderate' | 'aggressive') => {
+    const presets = {
+      conservative: {
+        max_position_per_signal_percent: 2,
+        max_total_exposure_percent: 10,
+        risk_per_trade_percent: 1,
+        max_leverage: 5,
+        daily_loss_limit_percent: 3,
+        weekly_loss_limit_percent: 10,
+        max_concurrent_positions: 3,
+        max_trades_per_day: 5,
+      },
+      moderate: {
+        max_position_per_signal_percent: 5,
+        max_total_exposure_percent: 25,
+        risk_per_trade_percent: 2,
+        max_leverage: 10,
+        daily_loss_limit_percent: 5,
+        weekly_loss_limit_percent: 15,
+        max_concurrent_positions: 5,
+        max_trades_per_day: 10,
+      },
+      aggressive: {
+        max_position_per_signal_percent: 10,
+        max_total_exposure_percent: 50,
+        risk_per_trade_percent: 5,
+        max_leverage: 20,
+        daily_loss_limit_percent: 10,
+        weekly_loss_limit_percent: 25,
+        max_concurrent_positions: 10,
+        max_trades_per_day: 20,
+      },
+    };
+
+    setFormData(prev => ({ ...prev, ...presets[preset] }));
+    setHasChanges(true);
+  };
+
+  // Calculate risk level based on settings
+  const calculateRiskLevel = (): number => {
+    const leverage = formData.max_leverage || 1;
+    const exposure = formData.max_total_exposure_percent || 0;
+    const riskPerTrade = formData.risk_per_trade_percent || 0;
+
+    const leverageScore = Math.min((leverage / 20) * 40, 40);
+    const exposureScore = Math.min((exposure / 50) * 30, 30);
+    const riskScore = Math.min((riskPerTrade / 5) * 30, 30);
+
+    return Math.round(leverageScore + exposureScore + riskScore);
+  };
+
+  // Detect current preset
+  const getCurrentPreset = (): 'conservative' | 'moderate' | 'aggressive' | null => {
+    const level = calculateRiskLevel();
+    if (level <= 30) return 'conservative';
+    if (level <= 60) return 'moderate';
+    if (level > 60) return 'aggressive';
+    return null;
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-700 border-t-cyan-500"></div>
+            <Settings className="absolute inset-0 m-auto text-cyan-400" size={24} />
+          </div>
+          <p className="text-gray-400">Loading configuration...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-28">
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
+      <div className="mb-8">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-              <Settings className="text-cyan-400" size={28} />
+            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20">
+                <Settings className="text-cyan-400" size={28} />
+              </div>
               Trading Configuration
             </h1>
-            <p className="text-gray-400 mt-1">
-              Customize your trading parameters, risk management, and auto-copy settings
+            <p className="text-gray-400 mt-2 max-w-xl">
+              Customize your trading parameters, risk management, and automation settings for optimal performance.
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            {/* Trading Status */}
-            <button
-              onClick={handleToggleTrading}
-              disabled={saving}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${
-                config?.trading_paused
-                  ? 'bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30'
-                  : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/30'
-              }`}
-            >
-              {config?.trading_paused ? <Play size={18} /> : <Pause size={18} />}
-              {config?.trading_paused ? 'Resume Trading' : 'Pause Trading'}
-            </button>
-          </div>
+          <motion.button
+            onClick={handleToggleTrading}
+            disabled={saving}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={`flex items-center gap-3 px-6 py-3 rounded-xl font-medium transition-all shadow-lg ${
+              config?.trading_paused
+                ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600'
+                : 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:from-yellow-600 hover:to-orange-600'
+            }`}
+          >
+            {config?.trading_paused ? <Play size={20} /> : <Pause size={20} />}
+            {config?.trading_paused ? 'Resume Trading' : 'Pause Trading'}
+          </motion.button>
         </div>
 
-        {/* Status Banner */}
-        {config?.trading_paused && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl flex items-center gap-3"
-          >
-            <AlertCircle className="text-yellow-400" size={20} />
-            <div>
-              <p className="text-yellow-400 font-medium">Trading is currently paused</p>
-              {config.pause_reason && (
-                <p className="text-gray-400 text-sm">Reason: {config.pause_reason}</p>
-              )}
-            </div>
-          </motion.div>
-        )}
+        {/* Paused Banner */}
+        <AnimatePresence>
+          {config?.trading_paused && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-4 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-xl flex items-center gap-3"
+            >
+              <AlertCircle className="text-yellow-400 flex-shrink-0" size={24} />
+              <div>
+                <p className="text-yellow-400 font-semibold">Trading is currently paused</p>
+                {config.pause_reason && (
+                  <p className="text-gray-400 text-sm">Reason: {config.pause_reason}</p>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Alerts */}
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center gap-3"
-        >
-          <AlertCircle className="text-red-400" size={20} />
-          <p className="text-red-400">{error}</p>
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center gap-3"
+          >
+            <AlertCircle className="text-red-400 flex-shrink-0" size={20} />
+            <p className="text-red-400">{error}</p>
+          </motion.div>
+        )}
+        {success && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-xl flex items-center gap-3"
+          >
+            <CheckCircle className="text-green-400 flex-shrink-0" size={20} />
+            <p className="text-green-400">{success}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {success && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-4 p-4 bg-green-500/10 border border-green-500/30 rounded-xl flex items-center gap-3"
-        >
-          <CheckCircle className="text-green-400" size={20} />
-          <p className="text-green-400">{success}</p>
-        </motion.div>
-      )}
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatCard
+          label="Daily P&L"
+          value={`$${config?.daily_pnl_usd?.toFixed(2) || '0.00'}`}
+          icon={<TrendingUp size={20} />}
+          trend={(config?.daily_pnl_usd || 0) >= 0 ? 'up' : 'down'}
+        />
+        <StatCard
+          label="Trades Today"
+          value={config?.daily_trade_count || 0}
+          icon={<Activity size={20} />}
+          color="blue"
+        />
+        <StatCard
+          label="Auto Copy"
+          value={config?.auto_copy_enabled ? 'Active' : 'Off'}
+          icon={<Zap size={20} />}
+          color={config?.auto_copy_enabled ? 'green' : 'gray'}
+        />
+        <StatCard
+          label="Max Leverage"
+          value={`${config?.max_leverage || 0}x`}
+          icon={<Scale size={20} />}
+          color="yellow"
+        />
+      </div>
 
-      {/* Daily Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
-          <p className="text-gray-400 text-sm">Daily P&L</p>
-          <p className={`text-xl font-bold ${(config?.daily_pnl_usd || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-            ${config?.daily_pnl_usd?.toFixed(2) || '0.00'}
-          </p>
+      {/* Risk Meter & Presets */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-1">
+          <RiskMeter riskLevel={calculateRiskLevel()} />
         </div>
-        <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
-          <p className="text-gray-400 text-sm">Trades Today</p>
-          <p className="text-xl font-bold text-white">{config?.daily_trade_count || 0}</p>
-        </div>
-        <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
-          <p className="text-gray-400 text-sm">Auto Copy</p>
-          <p className={`text-xl font-bold ${config?.auto_copy_enabled ? 'text-cyan-400' : 'text-gray-500'}`}>
-            {config?.auto_copy_enabled ? 'Enabled' : 'Disabled'}
-          </p>
-        </div>
-        <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
-          <p className="text-gray-400 text-sm">Max Leverage</p>
-          <p className="text-xl font-bold text-white">{config?.max_leverage || 0}x</p>
+        <div className="lg:col-span-2 bg-gray-800/50 border border-gray-700/50 rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Layers className="text-cyan-400" size={20} />
+            <span className="text-white font-medium">Quick Presets</span>
+            <Tooltip text="Apply preset configurations based on your risk tolerance">
+              <HelpCircle size={14} className="text-gray-500" />
+            </Tooltip>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <PresetButton
+              label="Conservative"
+              description="Lower risk, steady growth"
+              icon={<Shield size={18} />}
+              color="green"
+              onClick={() => applyPreset('conservative')}
+              isActive={getCurrentPreset() === 'conservative'}
+            />
+            <PresetButton
+              label="Moderate"
+              description="Balanced risk/reward"
+              icon={<Scale size={18} />}
+              color="yellow"
+              onClick={() => applyPreset('moderate')}
+              isActive={getCurrentPreset() === 'moderate'}
+            />
+            <PresetButton
+              label="Aggressive"
+              description="Higher risk, max potential"
+              icon={<Zap size={18} />}
+              color="red"
+              onClick={() => applyPreset('aggressive')}
+              isActive={getCurrentPreset() === 'aggressive'}
+            />
+          </div>
         </div>
       </div>
 
       {/* Configuration Sections */}
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Position Sizing */}
-        <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl overflow-hidden">
-          <button
-            onClick={() => toggleSection('position')}
-            className="w-full flex items-center justify-between p-4 hover:bg-gray-700/30 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <TrendingUp className="text-cyan-400" size={20} />
-              <span className="text-white font-medium">Position Sizing</span>
-            </div>
-            {expandedSection === 'position' ? (
-              <ChevronUp className="text-gray-400" size={20} />
-            ) : (
-              <ChevronDown className="text-gray-400" size={20} />
-            )}
-          </button>
-          {expandedSection === 'position' && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              className="p-4 pt-0 grid grid-cols-1 md:grid-cols-2 gap-4"
-            >
+        <SectionCard
+          title="Position Sizing"
+          description="Control your position sizes and exposure"
+          icon={<TrendingUp size={20} />}
+          color="cyan"
+        >
+          <div className="space-y-6">
+            <SliderInput
+              label="Max Position Per Signal"
+              value={formData.max_position_per_signal_percent || 0}
+              onChange={(v) => handleInputChange('max_position_per_signal_percent', v)}
+              min={0.5}
+              max={20}
+              step={0.5}
+              unit="%"
+              tooltip="Maximum percentage of your balance to use per signal"
+              recommended={{ min: 2, max: 5 }}
+            />
+            <SliderInput
+              label="Max Total Exposure"
+              value={formData.max_total_exposure_percent || 0}
+              onChange={(v) => handleInputChange('max_total_exposure_percent', v)}
+              min={5}
+              max={100}
+              step={5}
+              unit="%"
+              tooltip="Maximum total exposure across all open positions"
+              recommended={{ min: 20, max: 50 }}
+            />
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-400 text-sm mb-1">Max Position Per Signal (%)</label>
-                <input
-                  type="number"
-                  value={formData.max_position_per_signal_percent || ''}
-                  onChange={(e) => handleInputChange('max_position_per_signal_percent', parseFloat(e.target.value))}
-                  className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-1">Max Total Exposure (%)</label>
-                <input
-                  type="number"
-                  value={formData.max_total_exposure_percent || ''}
-                  onChange={(e) => handleInputChange('max_total_exposure_percent', parseFloat(e.target.value))}
-                  className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-1">Max Position Size (USDT)</label>
-                <input
-                  type="number"
-                  value={formData.max_position_size_usdt || ''}
-                  onChange={(e) => handleInputChange('max_position_size_usdt', parseFloat(e.target.value))}
-                  className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-1">Min Position Size (USDT)</label>
-                <input
-                  type="number"
-                  value={formData.min_position_size_usdt || ''}
-                  onChange={(e) => handleInputChange('min_position_size_usdt', parseFloat(e.target.value))}
-                  className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-1">Position Size Multiplier</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={formData.position_size_multiplier || ''}
-                  onChange={(e) => handleInputChange('position_size_multiplier', parseFloat(e.target.value))}
-                  className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
-                />
-              </div>
-              <div className="flex items-center">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.use_risk_based_sizing || false}
-                    onChange={(e) => handleInputChange('use_risk_based_sizing', e.target.checked)}
-                    className="w-5 h-5 rounded border-gray-600 bg-gray-900 text-cyan-500 focus:ring-cyan-500"
-                  />
-                  <span className="text-white">Use Risk-Based Sizing</span>
+                <label className="flex items-center gap-2 text-gray-300 text-sm mb-2">
+                  Max Position (USDT)
+                  <Tooltip text="Maximum USDT amount per position">
+                    <HelpCircle size={14} className="text-gray-500" />
+                  </Tooltip>
                 </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    value={formData.max_position_size_usdt || ''}
+                    onChange={(e) => handleInputChange('max_position_size_usdt', parseFloat(e.target.value))}
+                    className="w-full bg-gray-800/50 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-cyan-500 focus:outline-none pr-16"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">USDT</span>
+                </div>
               </div>
-            </motion.div>
-          )}
-        </div>
+              <div>
+                <label className="flex items-center gap-2 text-gray-300 text-sm mb-2">
+                  Min Position (USDT)
+                  <Tooltip text="Minimum USDT amount per position">
+                    <HelpCircle size={14} className="text-gray-500" />
+                  </Tooltip>
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    value={formData.min_position_size_usdt || ''}
+                    onChange={(e) => handleInputChange('min_position_size_usdt', parseFloat(e.target.value))}
+                    className="w-full bg-gray-800/50 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-cyan-500 focus:outline-none pr-16"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">USDT</span>
+                </div>
+              </div>
+            </div>
+            <SliderInput
+              label="Position Size Multiplier"
+              value={formData.position_size_multiplier || 1}
+              onChange={(v) => handleInputChange('position_size_multiplier', v)}
+              min={0.1}
+              max={3}
+              step={0.1}
+              unit="x"
+              tooltip="Multiply the calculated position size by this factor"
+              color="green"
+            />
+            <ToggleSwitch
+              enabled={formData.use_risk_based_sizing || false}
+              onChange={(v) => handleInputChange('use_risk_based_sizing', v)}
+              label="Risk-Based Sizing"
+              description="Calculate position size based on stop loss distance"
+              icon={<Target size={18} />}
+            />
+          </div>
+        </SectionCard>
 
         {/* Risk Management */}
-        <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl overflow-hidden">
-          <button
-            onClick={() => toggleSection('risk')}
-            className="w-full flex items-center justify-between p-4 hover:bg-gray-700/30 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <Shield className="text-cyan-400" size={20} />
-              <span className="text-white font-medium">Risk Management</span>
+        <SectionCard
+          title="Risk Management"
+          description="Define your risk parameters and limits"
+          icon={<Shield size={20} />}
+          color="yellow"
+        >
+          <div className="space-y-6">
+            <SliderInput
+              label="Risk Per Trade"
+              value={formData.risk_per_trade_percent || 0}
+              onChange={(v) => handleInputChange('risk_per_trade_percent', v)}
+              min={0.5}
+              max={10}
+              step={0.5}
+              unit="%"
+              tooltip="Maximum percentage of balance to risk per trade"
+              recommended={{ min: 1, max: 2 }}
+              color="yellow"
+            />
+            <SliderInput
+              label="Max Leverage"
+              value={formData.max_leverage || 1}
+              onChange={(v) => handleInputChange('max_leverage', v)}
+              min={1}
+              max={50}
+              step={1}
+              unit="x"
+              tooltip="Maximum leverage to use for positions"
+              recommended={{ min: 5, max: 10 }}
+              color={formData.max_leverage && formData.max_leverage > 20 ? 'red' : 'yellow'}
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <SliderInput
+                label="Daily Loss Limit"
+                value={formData.daily_loss_limit_percent || 0}
+                onChange={(v) => handleInputChange('daily_loss_limit_percent', v)}
+                min={1}
+                max={20}
+                step={1}
+                unit="%"
+                tooltip="Stop trading when daily loss exceeds this"
+                color="red"
+              />
+              <SliderInput
+                label="Weekly Loss Limit"
+                value={formData.weekly_loss_limit_percent || 0}
+                onChange={(v) => handleInputChange('weekly_loss_limit_percent', v)}
+                min={5}
+                max={50}
+                step={5}
+                unit="%"
+                tooltip="Stop trading when weekly loss exceeds this"
+                color="red"
+              />
             </div>
-            {expandedSection === 'risk' ? (
-              <ChevronUp className="text-gray-400" size={20} />
-            ) : (
-              <ChevronDown className="text-gray-400" size={20} />
-            )}
-          </button>
-          {expandedSection === 'risk' && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              className="p-4 pt-0 grid grid-cols-1 md:grid-cols-2 gap-4"
-            >
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-400 text-sm mb-1">Risk Per Trade (%)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={formData.risk_per_trade_percent || ''}
-                  onChange={(e) => handleInputChange('risk_per_trade_percent', parseFloat(e.target.value))}
-                  className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-1">Max Leverage</label>
-                <input
-                  type="number"
-                  value={formData.max_leverage || ''}
-                  onChange={(e) => handleInputChange('max_leverage', parseInt(e.target.value))}
-                  className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-1">Daily Loss Limit (%)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={formData.daily_loss_limit_percent || ''}
-                  onChange={(e) => handleInputChange('daily_loss_limit_percent', parseFloat(e.target.value))}
-                  className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-1">Weekly Loss Limit (%)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={formData.weekly_loss_limit_percent || ''}
-                  onChange={(e) => handleInputChange('weekly_loss_limit_percent', parseFloat(e.target.value))}
-                  className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-1">Max Concurrent Positions</label>
+                <label className="flex items-center gap-2 text-gray-300 text-sm mb-2">
+                  Max Concurrent Positions
+                  <Tooltip text="Maximum number of open positions at once">
+                    <HelpCircle size={14} className="text-gray-500" />
+                  </Tooltip>
+                </label>
                 <input
                   type="number"
                   value={formData.max_concurrent_positions || ''}
                   onChange={(e) => handleInputChange('max_concurrent_positions', parseInt(e.target.value))}
-                  className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
+                  className="w-full bg-gray-800/50 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-cyan-500 focus:outline-none"
                 />
               </div>
               <div>
-                <label className="block text-gray-400 text-sm mb-1">Max Trades Per Day</label>
+                <label className="flex items-center gap-2 text-gray-300 text-sm mb-2">
+                  Max Trades Per Day
+                  <Tooltip text="Maximum number of trades allowed per day">
+                    <HelpCircle size={14} className="text-gray-500" />
+                  </Tooltip>
+                </label>
                 <input
                   type="number"
                   value={formData.max_trades_per_day || ''}
                   onChange={(e) => handleInputChange('max_trades_per_day', parseInt(e.target.value))}
-                  className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
+                  className="w-full bg-gray-800/50 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-cyan-500 focus:outline-none"
                 />
               </div>
-            </motion.div>
-          )}
-        </div>
+            </div>
+          </div>
+        </SectionCard>
 
         {/* Auto Copy Settings */}
-        <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl overflow-hidden">
-          <button
-            onClick={() => toggleSection('autocopy')}
-            className="w-full flex items-center justify-between p-4 hover:bg-gray-700/30 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <Zap className="text-cyan-400" size={20} />
-              <span className="text-white font-medium">Auto Copy Settings</span>
-            </div>
-            {expandedSection === 'autocopy' ? (
-              <ChevronUp className="text-gray-400" size={20} />
-            ) : (
-              <ChevronDown className="text-gray-400" size={20} />
-            )}
-          </button>
-          {expandedSection === 'autocopy' && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              className="p-4 pt-0 space-y-4"
-            >
-              <div className="flex items-center justify-between p-3 bg-gray-900/50 rounded-lg">
-                <div>
-                  <p className="text-white font-medium">Enable Auto Copy</p>
-                  <p className="text-gray-400 text-sm">Automatically copy signals when consensus is met</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.auto_copy_enabled || false}
-                    onChange={(e) => handleInputChange('auto_copy_enabled', e.target.checked)}
-                    className="sr-only peer"
+        <SectionCard
+          title="Auto Copy Trading"
+          description="Configure automatic signal copying"
+          icon={<Zap size={20} />}
+          color="green"
+        >
+          <div className="space-y-6">
+            <ToggleSwitch
+              enabled={formData.auto_copy_enabled || false}
+              onChange={(v) => handleInputChange('auto_copy_enabled', v)}
+              label="Enable Auto Copy"
+              description="Automatically copy signals when consensus is met"
+              icon={<Zap size={18} />}
+            />
+            <AnimatePresence>
+              {formData.auto_copy_enabled && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                >
+                  <SliderInput
+                    label="Min Consensus Required"
+                    value={formData.min_consensus_for_auto_copy || 2}
+                    onChange={(v) => handleInputChange('min_consensus_for_auto_copy', v)}
+                    min={1}
+                    max={10}
+                    step={1}
+                    unit=" signals"
+                    tooltip="Minimum number of matching signals before auto-copying"
+                    color="green"
                   />
-                  <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
-                </label>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-gray-400 text-sm mb-1">Min Consensus for Auto Copy</label>
-                  <input
-                    type="number"
-                    value={formData.min_consensus_for_auto_copy || ''}
-                    onChange={(e) => handleInputChange('min_consensus_for_auto_copy', parseInt(e.target.value))}
-                    className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </SectionCard>
 
         {/* Advanced Settings */}
-        <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl overflow-hidden">
-          <button
-            onClick={() => toggleSection('advanced')}
-            className="w-full flex items-center justify-between p-4 hover:bg-gray-700/30 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <Settings className="text-cyan-400" size={20} />
-              <span className="text-white font-medium">Advanced Settings</span>
-            </div>
-            {expandedSection === 'advanced' ? (
-              <ChevronUp className="text-gray-400" size={20} />
-            ) : (
-              <ChevronDown className="text-gray-400" size={20} />
-            )}
-          </button>
-          {expandedSection === 'advanced' && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              className="p-4 pt-0 space-y-4"
-            >
-              {/* Breakeven SL */}
-              <div className="flex items-center justify-between p-3 bg-gray-900/50 rounded-lg">
-                <div>
-                  <p className="text-white font-medium">Enable Breakeven Stop Loss</p>
-                  <p className="text-gray-400 text-sm">Move SL to breakeven after hitting TP level</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.enable_breakeven_sl || false}
-                    onChange={(e) => handleInputChange('enable_breakeven_sl', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
-                </label>
-              </div>
+        <SectionCard
+          title="Advanced Settings"
+          description="Fine-tune your trading automation"
+          icon={<Settings size={20} />}
+          color="purple"
+        >
+          <div className="space-y-6">
+            <ToggleSwitch
+              enabled={formData.enable_breakeven_sl || false}
+              onChange={(v) => handleInputChange('enable_breakeven_sl', v)}
+              label="Breakeven Stop Loss"
+              description="Move SL to entry after hitting a TP level"
+              icon={<Target size={18} />}
+            />
+            <AnimatePresence>
               {formData.enable_breakeven_sl && (
-                <div className="pl-4">
-                  <label className="block text-gray-400 text-sm mb-1">Breakeven After TP Level</label>
-                  <input
-                    type="number"
-                    value={formData.breakeven_after_tp_level || ''}
-                    onChange={(e) => handleInputChange('breakeven_after_tp_level', parseInt(e.target.value))}
-                    className="w-full md:w-1/2 bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="pl-4 border-l-2 border-cyan-500/30"
+                >
+                  <SliderInput
+                    label="Move to Breakeven After TP"
+                    value={formData.breakeven_after_tp_level || 1}
+                    onChange={(v) => handleInputChange('breakeven_after_tp_level', v)}
+                    min={1}
+                    max={5}
+                    step={1}
+                    unit=""
+                    tooltip="TP level that triggers breakeven SL"
                   />
-                </div>
+                </motion.div>
               )}
+            </AnimatePresence>
 
-              {/* Trailing SL */}
-              <div className="flex items-center justify-between p-3 bg-gray-900/50 rounded-lg">
-                <div>
-                  <p className="text-white font-medium">Enable Trailing Stop Loss</p>
-                  <p className="text-gray-400 text-sm">Automatically trail your stop loss as price moves</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.enable_trailing_sl || false}
-                    onChange={(e) => handleInputChange('enable_trailing_sl', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
-                </label>
-              </div>
+            <ToggleSwitch
+              enabled={formData.enable_trailing_sl || false}
+              onChange={(v) => handleInputChange('enable_trailing_sl', v)}
+              label="Trailing Stop Loss"
+              description="Automatically trail SL as price moves in your favor"
+              icon={<TrendingUp size={18} />}
+            />
+            <AnimatePresence>
               {formData.enable_trailing_sl && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-4">
-                  <div>
-                    <label className="block text-gray-400 text-sm mb-1">Trailing Stop (%)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={formData.trailing_stop_percent || ''}
-                      onChange={(e) => handleInputChange('trailing_stop_percent', parseFloat(e.target.value))}
-                      className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-400 text-sm mb-1">Trailing Activation (%)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={formData.trailing_activation_percent || ''}
-                      onChange={(e) => handleInputChange('trailing_activation_percent', parseFloat(e.target.value))}
-                      className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
-                    />
-                  </div>
-                </div>
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="pl-4 border-l-2 border-cyan-500/30 space-y-4"
+                >
+                  <SliderInput
+                    label="Trailing Stop Distance"
+                    value={formData.trailing_stop_percent || 1}
+                    onChange={(v) => handleInputChange('trailing_stop_percent', v)}
+                    min={0.5}
+                    max={10}
+                    step={0.5}
+                    unit="%"
+                    tooltip="Distance from current price for trailing stop"
+                  />
+                  <SliderInput
+                    label="Activation Threshold"
+                    value={formData.trailing_activation_percent || 1}
+                    onChange={(v) => handleInputChange('trailing_activation_percent', v)}
+                    min={0.5}
+                    max={10}
+                    step={0.5}
+                    unit="%"
+                    tooltip="Minimum profit % before trailing stop activates"
+                  />
+                </motion.div>
               )}
-            </motion.div>
-          )}
-        </div>
+            </AnimatePresence>
+          </div>
+        </SectionCard>
       </div>
 
-      {/* Action Buttons */}
-      <div className="fixed bottom-0 left-0 right-0 lg:left-80 bg-gray-900/95 border-t border-gray-700 p-4 z-20">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
+      {/* Fixed Action Bar */}
+      <div className="fixed bottom-0 left-0 right-0 lg:left-80 bg-gray-900/95 backdrop-blur-md border-t border-gray-700/50 p-4 z-20">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            {hasChanges && (
-              <span className="text-yellow-400 text-sm flex items-center gap-1">
-                <Info size={16} />
-                You have unsaved changes
-              </span>
-            )}
+            <AnimatePresence>
+              {hasChanges && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="flex items-center gap-2 text-yellow-400 text-sm"
+                >
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+                  <Info size={16} />
+                  <span>You have unsaved changes</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           <div className="flex items-center gap-3">
-            <button
+            <motion.button
               onClick={handleReset}
               disabled={saving}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-xl transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center gap-2 px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-xl transition-colors"
             >
               <RotateCcw size={18} />
-              Reset to Defaults
-            </button>
-            <button
+              Reset Defaults
+            </motion.button>
+            <motion.button
               onClick={handleSave}
               disabled={saving || !hasChanges}
-              className={`flex items-center gap-2 px-6 py-2 rounded-xl font-medium transition-all ${
+              whileHover={hasChanges ? { scale: 1.02 } : {}}
+              whileTap={hasChanges ? { scale: 0.98 } : {}}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all shadow-lg ${
                 hasChanges
-                  ? 'bg-cyan-500 hover:bg-cyan-600 text-white'
+                  ? 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white'
                   : 'bg-gray-700 text-gray-400 cursor-not-allowed'
               }`}
             >
               {saving ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
               ) : (
                 <Save size={18} />
               )}
               Save Changes
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
