@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import DashboardMenu from './Authlayout/DashboardMenu';
-import { useAuth } from '../../components/contexts/AuthContext';
 import {
   RefreshCw,
   TrendingUp,
@@ -50,7 +49,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isTranslatorOpen, setIsTranslatorOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 

@@ -11,7 +11,6 @@ import {
   CreditCard,
   LogOut,
   X,
-  ChevronLeft,
   ChevronRight,
   ChevronDown,
   Users,
