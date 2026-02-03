@@ -1,7 +1,8 @@
 // src/components/Layout/PublicLayout.tsx
 import React from 'react';
-import Header from './Header/Header';
-import Footer from './Footer/Footer';
+import LandingHeader from './LandingHeader';
+import LandingFooter from './LandingFooter';
+import { ThemeProvider } from '../contexts/ThemeContext';
 
 interface PublicLayoutProps {
   children: React.ReactNode;
@@ -9,13 +10,15 @@ interface PublicLayoutProps {
 
 const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900">
-      <Header />
-      <main className="flex-1">
-        {children}
-      </main>
-      <Footer />
-    </div>
+    <ThemeProvider>
+      <div className="min-h-screen flex flex-col bg-white dark:bg-dark-base transition-colors duration-300">
+        <LandingHeader />
+        <main className="flex-1">
+          {children}
+        </main>
+        <LandingFooter />
+      </div>
+    </ThemeProvider>
   );
 };
 
