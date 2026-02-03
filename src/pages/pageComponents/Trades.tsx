@@ -10,75 +10,22 @@ import {
   ExchangeTrade,
 } from '../../types/trades.types';
 import {
-  TrendingUp,
-  TrendingDown,
   RefreshCw,
   Search,
-  Filter,
   ArrowUpRight,
   ArrowDownRight,
   Clock,
   AlertCircle,
-  ChevronDown,
   BarChart3,
   Activity,
   DollarSign,
-  Percent,
   Target,
-  Zap,
-  ExternalLink,
-  CheckCircle2,
-  XCircle,
-  Circle,
   Layers,
-  Eye,
-  EyeOff,
   History,
-  ArrowUp,
-  ArrowDown,
   Wallet,
   Award,
   Link2,
 } from 'lucide-react';
-
-// Animated Counter Component
-const AnimatedCounter: React.FC<{
-  value: number;
-  prefix?: string;
-  suffix?: string;
-  decimals?: number;
-  className?: string;
-}> = ({ value, prefix = '', suffix = '', decimals = 2, className = '' }) => {
-  const [displayValue, setDisplayValue] = useState(0);
-
-  useEffect(() => {
-    const duration = 800;
-    const steps = 40;
-    const increment = value / steps;
-    let current = 0;
-    let step = 0;
-
-    const timer = setInterval(() => {
-      step++;
-      current = Math.min(value, increment * step);
-      setDisplayValue(current);
-      if (step >= steps) clearInterval(timer);
-    }, duration / steps);
-
-    return () => clearInterval(timer);
-  }, [value]);
-
-  return (
-    <span className={className}>
-      {prefix}
-      {displayValue.toLocaleString('en-US', {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals,
-      })}
-      {suffix}
-    </span>
-  );
-};
 
 // Tab types
 type TabType = 'platform' | 'exchange';
@@ -102,7 +49,6 @@ const Trades: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
   // Load platform trades
@@ -242,8 +188,6 @@ const Trades: React.FC = () => {
     });
 
   const getPnLColor = (pnl: number) => (pnl >= 0 ? 'text-emerald-400' : 'text-red-400');
-  const getPnLBgColor = (pnl: number) =>
-    pnl >= 0 ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-red-500/10 border-red-500/20';
 
   const isLoading = activeTab === 'platform' ? platformLoading : exchangeLoading;
 
