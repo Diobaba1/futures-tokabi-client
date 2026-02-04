@@ -2,7 +2,12 @@
 import axiosInstance from '../axiosConfig';
 import { API_ENDPOINTS } from '../endpoints';
 
-import { APIKeyAdd, APIKeyResponse, SubscriptionUpdate, UserProfileResponse } from '../../types/user.types';
+import {
+  APIKeyAdd,
+  APIKeysListResponse,
+  SubscriptionUpdate,
+  UserProfileResponse,
+} from '../../types/user.types';
 
 export const userService = {
   async addApiKey(data: APIKeyAdd): Promise<{ status: string; message: string }> {
@@ -10,7 +15,7 @@ export const userService = {
     return response.data;
   },
 
-  async getApiKeys(): Promise<{ api_keys: APIKeyResponse[] }> {
+  async getApiKeys(): Promise<APIKeysListResponse> {
     const response = await axiosInstance.get(API_ENDPOINTS.USERS.API_KEYS);
     return response.data;
   },

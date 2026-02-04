@@ -8,7 +8,7 @@ export interface APIKeyAdd {
   api_secret: string;
   label?: string;
   testnet?: boolean;
-  exchange_type?: ExchangeType;
+  exchange_type: ExchangeType;
 }
 
 export interface APIKeyResponse {
@@ -19,6 +19,12 @@ export interface APIKeyResponse {
   validation_status: 'pending' | 'valid' | 'invalid';
   exchange_type: ExchangeType;
   created_at: string;
+}
+
+export interface APIKeysListResponse {
+  api_keys: APIKeyResponse[];
+  has_active_connection: boolean;
+  connected_exchange: ExchangeType | null;
 }
 
 export interface SubscriptionUpdate {

@@ -1,4 +1,12 @@
 // src/pages/walletpages/APIKeyManager.tsx
+/**
+ * Exchange API Key Manager Component
+ *
+ * This component manages exchange connections with a single connection policy:
+ * - Users can only connect ONE exchange at a time
+ * - All other exchanges are disabled when one is connected
+ * - Users must disconnect the current exchange to connect a different one
+ */
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { userService } from '../../api/services/userService';
@@ -12,7 +20,6 @@ import {
   AlertCircle,
   Clock,
   Trash2,
-  Plus,
   X,
   Eye,
   EyeOff,
@@ -24,6 +31,7 @@ import {
   RefreshCw,
   Info,
   AlertTriangle,
+  Ban,
 } from 'lucide-react';
 
 interface APIKeyManagerProps {
@@ -79,6 +87,10 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [showApiSecret, setShowApiSecret] = useState(false);
 
+  // Single exchange connection state
+  const [hasActiveConnection, setHasActiveConnection] = useState(false);
+  const [connectedExchange, setConnectedExchange] = useState<ExchangeType | null>(null);
+
   // Form state
   const [formData, setFormData] = useState<APIKeyAdd>({
     api_key: '',
@@ -94,6 +106,8 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
       setIsLoading(true);
       const response = await userService.getApiKeys();
       setApiKeys(response.api_keys);
+      setHasActiveConnection(response.has_active_connection);
+      setConnectedExchange(response.connected_exchange);
       onKeysUpdate?.(response.api_keys);
     } catch (err: unknown) {
       showError(getUserFriendlyError(err), { title: 'Failed to Load' });
@@ -111,8 +125,21 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
     return apiKeys.filter((key) => key.exchange_type === exchange);
   };
 
-  // Open connect modal
+  // Check if an exchange can be connected (only if no active connection exists)
+  const canConnect = (exchange: ExchangeType): boolean => {
+    return !hasActiveConnection;
+  };
+
+  // Open connect modal (only if allowed)
   const openConnectModal = (exchange: ExchangeType) => {
+    if (!canConnect(exchange)) {
+      showError(
+        `You already have ${connectedExchange?.toUpperCase()} connected. ` +
+        'Please disconnect it first before connecting another exchange.',
+        { title: 'Connection Limit Reached' }
+      );
+      return;
+    }
     setSelectedExchange(exchange);
     setFormData({
       api_key: '',
@@ -211,8 +238,9 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
               transition={{ delay: 0.2 }}
               className="text-gray-400 text-lg max-w-2xl mx-auto mb-8"
             >
-              Link your exchange accounts to enable automated trading. Your API keys are
-              encrypted with AES-256 and never stored in plain text.
+              Connect your preferred exchange to enable automated trading. You can have
+              <strong className="text-white"> one active connection</strong> at a time.
+              Your API keys are encrypted with AES-256.
             </motion.p>
 
             {/* Security badges */}
@@ -248,16 +276,39 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-              <span>Supported Exchanges</span>
-              <span className="text-xs text-gray-500 font-normal">({apiKeys.length} connected)</span>
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                <span>Supported Exchanges</span>
+                {hasActiveConnection && connectedExchange && (
+                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-medium">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    {connectedExchange.charAt(0).toUpperCase() + connectedExchange.slice(1)} Connected
+                  </span>
+                )}
+              </h2>
+              {hasActiveConnection && (
+                <span className="text-xs text-gray-500">
+                  Single exchange connection active
+                </span>
+              )}
+            </div>
+
+            {/* Single Exchange Policy Notice */}
+            {!hasActiveConnection && (
+              <div className="mb-4 p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-start gap-3">
+                <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-blue-400/80">
+                  You can connect <strong>one exchange</strong> at a time. Choose the exchange you want to use for trading.
+                </p>
+              </div>
+            )}
 
             <div className="grid md:grid-cols-2 gap-4">
               {(Object.keys(EXCHANGES) as ExchangeType[]).map((exchangeKey) => {
                 const exchange = EXCHANGES[exchangeKey];
                 const connectedKeys = getKeysByExchange(exchangeKey);
                 const isConnected = connectedKeys.length > 0;
+                const isDisabled = hasActiveConnection && !isConnected;
 
                 return (
                   <ExchangeCard
@@ -266,6 +317,7 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
                     exchange={exchange}
                     connectedKeys={connectedKeys}
                     isConnected={isConnected}
+                    isDisabled={isDisabled}
                     isLoading={isLoading}
                     isDeleting={isDeleting}
                     showDeleteConfirm={showDeleteConfirm}
@@ -326,6 +378,7 @@ interface ExchangeCardProps {
   exchange: typeof EXCHANGES[ExchangeType];
   connectedKeys: APIKeyResponse[];
   isConnected: boolean;
+  isDisabled: boolean;
   isLoading: boolean;
   isDeleting: string | null;
   showDeleteConfirm: string | null;
@@ -339,6 +392,7 @@ const ExchangeCard: React.FC<ExchangeCardProps> = ({
   exchange,
   connectedKeys,
   isConnected,
+  isDisabled,
   isLoading,
   isDeleting,
   showDeleteConfirm,
@@ -354,15 +408,27 @@ const ExchangeCard: React.FC<ExchangeCardProps> = ({
       className={`relative overflow-hidden rounded-2xl border transition-all duration-300 ${
         isConnected
           ? `bg-gradient-to-br ${exchange.bgGradient} ${exchange.borderColor}`
+          : isDisabled
+          ? 'bg-gray-900/30 border-white/5 opacity-60'
           : 'bg-gray-900/50 border-white/5 hover:border-white/10'
       }`}
     >
+      {/* Disabled Overlay */}
+      {isDisabled && (
+        <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-[1px] z-10 flex items-center justify-center">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800/80 border border-white/10">
+            <Ban className="w-4 h-4 text-gray-400" />
+            <span className="text-sm text-gray-400">Disconnect other exchange first</span>
+          </div>
+        </div>
+      )}
+
       {/* Card Header */}
       <div className="p-5">
         <div className="flex items-start justify-between">
           {/* Exchange Info */}
           <div className="flex items-center gap-4">
-            <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${exchange.gradient} flex items-center justify-center text-white shadow-lg`}>
+            <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${exchange.gradient} flex items-center justify-center text-white shadow-lg ${isDisabled ? 'grayscale' : ''}`}>
               {exchange.logo}
             </div>
             <div>
@@ -379,26 +445,16 @@ const ExchangeCard: React.FC<ExchangeCardProps> = ({
             </div>
           </div>
 
-          {/* Action Button */}
-          {!isConnected ? (
+          {/* Action Button - Only show Connect for non-connected exchanges */}
+          {!isConnected && (
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={!isDisabled ? { scale: 1.02 } : {}}
+              whileTap={!isDisabled ? { scale: 0.98 } : {}}
               onClick={onConnect}
-              disabled={isLoading}
-              className={`px-4 py-2 rounded-xl bg-gradient-to-r ${exchange.gradient} text-white font-medium text-sm shadow-lg transition-all hover:shadow-xl disabled:opacity-50`}
+              disabled={isLoading || isDisabled}
+              className={`px-4 py-2 rounded-xl bg-gradient-to-r ${exchange.gradient} text-white font-medium text-sm shadow-lg transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               Connect
-            </motion.button>
-          ) : (
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={onConnect}
-              className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white font-medium text-sm hover:bg-white/10 transition-all flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Add Key
             </motion.button>
           )}
         </div>
@@ -408,7 +464,7 @@ const ExchangeCard: React.FC<ExchangeCardProps> = ({
           {exchange.features.map((feature) => (
             <span
               key={feature}
-              className="px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 text-xs"
+              className={`px-2.5 py-1 rounded-lg bg-white/5 text-xs ${isDisabled ? 'text-gray-500' : 'text-gray-400'}`}
             >
               {feature}
             </span>
