@@ -292,15 +292,15 @@ export const SignalDetailModal: React.FC<SignalDetailModalProps> = ({
                 <h3 className="text-sm font-medium text-slate-400 mb-3">Price Levels</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <PriceCard label="Entry" value={signal.entry_price} color="slate" />
-                  <PriceCard 
-                    label="Stop Loss" 
-                    value={signal.stop_loss_price} 
-                    color="rose" 
+                  <PriceCard
+                    label="Stop Loss"
+                    value={signal.stop_loss_price}
+                    color="rose"
                     percent={signal.stop_loss_percent ? -Math.abs(signal.stop_loss_percent) : undefined}
                   />
-                  <PriceCard 
-                    label="Take Profit" 
-                    value={signal.take_profit_price} 
+                  <PriceCard
+                    label="Take Profit"
+                    value={signal.take_profit_price}
                     color="emerald"
                     percent={signal.take_profit_percent ?? undefined}
                   />
@@ -309,6 +309,30 @@ export const SignalDetailModal: React.FC<SignalDetailModalProps> = ({
                   )}
                 </div>
               </div>
+
+              {/* Multiple Take Profits (if available) */}
+              {signal.take_profits && signal.take_profits.length > 1 && (
+                <div>
+                  <h3 className="text-sm font-medium text-slate-400 mb-3">Take Profit Levels</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {signal.take_profits.map((tp, index) => (
+                      <div key={tp.level || index} className="p-3 bg-slate-800/50 rounded-xl border border-emerald-500/20">
+                        <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">
+                          TP{tp.level || index + 1}
+                        </p>
+                        <p className="text-base font-semibold font-mono text-emerald-400">
+                          {formatPrice(tp.price)}
+                        </p>
+                        {tp.percentage && (
+                          <p className="text-[10px] text-emerald-400/60 font-mono">
+                            {tp.percentage.toFixed(0)}% of position
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Risk Metrics */}
               {(signal.risk_reward_ratio || signal.suggested_leverage) && (

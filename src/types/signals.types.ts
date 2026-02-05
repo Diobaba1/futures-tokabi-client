@@ -30,6 +30,16 @@ export enum SignalSource {
 }
 
 // =============================================================================
+// Take Profit Level (for multiple TPs)
+// =============================================================================
+
+export interface SignalTakeProfit {
+  level: number;
+  price: number;
+  percentage?: number | null;
+}
+
+// =============================================================================
 // Model Decision (from LLM models)
 // =============================================================================
 
@@ -68,7 +78,8 @@ export interface UserSignal {
   // Price Levels
   entry_price: number | null;
   stop_loss_price: number | null;
-  take_profit_price: number | null;
+  take_profit_price: number | null;  // Primary TP price
+  take_profits: SignalTakeProfit[];  // Multiple TP levels (auto-generated if single TP provided)
   current_price?: number | null;
   
   // Risk Metrics
