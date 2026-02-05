@@ -62,6 +62,7 @@ function transformToUserSignal(backendSignal: any): UserSignal {
     entry_price: backendSignal.entry_price,
     stop_loss_price: backendSignal.stop_loss_price || backendSignal.stop_loss,
     take_profit_price: backendSignal.take_profit_price || backendSignal.take_profit,
+    take_profits: backendSignal.take_profits || [],
     current_price: backendSignal.current_price,
     
     // Risk Metrics

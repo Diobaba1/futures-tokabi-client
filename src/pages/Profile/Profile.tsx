@@ -16,11 +16,12 @@ const Profile: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
 
   // API Key Form State
-  const [newKey, setNewKey] = useState<APIKeyAdd>({ 
-    api_key: '', 
-    api_secret: '', 
-    label: '', 
-    testnet: false 
+  const [newKey, setNewKey] = useState<APIKeyAdd>({
+    api_key: '',
+    api_secret: '',
+    label: '',
+    testnet: false,
+    exchange_type: 'binance'
   });
 
   useEffect(() => {
@@ -55,7 +56,7 @@ const Profile: React.FC = () => {
       });
       
       setSuccess('API key added successfully!');
-      setNewKey({ api_key: '', api_secret: '', label: '', testnet: false });
+      setNewKey({ api_key: '', api_secret: '', label: '', testnet: false, exchange_type: 'binance' });
       setShowAddForm(false);
       loadApiKeys();
     } catch (err: any) {
