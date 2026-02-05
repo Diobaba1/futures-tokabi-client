@@ -33,6 +33,7 @@ interface UseStaffSignalsState {
   isCreating: boolean;
   isUpdating: boolean;
   error: string | null;
+  requiresSubscription: boolean;
 }
 
 interface UseStaffSignalsReturn extends UseStaffSignalsState {
@@ -89,6 +90,7 @@ export const useStaffSignals = (
     isCreating: false,
     isUpdating: false,
     error: null,
+    requiresSubscription: false,
   });
 
   const [currentFilters, setCurrentFilters] = useState<StaffSignalFilterParams>(
@@ -170,10 +172,26 @@ export const useStaffSignals = (
         ...prev,
         activeSignals: response,
         isLoading: false,
+        requiresSubscription: false,
       }));
     } catch (err: any) {
-      const errorMessage =
-        err.response?.data?.detail || "Failed to fetch active signals";
+      const detail = err.response?.data?.detail;
+
+      // Check if it's a subscription error (detail can be an object with error_code)
+      if (detail?.error_code === "NO_SUBSCRIPTION" || err.response?.status === 403) {
+        setState((prev) => ({
+          ...prev,
+          isLoading: false,
+          requiresSubscription: true,
+          error: detail?.message || "An active subscription is required to access premium signals.",
+        }));
+        return;
+      }
+
+      // Handle other errors
+      const errorMessage = typeof detail === "string"
+        ? detail
+        : detail?.message || "Failed to fetch active signals";
       setError(errorMessage);
       setLoading(false);
     }

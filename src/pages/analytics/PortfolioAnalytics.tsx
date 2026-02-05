@@ -1129,7 +1129,7 @@ const PositionRow: React.FC<PositionRowProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const pnl = parseFloat(position.unRealizedProfit) || 0;
-  const isProfit = pnl >= 0;
+  const isLong = position.positionSide === "LONG" || position.positionSide === "Long";
 
   return (
     <motion.div
@@ -1147,12 +1147,12 @@ const PositionRow: React.FC<PositionRowProps> = ({
         <div className="flex items-center gap-3">
           <div
             className={`p-2 rounded-lg ${
-              isProfit
+              isLong
                 ? "bg-emerald-500/20 border border-emerald-500/30"
                 : "bg-red-500/20 border border-red-500/30"
             }`}
           >
-            {isProfit ? (
+            {isLong ? (
               <ArrowUpRight className="w-4 h-4 text-emerald-400" />
             ) : (
               <ArrowDownRight className="w-4 h-4 text-red-400" />

@@ -4,6 +4,7 @@
 // This page is for regular users to view active signals created by staff
 
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   RefreshCw,
   Search,
@@ -14,6 +15,9 @@ import {
   Clock,
   AlertCircle,
   Zap,
+  Crown,
+  Sparkles,
+  ArrowRight,
 } from "lucide-react";
 import { useStaffSignals } from "../../components/hooks/useStaffSignals";
 import {
@@ -22,10 +26,11 @@ import {
 } from "../../types/staffSignals.types";
 
 const ActiveSignalsPage: React.FC = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [positionFilter, setPositionFilter] = useState<string>("");
 
-  const { activeSignals, isLoading, error, fetchActiveSignals } =
+  const { activeSignals, isLoading, error, requiresSubscription, fetchActiveSignals } =
     useStaffSignals();
 
   useEffect(() => {
@@ -71,135 +76,196 @@ const ActiveSignalsPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Search & Filters */}
-        <div className="bg-gray-900/80 backdrop-blur-sm border border-gray-800 rounded-xl p-4 mb-8">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <form onSubmit={handleSearch} className="flex-1">
-              <div className="relative">
-                <Search
-                  size={18}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-                />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by symbol (e.g., BTCUSDT)"
-                  className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors"
-                />
-              </div>
-            </form>
+        {/* Search & Filters - Hide when subscription required */}
+        {!requiresSubscription && (
+          <div className="bg-gray-900/80 backdrop-blur-sm border border-gray-800 rounded-xl p-4 mb-8">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <form onSubmit={handleSearch} className="flex-1">
+                <div className="relative">
+                  <Search
+                    size={18}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+                  />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search by symbol (e.g., BTCUSDT)"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                  />
+                </div>
+              </form>
 
-            <div className="flex items-center gap-3">
-              <div className="flex items-center bg-gray-800 border border-gray-700 rounded-lg p-1">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center bg-gray-800 border border-gray-700 rounded-lg p-1">
+                  <button
+                    onClick={() => setPositionFilter("")}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      positionFilter === ""
+                        ? "bg-gray-700 text-white"
+                        : "text-gray-500 hover:text-white"
+                    }`}
+                  >
+                    All
+                  </button>
+                  <button
+                    onClick={() => setPositionFilter("buy")}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-1.5 ${
+                      positionFilter === "buy"
+                        ? "bg-green-500/20 text-green-400"
+                        : "text-gray-500 hover:text-white"
+                    }`}
+                  >
+                    <TrendingUp size={14} /> Buy
+                  </button>
+                  <button
+                    onClick={() => setPositionFilter("sell")}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-1.5 ${
+                      positionFilter === "sell"
+                        ? "bg-red-500/20 text-red-400"
+                        : "text-gray-500 hover:text-white"
+                    }`}
+                  >
+                    <TrendingDown size={14} /> Sell
+                  </button>
+                </div>
+
                 <button
-                  onClick={() => setPositionFilter("")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    positionFilter === ""
-                      ? "bg-gray-700 text-white"
-                      : "text-gray-500 hover:text-white"
-                  }`}
+                  onClick={handleRefresh}
+                  disabled={isLoading}
+                  className="p-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-400 hover:text-white hover:border-cyan-500/50 transition-all"
                 >
-                  All
-                </button>
-                <button
-                  onClick={() => setPositionFilter("buy")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-1.5 ${
-                    positionFilter === "buy"
-                      ? "bg-green-500/20 text-green-400"
-                      : "text-gray-500 hover:text-white"
-                  }`}
-                >
-                  <TrendingUp size={14} /> Buy
-                </button>
-                <button
-                  onClick={() => setPositionFilter("sell")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-1.5 ${
-                    positionFilter === "sell"
-                      ? "bg-red-500/20 text-red-400"
-                      : "text-gray-500 hover:text-white"
-                  }`}
-                >
-                  <TrendingDown size={14} /> Sell
+                  <RefreshCw
+                    size={18}
+                    className={isLoading ? "animate-spin" : ""}
+                  />
                 </button>
               </div>
-
-              <button
-                onClick={handleRefresh}
-                disabled={isLoading}
-                className="p-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-400 hover:text-white hover:border-cyan-500/50 transition-all"
-              >
-                <RefreshCw
-                  size={18}
-                  className={isLoading ? "animate-spin" : ""}
-                />
-              </button>
             </div>
-          </div>
-        </div>
-
-        {/* Error */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center gap-3 text-red-400">
-            <AlertCircle size={20} />
-            <span>{error}</span>
           </div>
         )}
 
-        {/* Signals */}
-        {isLoading && filteredSignals.length === 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[...Array(4)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 animate-pulse"
-              >
-                <div className="h-6 w-32 bg-gray-800 rounded mb-4" />
-                <div className="space-y-3">
-                  <div className="h-16 bg-gray-800 rounded-xl" />
-                  <div className="h-16 bg-gray-800 rounded-xl" />
+        {/* Subscription Required */}
+        {requiresSubscription ? (
+          <div className="bg-gradient-to-br from-gray-900/90 via-gray-900/80 to-gray-900/90 backdrop-blur-sm border border-yellow-500/20 rounded-2xl p-8 sm:p-12 text-center relative overflow-hidden">
+            {/* Background glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 via-transparent to-cyan-500/5 pointer-events-none" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl -translate-y-1/2 pointer-events-none" />
+
+            <div className="relative">
+              {/* Icon */}
+              <div className="w-24 h-24 bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 border border-yellow-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Crown size={48} className="text-yellow-400" />
+              </div>
+
+              {/* Title */}
+              <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+                Premium Signals
+              </h3>
+              <p className="text-gray-400 max-w-md mx-auto mb-8">
+                Subscribe to access premium trading signals from our expert analysts.
+                Get real-time alerts and detailed analysis to make informed trading decisions.
+              </p>
+
+              {/* Features */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 max-w-2xl mx-auto">
+                <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
+                  <Zap size={24} className="text-cyan-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-300 font-medium">Real-time Alerts</p>
+                </div>
+                <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
+                  <Target size={24} className="text-green-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-300 font-medium">Entry & Exit Points</p>
+                </div>
+                <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
+                  <Sparkles size={24} className="text-purple-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-300 font-medium">Expert Analysis</p>
                 </div>
               </div>
-            ))}
-          </div>
-        ) : filteredSignals.length === 0 ? (
-          <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-16 text-center">
-            <div className="w-20 h-20 bg-gray-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Zap size={40} className="text-gray-600" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-400 mb-2">
-              No Active Signals
-            </h3>
-            <p className="text-gray-600">
-              Check back later for new trading signals from our analysts.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredSignals.map((signal) => (
-              <SignalDisplayCard key={signal.id} signal={signal} />
-            ))}
-          </div>
-        )}
 
-        {/* Disclaimer */}
-        <div className="mt-12 p-6 bg-yellow-500/5 border border-yellow-500/20 rounded-xl">
-          <div className="flex items-start gap-4">
-            <AlertCircle className="text-yellow-500 flex-shrink-0 mt-0.5" />
-            <div>
-              <h4 className="text-sm font-semibold text-yellow-500 mb-1">
-                Risk Disclaimer
-              </h4>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                Trading cryptocurrencies involves significant risk and can result
-                in the loss of your capital. The signals provided are for
-                informational purposes only and should not be considered as
-                financial advice. Always conduct your own research and consider
-                your risk tolerance before making any trading decisions.
+              {/* CTA Button */}
+              <button
+                onClick={() => navigate("/pricing")}
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-gray-900 font-bold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/25 hover:shadow-yellow-500/40 hover:scale-105"
+              >
+                <Crown size={20} />
+                Subscribe Now
+                <ArrowRight size={20} />
+              </button>
+
+              <p className="text-xs text-gray-500 mt-4">
+                Cancel anytime. No commitment required.
               </p>
             </div>
           </div>
-        </div>
+        ) : (
+          <>
+            {/* Error */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center gap-3 text-red-400">
+                <AlertCircle size={20} />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {/* Signals */}
+            {isLoading && filteredSignals.length === 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[...Array(4)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 animate-pulse"
+                  >
+                    <div className="h-6 w-32 bg-gray-800 rounded mb-4" />
+                    <div className="space-y-3">
+                      <div className="h-16 bg-gray-800 rounded-xl" />
+                      <div className="h-16 bg-gray-800 rounded-xl" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredSignals.length === 0 ? (
+              <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-16 text-center">
+                <div className="w-20 h-20 bg-gray-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Zap size={40} className="text-gray-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-400 mb-2">
+                  No Active Signals
+                </h3>
+                <p className="text-gray-600">
+                  Check back later for new trading signals from our analysts.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {filteredSignals.map((signal) => (
+                  <SignalDisplayCard key={signal.id} signal={signal} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Disclaimer - Only show when signals are accessible */}
+        {!requiresSubscription && (
+          <div className="mt-12 p-6 bg-yellow-500/5 border border-yellow-500/20 rounded-xl">
+            <div className="flex items-start gap-4">
+              <AlertCircle className="text-yellow-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <h4 className="text-sm font-semibold text-yellow-500 mb-1">
+                  Risk Disclaimer
+                </h4>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Trading cryptocurrencies involves significant risk and can result
+                  in the loss of your capital. The signals provided are for
+                  informational purposes only and should not be considered as
+                  financial advice. Always conduct your own research and consider
+                  your risk tolerance before making any trading decisions.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
