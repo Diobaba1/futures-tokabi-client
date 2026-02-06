@@ -12,6 +12,24 @@ import { logError, parseError } from '../utils/errorHandler';
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
 
 // =============================================================================
+// Notification Debounce - Prevent duplicate toasts
+// =============================================================================
+
+const notificationDebounce: Record<string, number> = {};
+const DEBOUNCE_MS = 3000; // 3 seconds between same notifications
+
+function shouldShowNotification(key: string): boolean {
+  const now = Date.now();
+  const lastShown = notificationDebounce[key];
+
+  if (!lastShown || now - lastShown > DEBOUNCE_MS) {
+    notificationDebounce[key] = now;
+    return true;
+  }
+  return false;
+}
+
+// =============================================================================
 // Axios Instance Configuration
 // =============================================================================
 
@@ -65,8 +83,10 @@ axiosInstance.interceptors.response.use(
       // Dispatch auth logout event
       window.dispatchEvent(new CustomEvent('auth:logout'));
 
-      // Show user-friendly notification for session expiry only
-      dispatchNotification('warning', 'Session Expired', 'Your session has expired. Please log in again.');
+      // Show user-friendly notification for session expiry only (debounced)
+      if (shouldShowNotification('session-expired')) {
+        dispatchNotification('warning', 'Session Expired', 'Your session has expired. Please log in again.');
+      }
 
       // Redirect to login
       if (window.location.pathname !== '/login') {
@@ -81,7 +101,10 @@ axiosInstance.interceptors.response.use(
     // Handle 403 Forbidden - Check for subscription errors
     if (status === 403 && isSubscriptionError(error)) {
       handleSubscriptionError(error);
-      dispatchNotification('warning', 'Subscription Required', 'Please upgrade your subscription to access this feature.');
+      // Use debounced notification to prevent multiple toasts from parallel API calls
+      if (shouldShowNotification('subscription-required')) {
+        dispatchNotification('warning', 'Subscription Required', 'Please upgrade your subscription to access this feature.');
+      }
       return Promise.reject(error);
     }
 
