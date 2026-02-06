@@ -25,12 +25,27 @@ import type {
 
 /**
  * Extract error message from Axios error
+ * Handles nested detail objects from FastAPI errors
  */
 function extractErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
-    const axiosErr = error as AxiosError<{ detail?: string; message?: string }>;
+    const axiosErr = error as AxiosError<{ detail?: string | { message?: string; error_code?: string }; message?: string }>;
+
+    // Handle FastAPI detail response (can be string or object)
+    const detail = axiosErr.response?.data?.detail;
+    if (detail) {
+      // If detail is an object with a message property
+      if (typeof detail === 'object' && detail !== null && 'message' in detail) {
+        return detail.message || "An error occurred";
+      }
+      // If detail is a string
+      if (typeof detail === 'string') {
+        return detail;
+      }
+    }
+
+    // Fallback to other error formats
     return (
-      axiosErr.response?.data?.detail ||
       axiosErr.response?.data?.message ||
       axiosErr.message ||
       "An error occurred"

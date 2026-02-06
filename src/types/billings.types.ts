@@ -351,15 +351,52 @@ export interface SubscriptionErrorResponse {
 
 /**
  * Check if an error is a subscription error
+ * Backend may return error_code in data directly OR nested in data.detail
  */
-export function isSubscriptionError(error: unknown): error is { response: { status: number; data: SubscriptionErrorResponse } } {
+export function isSubscriptionError(error: unknown): error is { response: { status: number; data: SubscriptionErrorResponse | { detail: SubscriptionErrorResponse } } } {
   if (!error || typeof error !== 'object') return false;
-  const err = error as { response?: { status?: number; data?: SubscriptionErrorResponse } };
-  return (
-    err.response?.status === 403 &&
-    err.response?.data?.error_code !== undefined &&
-    Object.values(SubscriptionErrorCode).includes(err.response.data.error_code)
-  );
+  const err = error as { response?: { status?: number; data?: SubscriptionErrorResponse | { detail?: SubscriptionErrorResponse } } };
+
+  if (err.response?.status !== 403) return false;
+
+  // Check if error_code is directly in data
+  const directErrorCode = (err.response?.data as SubscriptionErrorResponse)?.error_code;
+  if (directErrorCode && Object.values(SubscriptionErrorCode).includes(directErrorCode)) {
+    return true;
+  }
+
+  // Check if error_code is nested in data.detail
+  const nestedData = err.response?.data as { detail?: SubscriptionErrorResponse };
+  const nestedErrorCode = nestedData?.detail?.error_code;
+  if (nestedErrorCode && Object.values(SubscriptionErrorCode).includes(nestedErrorCode)) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Extract subscription error data from error response
+ * Handles both direct and nested (detail) response formats
+ */
+export function getSubscriptionErrorData(error: unknown): SubscriptionErrorResponse | null {
+  if (!isSubscriptionError(error)) return null;
+
+  const err = error as { response: { data: SubscriptionErrorResponse | { detail: SubscriptionErrorResponse } } };
+
+  // Check direct format first
+  const directData = err.response.data as SubscriptionErrorResponse;
+  if (directData.error_code) {
+    return directData;
+  }
+
+  // Check nested format
+  const nestedData = err.response.data as { detail: SubscriptionErrorResponse };
+  if (nestedData.detail?.error_code) {
+    return nestedData.detail;
+  }
+
+  return null;
 }
 
 /**

@@ -14,20 +14,35 @@ import type {
   UserSignalStats,
   SignalStatus,
 } from "../../types/signals.types";
-import { isSubscriptionError } from "../../types/billings.types";
+import { isSubscriptionError, getSubscriptionErrorData } from "../../types/billings.types";
 
 /**
  * Extract error message from various error types
+ * Handles nested detail objects from FastAPI errors
  */
 function extractErrorMessage(err: unknown): string {
   if (axios.isAxiosError(err)) {
-    // Check for subscription error
+    // Check for subscription error first
     if (isSubscriptionError(err)) {
-      return err.response?.data?.message || "Subscription required to access this feature";
+      const subError = getSubscriptionErrorData(err);
+      return subError?.message || "Subscription required to access this feature";
     }
-    // Standard axios error
+
+    // Handle FastAPI detail response (can be string or object)
+    const detail = err.response?.data?.detail;
+    if (detail) {
+      // If detail is an object with a message property
+      if (typeof detail === 'object' && detail !== null && 'message' in detail) {
+        return (detail as { message: string }).message;
+      }
+      // If detail is a string
+      if (typeof detail === 'string') {
+        return detail;
+      }
+    }
+
+    // Fallback to other error formats
     return (
-      err.response?.data?.detail ||
       err.response?.data?.message ||
       err.message ||
       "An error occurred"

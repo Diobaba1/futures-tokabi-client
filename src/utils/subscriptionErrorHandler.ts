@@ -13,6 +13,7 @@ import {
   SubscriptionErrorResponse,
   SUBSCRIPTION_ERROR_MESSAGES,
   isSubscriptionError,
+  getSubscriptionErrorData,
 } from '../types/billings.types';
 
 // ============================================================================
@@ -68,12 +69,15 @@ export function onSubscriptionError(
 /**
  * Process an API error and check if it's a subscription error
  * Returns true if it was a subscription error and was handled
+ * Handles both direct and nested (detail) response formats
  */
 export function handleSubscriptionError(error: unknown): boolean {
   if (isSubscriptionError(error)) {
-    const errorData = error.response.data;
-    dispatchSubscriptionError(errorData);
-    return true;
+    const errorData = getSubscriptionErrorData(error);
+    if (errorData) {
+      dispatchSubscriptionError(errorData);
+      return true;
+    }
   }
   return false;
 }
