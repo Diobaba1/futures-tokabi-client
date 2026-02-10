@@ -1228,6 +1228,48 @@ const PositionRow: React.FC<PositionRowProps> = ({
                   </span>
                 </div>
               </div>
+
+              {/* TP / SL Section */}
+              {(position.stop_loss_price || (position.take_profit_orders && position.take_profit_orders.length > 0)) && (
+                <div className="pt-3 border-t border-white/5 space-y-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Target className="w-3 h-3 text-violet-400" />
+                    <span className="text-gray-400 font-medium">TP / SL</span>
+                    {position.sl_moved_to_breakeven && (
+                      <span className="px-1.5 py-0.5 text-[10px] rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                        SL → BE
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Stop Loss */}
+                    {position.stop_loss_price && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Stop Loss</span>
+                        <span className="text-red-400 font-mono">
+                          {formatNumber(position.stop_loss_price)}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Take Profits */}
+                    {position.take_profit_orders && position.take_profit_orders.map((tp: any) => (
+                      <div key={tp.level} className="flex justify-between">
+                        <span className="text-gray-500 flex items-center gap-1">
+                          TP{tp.level}
+                          {tp.hit && (
+                            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                          )}
+                        </span>
+                        <span className={`font-mono ${tp.hit ? "text-emerald-400 line-through opacity-60" : "text-emerald-400"}`}>
+                          {formatNumber(tp.price)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
         )}
