@@ -172,16 +172,35 @@ export const signalsService = {
   // GET /signals/active - Active LONG/SHORT signals only
   // Backend auto-filters: No HOLD, last 24h only, active status
   // ==========================================================================
-  async getActiveSignals(symbol?: string, limit: number = 50): Promise<UserSignal[]> {
+  async getActiveSignals(
+    symbol?: string,
+    page: number = 1,
+    pageSize: number = 20,
+  ): Promise<{
+    items: UserSignal[];
+    total: number;
+    page: number;
+    page_size: number;
+    total_pages: number;
+    has_next: boolean;
+    has_prev: boolean;
+  }> {
     try {
-      const params: Record<string, any> = { limit };
+      const params: Record<string, any> = { page, page_size: pageSize };
       if (symbol) params.symbol = symbol.toUpperCase();
 
       const url = API_ENDPOINTS.SIGNALS.ACTIVE + buildQueryString(params);
       const response = await axiosInstance.get(url);
 
-      // Backend already filters - just transform
-      return response.data.map(transformToUserSignal);
+      return {
+        items: (response.data.items || []).map(transformToUserSignal),
+        total: response.data.total,
+        page: response.data.page,
+        page_size: response.data.page_size,
+        total_pages: response.data.total_pages,
+        has_next: response.data.has_next,
+        has_prev: response.data.has_prev,
+      };
     } catch (error) {
       throw new Error(extractErrorMessage(error));
     }
@@ -268,12 +287,22 @@ export const signalsService = {
   async getLeverageRecommendations(
     symbol?: string,
     minConsensus: number = 80,
-    limit: number = 10
-  ): Promise<LeverageRecommendation[]> {
+    page: number = 1,
+    pageSize: number = 10,
+  ): Promise<{
+    items: LeverageRecommendation[];
+    total: number;
+    page: number;
+    page_size: number;
+    total_pages: number;
+    has_next: boolean;
+    has_prev: boolean;
+  }> {
     try {
       const params: Record<string, any> = {
         min_consensus: minConsensus,
-        limit,
+        page,
+        page_size: pageSize,
       };
       if (symbol) params.symbol = symbol.toUpperCase();
 

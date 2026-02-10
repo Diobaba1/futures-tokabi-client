@@ -22,7 +22,7 @@ export interface ApiResponse<T = any> {
  */
 export interface PaginationParams {
   page?: number;
-  limit?: number;
+  page_size?: number;
   sort_by?: string;
   sort_order?: 'asc' | 'desc';
 }
@@ -34,7 +34,7 @@ export interface PaginatedResponse<T> {
   items: T[];
   total: number;
   page: number;
-  limit: number;
+  page_size: number;
   total_pages: number;
   has_next: boolean;
   has_prev: boolean;

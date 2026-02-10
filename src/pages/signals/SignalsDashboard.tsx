@@ -15,6 +15,7 @@ import { UserSignal, UserSignalDetail } from "../../types/signals.types";
 import { signalsService } from "../../api/services/userSignalsService";
 import { Card, Spinner } from "../../components/ui";
 import { SignalCard, SignalFilters, SignalDetailModal } from "../../components/signals";
+import Pagination from "../../components/common/Pagination";
 import UpgradePrompt from "../../components/common/UpgradePrompt";
 import { SubscriptionErrorCode } from "../../types/billings.types";
 
@@ -158,6 +159,8 @@ const SignalsDashboard: React.FC = () => {
   const [selectedSignal, setSelectedSignal] = useState<UserSignalDetail | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+  const [activePage, setActivePage] = useState(1);
+  const [activePageSize] = useState(20);
 
   // Hooks
   const {
@@ -171,10 +174,14 @@ const SignalsDashboard: React.FC = () => {
 
   const {
     signals: activeSignals,
+    total: activeTotal,
+    totalPages: activeTotalPages,
+    hasNext: activeHasNext,
+    hasPrev: activeHasPrev,
     isLoading: isLoadingActive,
     error: errorActive,
     refetch: refetchActive,
-  } = useActiveSignals();
+  } = useActiveSignals(undefined, activePage, activePageSize);
 
   const { stats, isLoading: isLoadingStats } = useSignalStats("24h");
   const { symbols } = useAvailableSymbols();
@@ -331,7 +338,7 @@ const SignalsDashboard: React.FC = () => {
             <TabButton
               active={activeTab === "active"}
               onClick={() => setActiveTab("active")}
-              count={activeSignals.length}
+              count={activeTotal}
             >
               Active
             </TabButton>
@@ -405,15 +412,32 @@ const SignalsDashboard: React.FC = () => {
         ) : filteredSignals.length === 0 ? (
           <EmptySignals hasFilters={hasFilters} />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {filteredSignals.map((signal) => (
-              <SignalCard 
-                key={signal.id} 
-                signal={signal} 
-                onClick={() => handleSignalClick(signal)}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {filteredSignals.map((signal) => (
+                <SignalCard
+                  key={signal.id}
+                  signal={signal}
+                  onClick={() => handleSignalClick(signal)}
+                />
+              ))}
+            </div>
+
+            {/* Pagination for active tab */}
+            {activeTab === "active" && activeTotal > 0 && (
+              <div className="mt-6">
+                <Pagination
+                  page={activePage}
+                  pageSize={activePageSize}
+                  total={activeTotal}
+                  totalPages={activeTotalPages}
+                  hasNext={activeHasNext}
+                  hasPrev={activeHasPrev}
+                  onPageChange={setActivePage}
+                />
+              </div>
+            )}
+          </>
         )}
 
         {/* Footer Note */}

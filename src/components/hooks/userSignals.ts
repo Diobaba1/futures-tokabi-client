@@ -125,10 +125,14 @@ export function useSignals(initialFilters?: UserSignalFilters) {
 }
 
 /**
- * Hook for fetching active signals only
+ * Hook for fetching active signals only (with pagination)
  */
-export function useActiveSignals(symbol?: string, limit: number = 50) {
+export function useActiveSignals(symbol?: string, page: number = 1, pageSize: number = 20) {
   const [signals, setSignals] = useState<UserSignal[]>([]);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrev, setHasPrev] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -136,14 +140,18 @@ export function useActiveSignals(symbol?: string, limit: number = 50) {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await signalsService.getActiveSignals(symbol, limit);
-      setSignals(data);
+      const data = await signalsService.getActiveSignals(symbol, page, pageSize);
+      setSignals(data.items);
+      setTotal(data.total);
+      setTotalPages(data.total_pages);
+      setHasNext(data.has_next);
+      setHasPrev(data.has_prev);
     } catch (err) {
       setError(extractErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
-  }, [symbol, limit]);
+  }, [symbol, page, pageSize]);
 
   useEffect(() => {
     fetchActiveSignals();
@@ -151,6 +159,12 @@ export function useActiveSignals(symbol?: string, limit: number = 50) {
 
   return {
     signals,
+    total,
+    totalPages,
+    hasNext,
+    hasPrev,
+    page,
+    pageSize,
     isLoading,
     error,
     refetch: fetchActiveSignals,
