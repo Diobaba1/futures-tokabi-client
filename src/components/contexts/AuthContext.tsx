@@ -46,8 +46,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const hasInitialized = useRef(false);
 
   const clearAuth = useCallback(async () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    // Cookies are httpOnly and cleared server-side on logout.
     setUser(null);
     setIsAuthenticated(false);
     setIsLoading(false);
@@ -55,11 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshUser = useCallback(async () => {
     try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        throw new Error("No access token available");
-      }
-
+      // Cookie is sent automatically by axios withCredentials.
       const fetchedUser = await authService.getProfile();
       setUser(fetchedUser);
       setIsAuthenticated(true);
@@ -77,15 +72,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     hasInitialized.current = true;
 
     const initializeAuth = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (token) {
-        try {
-          await refreshUser();
-        } catch (error) {
-          console.error("Failed to refresh user on init:", error);
-          await clearAuth();
-        }
-      } else {
+      // Try to load profile — cookie is sent automatically.
+      // If no valid cookie exists the API returns 401 and we stay logged out.
+      try {
+        await refreshUser();
+      } catch {
+        // No valid session — stay logged out.
         setIsLoading(false);
       }
     };
@@ -96,9 +88,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = useCallback(async (data: LoginRequest) => {
     setIsLoading(true);
     try {
-      const response = await authService.login(data);
-      localStorage.setItem("accessToken", response.access_token);
-      localStorage.setItem("refreshToken", response.refresh_token);
+      // Cookies are set automatically by the server response.
+      await authService.login(data);
       await refreshUser();
     } catch (error) {
       await clearAuth();
@@ -109,9 +100,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = useCallback(async (data: RegisterRequest): Promise<void> => {
     setIsLoading(true);
     try {
-      const response = await authService.register(data);
-      localStorage.setItem("accessToken", response.access_token);
-      localStorage.setItem("refreshToken", response.refresh_token);
+      // Cookies are set automatically by the server response.
+      await authService.register(data);
       await refreshUser();
     } catch (error) {
       await clearAuth();

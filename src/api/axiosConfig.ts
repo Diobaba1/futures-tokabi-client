@@ -39,6 +39,7 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
   timeout: 30000,
+  withCredentials: true,  // Send httpOnly cookies with every request
 });
 
 // =============================================================================
@@ -47,10 +48,8 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('accessToken');
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    // Cookies are sent automatically via withCredentials.
+    // No manual Authorization header needed.
     return config;
   },
   (error: AxiosError) => {
@@ -76,11 +75,8 @@ axiosInstance.interceptors.response.use(
     if (status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      // Clear tokens
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-
-      // Dispatch auth logout event
+      // Cookies are cleared server-side on logout.
+      // Dispatch auth logout event so UI resets.
       window.dispatchEvent(new CustomEvent('auth:logout'));
 
       // Show user-friendly notification for session expiry only (debounced)

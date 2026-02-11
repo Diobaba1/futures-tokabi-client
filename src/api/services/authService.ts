@@ -41,9 +41,8 @@ export const authService = {
   },
 
   async logout(): Promise<void> {
-    // No explicit logout endpoint, just clear tokens
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    // Server clears httpOnly cookies and blacklists the token.
+    await axiosInstance.post(API_ENDPOINTS.AUTH.LOGOUT);
   },
 
   /**

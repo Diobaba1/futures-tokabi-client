@@ -116,9 +116,8 @@ export function useWebSocketChat(): UseWebSocketChatReturn {
     const unsubStatus = websocketService.onStatusChange(handleStatusChange);
     const unsubError = websocketService.onError(handleError);
 
-    // Auto-connect if we have a token
-    const token = localStorage.getItem('accessToken');
-    if (token && !hasConnectedRef.current) {
+    // Auto-connect (auth is handled via httpOnly cookies on WS upgrade)
+    if (!hasConnectedRef.current) {
       hasConnectedRef.current = true;
       websocketService.connect();
     }

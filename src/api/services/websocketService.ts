@@ -65,18 +65,13 @@ class WebSocketService {
       this.socket = null;
     }
 
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      this.notifyError('No authentication token found. Please log in.');
-      return;
-    }
-
     this.isIntentionalClose = false;
     this.updateStatus('connecting');
 
     try {
-      const wsUrl = `${this.getWebSocketUrl()}?token=${token}`;
-      console.log('Connecting to WebSocket:', wsUrl.replace(/token=.*/, 'token=***'));
+      // Auth is handled via httpOnly cookies sent automatically on WS upgrade.
+      const wsUrl = this.getWebSocketUrl();
+      console.log('Connecting to WebSocket:', wsUrl);
 
       this.socket = new WebSocket(wsUrl);
 
