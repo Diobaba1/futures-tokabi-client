@@ -165,6 +165,7 @@ export interface UserSignalFilters {
   max_consensus?: number;
   min_leverage?: number;
   max_leverage?: number;
+  page?: number;
   limit?: number;
   offset?: number;
   start_date?: string;

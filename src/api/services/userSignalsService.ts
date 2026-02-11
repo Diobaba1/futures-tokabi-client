@@ -140,8 +140,8 @@ export const signalsService = {
   async getSignals(filters: UserSignalFilters = {}): Promise<UserSignalListResponse> {
     try {
       const params: Record<string, any> = {
-        limit: filters.limit || 50,
-        offset: filters.offset || 0,
+        page: filters.page || 1,
+        page_size: filters.limit || 50,
       };
 
       if (filters.symbol) params.symbol = filters.symbol.toUpperCase();
@@ -155,13 +155,14 @@ export const signalsService = {
       const url = API_ENDPOINTS.SIGNALS.LIST + buildQueryString(params);
       const response = await axiosInstance.get(url);
 
-      // Backend already filters out HOLD and old signals
-      const signals: UserSignal[] = response.data.map(transformToUserSignal);
+      // Backend returns paginated response: {items, total, page, page_size, ...}
+      const items = response.data.items || [];
+      const signals: UserSignal[] = items.map(transformToUserSignal);
 
       return {
         signals,
-        total: (filters.offset || 0) + signals.length,
-        hasMore: signals.length === (filters.limit || 50),
+        total: response.data.total || signals.length,
+        hasMore: response.data.has_next || false,
       };
     } catch (error) {
       throw new Error(extractErrorMessage(error));
