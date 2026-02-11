@@ -54,11 +54,23 @@ export const staffSignalsService = {
   },
 
   /**
-   * Get all active signals
+   * Get active signals with pagination
    */
-  async getActive(symbol?: string): Promise<StaffSignalResponse[]> {
-    const queryString = symbol ? buildQueryString({ symbol }) : "";
-    const response = await axiosInstance.get<StaffSignalResponse[]>(
+  async getActive(params?: {
+    symbol?: string;
+    page?: number;
+    page_size?: number;
+  }): Promise<{
+    items: StaffSignalResponse[];
+    total: number;
+    page: number;
+    page_size: number;
+    total_pages: number;
+    has_next: boolean;
+    has_prev: boolean;
+  }> {
+    const queryString = params ? buildQueryString(params) : "";
+    const response = await axiosInstance.get(
       `${API_ENDPOINTS.STAFF_SIGNALS.ACTIVE}${queryString}`
     );
     return response.data;

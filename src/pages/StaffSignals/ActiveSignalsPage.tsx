@@ -20,6 +20,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useStaffSignals } from "../../components/hooks/useStaffSignals";
+import Pagination from "../../components/common/Pagination";
 import {
   StaffSignalResponse,
   TakeProfit,
@@ -29,22 +30,34 @@ const ActiveSignalsPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [positionFilter, setPositionFilter] = useState<string>("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
 
-  const { activeSignals, isLoading, error, requiresSubscription, fetchActiveSignals } =
+  const { activeSignals, activePagination, isLoading, error, requiresSubscription, fetchActiveSignals } =
     useStaffSignals();
 
   useEffect(() => {
-    fetchActiveSignals();
+    fetchActiveSignals({ symbol: searchQuery || undefined, page, page_size: pageSize });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [page, pageSize]);
 
   const handleRefresh = () => {
-    fetchActiveSignals(searchQuery || undefined);
+    fetchActiveSignals({ symbol: searchQuery || undefined, page, page_size: pageSize });
   };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchActiveSignals(searchQuery || undefined);
+    setPage(1);
+    fetchActiveSignals({ symbol: searchQuery || undefined, page: 1, page_size: pageSize });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setPage(1);
   };
 
   const filteredSignals = activeSignals.filter((signal) => {
@@ -237,11 +250,28 @@ const ActiveSignalsPage: React.FC = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filteredSignals.map((signal) => (
-                  <SignalDisplayCard key={signal.id} signal={signal} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {filteredSignals.map((signal) => (
+                    <SignalDisplayCard key={signal.id} signal={signal} />
+                  ))}
+                </div>
+
+                {activePagination.total > 0 && (
+                  <div className="mt-6 bg-gray-900/80 backdrop-blur-sm border border-gray-800 rounded-xl">
+                    <Pagination
+                      page={activePagination.page}
+                      pageSize={activePagination.pageSize}
+                      total={activePagination.total}
+                      totalPages={activePagination.totalPages}
+                      hasNext={activePagination.hasNext}
+                      hasPrev={activePagination.hasPrev}
+                      onPageChange={handlePageChange}
+                      onPageSizeChange={handlePageSizeChange}
+                    />
+                  </div>
+                )}
+              </>
             )}
           </>
         )}

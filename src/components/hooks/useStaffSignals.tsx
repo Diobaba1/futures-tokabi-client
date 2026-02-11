@@ -18,17 +18,22 @@ import {
 // Types
 // =============================================================================
 
+interface PaginationState {
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
 interface UseStaffSignalsState {
   signals: StaffSignalResponse[];
   activeSignals: StaffSignalResponse[];
   selectedSignal: StaffSignalDetailResponse | null;
   stats: StaffSignalStatsResponse | null;
-  pagination: {
-    total: number;
-    page: number;
-    pageSize: number;
-    totalPages: number;
-  };
+  pagination: PaginationState;
+  activePagination: PaginationState;
   isLoading: boolean;
   isCreating: boolean;
   isUpdating: boolean;
@@ -39,7 +44,7 @@ interface UseStaffSignalsState {
 interface UseStaffSignalsReturn extends UseStaffSignalsState {
   // Fetch operations
   fetchSignals: (params?: StaffSignalFilterParams) => Promise<void>;
-  fetchActiveSignals: (symbol?: string) => Promise<void>;
+  fetchActiveSignals: (params?: { symbol?: string; page?: number; page_size?: number }) => Promise<void>;
   fetchSignalById: (signalId: string) => Promise<void>;
   fetchStats: (days?: number) => Promise<void>;
 
@@ -75,17 +80,22 @@ interface UseStaffSignalsReturn extends UseStaffSignalsState {
 export const useStaffSignals = (
   initialFilters?: StaffSignalFilterParams
 ): UseStaffSignalsReturn => {
+  const defaultPagination: PaginationState = {
+    total: 0,
+    page: 1,
+    pageSize: 20,
+    totalPages: 1,
+    hasNext: false,
+    hasPrev: false,
+  };
+
   const [state, setState] = useState<UseStaffSignalsState>({
     signals: [],
     activeSignals: [],
     selectedSignal: null,
     stats: null,
-    pagination: {
-      total: 0,
-      page: 1,
-      pageSize: 20,
-      totalPages: 1,
-    },
+    pagination: { ...defaultPagination },
+    activePagination: { ...defaultPagination },
     isLoading: false,
     isCreating: false,
     isUpdating: false,
@@ -140,6 +150,7 @@ export const useStaffSignals = (
 
         const response = await staffSignalsService.list(filters);
 
+        const totalPages = response.total_pages || Math.ceil(response.total / response.page_size) || 1;
         setState((prev) => ({
           ...prev,
           signals: response.signals,
@@ -147,7 +158,9 @@ export const useStaffSignals = (
             total: response.total,
             page: response.page,
             pageSize: response.page_size,
-            totalPages: response.total_pages,
+            totalPages,
+            hasNext: response.page < totalPages,
+            hasPrev: response.page > 1,
           },
           isLoading: false,
         }));
@@ -161,16 +174,24 @@ export const useStaffSignals = (
     [currentFilters]
   );
 
-  const fetchActiveSignals = useCallback(async (symbol?: string) => {
+  const fetchActiveSignals = useCallback(async (params?: { symbol?: string; page?: number; page_size?: number }) => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await staffSignalsService.getActive(symbol);
+      const response = await staffSignalsService.getActive(params);
 
       setState((prev) => ({
         ...prev,
-        activeSignals: response,
+        activeSignals: response.items,
+        activePagination: {
+          total: response.total,
+          page: response.page,
+          pageSize: response.page_size,
+          totalPages: response.total_pages,
+          hasNext: response.has_next,
+          hasPrev: response.has_prev,
+        },
         isLoading: false,
         requiresSubscription: false,
       }));

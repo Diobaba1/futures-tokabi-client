@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../components/contexts/AuthContext';
 import { tradeService } from '../../api/services';
+import Pagination from '../../components/common/Pagination';
 import {
   TradeDetailResponse,
   TradeListResponse,
@@ -39,6 +40,12 @@ const Trades: React.FC = () => {
   // Platform trades state
   const [platformTrades, setPlatformTrades] = useState<TradeDetailResponse[]>([]);
   const [platformLoading, setPlatformLoading] = useState(true);
+  const [platformPage, setPlatformPage] = useState(1);
+  const [platformPageSize, setPlatformPageSize] = useState(20);
+  const [platformTotal, setPlatformTotal] = useState(0);
+  const [platformTotalPages, setPlatformTotalPages] = useState(1);
+  const [platformHasNext, setPlatformHasNext] = useState(false);
+  const [platformHasPrev, setPlatformHasPrev] = useState(false);
 
   // Exchange history state
   const [exchangeData, setExchangeData] = useState<ExchangeHistoryResponse | null>(null);
@@ -57,9 +64,14 @@ const Trades: React.FC = () => {
     else setPlatformLoading(true);
 
     try {
-      const params = statusFilter ? { status: statusFilter } : {};
-      const data: TradeListResponse = await tradeService.getTrades(params);
-      setPlatformTrades(data.trades || []);
+      const params: any = { page: platformPage, page_size: platformPageSize };
+      if (statusFilter) params.status = statusFilter;
+      const data = await tradeService.getTrades(params);
+      setPlatformTrades(data.items || []);
+      setPlatformTotal(data.total || 0);
+      setPlatformTotalPages(data.total_pages || 1);
+      setPlatformHasNext(data.has_next || false);
+      setPlatformHasPrev(data.has_prev || false);
       setLastRefresh(new Date());
     } catch (error) {
       console.error('Failed to load platform trades:', error);
@@ -68,7 +80,7 @@ const Trades: React.FC = () => {
       setPlatformLoading(false);
       setRefreshing(false);
     }
-  }, [statusFilter]);
+  }, [statusFilter, platformPage, platformPageSize]);
 
   // Load exchange history
   const loadExchangeHistory = useCallback(async (isRefresh = false) => {
@@ -496,14 +508,28 @@ const Trades: React.FC = () => {
                 getPnLColor={getPnLColor}
               />
             ) : (
-              <PlatformTradesList
-                trades={filteredPlatformTrades}
-                formatCurrency={formatCurrency}
-                formatPrice={formatPrice}
-                formatQuantity={formatQuantity}
-                formatDate={formatDate}
-                getPnLColor={getPnLColor}
-              />
+              <>
+                <PlatformTradesList
+                  trades={filteredPlatformTrades}
+                  formatCurrency={formatCurrency}
+                  formatPrice={formatPrice}
+                  formatQuantity={formatQuantity}
+                  formatDate={formatDate}
+                  getPnLColor={getPnLColor}
+                />
+                {platformTotal > 0 && (
+                  <Pagination
+                    page={platformPage}
+                    pageSize={platformPageSize}
+                    total={platformTotal}
+                    totalPages={platformTotalPages}
+                    hasNext={platformHasNext}
+                    hasPrev={platformHasPrev}
+                    onPageChange={setPlatformPage}
+                    onPageSizeChange={(size) => { setPlatformPageSize(size); setPlatformPage(1); }}
+                  />
+                )}
+              </>
             )}
           </motion.div>
         </div>

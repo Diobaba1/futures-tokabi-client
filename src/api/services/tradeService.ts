@@ -15,9 +15,17 @@ export const tradeService = {
   getTrades: async (params?: {
     status?: string;
     symbol?: string;
-    limit?: number;
-    offset?: number;
-  }): Promise<TradeListResponse> => {
+    page?: number;
+    page_size?: number;
+  }): Promise<{
+    items: any[];
+    total: number;
+    page: number;
+    page_size: number;
+    total_pages: number;
+    has_next: boolean;
+    has_prev: boolean;
+  }> => {
     const response = await axiosInstance.get(API_ENDPOINTS.TRADES.LIST, { params });
     return response.data;
   },
