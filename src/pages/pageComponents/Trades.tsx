@@ -6,7 +6,6 @@ import { tradeService } from '../../api/services';
 import Pagination from '../../components/common/Pagination';
 import {
   TradeDetailResponse,
-  TradeListResponse,
   ExchangeHistoryResponse,
   ExchangeTrade,
 } from '../../types/trades.types';
