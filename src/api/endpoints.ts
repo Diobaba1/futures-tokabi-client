@@ -5,10 +5,10 @@
 export const API_ENDPOINTS = {
   // Authentication
   AUTH: {
-    LOGIN: "/auth/login/",
-    REGISTER: "/auth/register/",
-    LOGOUT: "/auth/logout/",
-    PROFILE: "/auth/profile/",
+    LOGIN: "/auth/login",
+    REGISTER: "/auth/register",
+    LOGOUT: "/auth/logout",
+    PROFILE: "/auth/profile",
 
     // Password Reset & Management
     FORGOT_PASSWORD: "/auth/forgot-password",
@@ -23,8 +23,8 @@ export const API_ENDPOINTS = {
 
   // Users
   USERS: {
-    ME: "/users/me/",
-    UPDATE: "/users/me/",
+    ME: "/users/me",
+    UPDATE: "/users/me",
 
     API_KEYS: "/users/api-keys",
     API_KEYS_ID: (keyId: string) => `/users/api-keys/${keyId}`,
@@ -37,7 +37,7 @@ export const API_ENDPOINTS = {
 
   // Portfolio
   PORTFOLIO: {
-    GET: "/portfolio/portfolio/",
+    GET: "/portfolio/portfolio",
   },
 
   USER_SEARCH_SYMBOL: {
@@ -71,7 +71,7 @@ export const API_ENDPOINTS = {
     // ========================================
     SUBSCRIPTIONS: {
       CURRENT: "/subscriptions/me",                              // GET /api/subscriptions/me
-      CREATE: "/subscriptions/",                                 // POST /api/subscriptions/
+      CREATE: "/subscriptions",                                  // POST /api/subscriptions
       CREATE_EMAIL: "/subscriptions/email",                      // POST /api/subscriptions/email
       HISTORY: "/subscriptions/history",                         // GET /api/subscriptions/history
       CANCEL: (subscriptionId: string) => 
@@ -85,7 +85,7 @@ export const API_ENDPOINTS = {
     // Backend: payments.router prefix="/payments"
     // ========================================
     PAYMENTS: {
-      LIST: "/payments/",                                        // GET /api/payments/
+      LIST: "/payments",                                         // GET /api/payments
       DETAIL: (paymentId: string) => `/payments/${paymentId}`,   // GET /api/payments/{id}
       STATUS: (paymentId: string) => 
         `/payments/${paymentId}/status`,                         // GET /api/payments/{id}/status
@@ -97,7 +97,7 @@ export const API_ENDPOINTS = {
     // Backend: invoices.router prefix="/invoices"
     // ========================================
     INVOICES: {
-      LIST: "/invoices/",                                        // GET /api/invoices/
+      LIST: "/invoices",                                         // GET /api/invoices
       UNPAID: "/invoices/unpaid",                                // GET /api/invoices/unpaid
       DETAIL: (invoiceId: string) => `/invoices/${invoiceId}`,   // GET /api/invoices/{id}
       PAY: (invoiceId: string) => `/invoices/${invoiceId}/pay`,  // POST /api/invoices/{id}/pay
@@ -151,8 +151,8 @@ export const API_ENDPOINTS = {
   // ============================================================================
   STAFF_SIGNALS: {
     // Base CRUD
-    LIST: "/staff-signals/",
-    CREATE: "/staff-signals/",
+    LIST: "/staff-signals",
+    CREATE: "/staff-signals",
     DETAIL: (signalId: string) => `/staff-signals/${signalId}`,
     UPDATE: (signalId: string) => `/staff-signals/${signalId}`,
 
@@ -174,9 +174,9 @@ export const API_ENDPOINTS = {
 
   // Trades
   TRADES: {
-    LIST: "/trades/",
+    LIST: "/trades",
     DETAIL: "/trades/{id}",
-    CREATE: "/trades/",
+    CREATE: "/trades",
     UPDATE: "/trades/{id}",
     DELETE: "/trades/{id}",
     STATS: "/trades/stats/summary",
@@ -187,15 +187,15 @@ export const API_ENDPOINTS = {
 
   // Analytics
   ANALYTICS: {
-    PORTFOLIO: "/analytics/portfolio/",
-    PERFORMANCE: "/analytics/performance/",
-    HISTORY: "/analytics/history/",
-    SYSTEM: "/analytics/system/",
+    PORTFOLIO: "/analytics/portfolio",
+    PERFORMANCE: "/analytics/performance",
+    HISTORY: "/analytics/history",
+    SYSTEM: "/analytics/system",
   },
 
   SIGNALS: {
     // GET /signals/ - List signals with filters
-    LIST: "/signals/",
+    LIST: "/signals",
 
     // GET /signals/active - Get active signals
     ACTIVE: "/signals/active",
