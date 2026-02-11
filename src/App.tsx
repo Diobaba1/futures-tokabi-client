@@ -1,5 +1,5 @@
 // src/App.tsx
-import React from "react";
+import React, { Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./components/contexts/AuthContext";
 import { AnalyticsProvider } from "./components/contexts/AnalyticsContext";
@@ -8,57 +8,153 @@ import { QueryProvider } from "./providers/QueryProvider";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
 import PublicLayout from "./components/layout/PublicLayout";
 import DashboardLayout from "./components/layout/DashboardLayout";
+import ErrorBoundary from "./components/ErrorBoundary";
+import "./App.css";
 
+// --------------------------------------------------------------------------
+// Critical pages (keep static for instant load)
+// --------------------------------------------------------------------------
 import HomePage from "./pages/Home/Home";
 import Login from "./pages/Auth/Login/Login";
 import Register from "./pages/Auth/Register";
-import FeaturesSection from "./pages/pageComponents/FeaturesSection";
-import Dashboard from "./pages/Dashboard/Dashboard";
-import Trades from "./pages/pageComponents/Trades";
-import Profile from "./pages/Profile";
-import "./App.css";
-import CommunityPage from "./pages/pageComponents/Community";
-import APIKeyManager from "./pages/walletpages/APIKeyManager";
-import TgConfigPage from "./pages/config/tgConfigPage";
-import { SymbolSearchPage } from "./pages/analytics/SymbolSearchPage";
-import AffiliatePage from "./pages/Users/AffiliatePage";
 
-import ForgotPasswordPage from "./pages/Auth/settings/password/ForgotPasswordPage";
-import SecuritySettingsPage from "./pages/Auth/settings/SecuritySettingsPage";
-import ChangePasswordPage from "./pages/Auth/settings/password/ChangePasswordPage";
-import ResetPasswordPage from "./pages/Auth/settings/password/ResetPasswordPage";
-import { SignalsDashboard } from "./pages/signals";
-import ReferredUsersList from "./pages/Users/ReferredUsersList";
+// --------------------------------------------------------------------------
+// Lazy-loaded pages (code-split for smaller initial bundle)
+// --------------------------------------------------------------------------
+const FeaturesSection = React.lazy(
+  () => import("./pages/pageComponents/FeaturesSection")
+);
+const Dashboard = React.lazy(() => import("./pages/Dashboard/Dashboard"));
+const Trades = React.lazy(() => import("./pages/pageComponents/Trades"));
+const Profile = React.lazy(() => import("./pages/Profile"));
+const CommunityPage = React.lazy(
+  () => import("./pages/pageComponents/Community")
+);
+const APIKeyManager = React.lazy(
+  () => import("./pages/walletpages/APIKeyManager")
+);
+const TgConfigPage = React.lazy(
+  () => import("./pages/config/tgConfigPage")
+);
+const SymbolSearchPage = React.lazy(() =>
+  import("./pages/analytics/SymbolSearchPage").then((m) => ({
+    default: m.SymbolSearchPage,
+  }))
+);
+const AffiliatePage = React.lazy(
+  () => import("./pages/Users/AffiliatePage")
+);
+const ForgotPasswordPage = React.lazy(
+  () => import("./pages/Auth/settings/password/ForgotPasswordPage")
+);
+const SecuritySettingsPage = React.lazy(
+  () => import("./pages/Auth/settings/SecuritySettingsPage")
+);
+const ChangePasswordPage = React.lazy(
+  () => import("./pages/Auth/settings/password/ChangePasswordPage")
+);
+const ResetPasswordPage = React.lazy(
+  () => import("./pages/Auth/settings/password/ResetPasswordPage")
+);
+const SignalsDashboard = React.lazy(() =>
+  import("./pages/signals").then((m) => ({ default: m.SignalsDashboard }))
+);
+const ReferredUsersList = React.lazy(
+  () => import("./pages/Users/ReferredUsersList")
+);
+const TradingConfigPage = React.lazy(
+  () => import("./pages/trading/TradingConfigPage")
+);
 
-// Static Pages
-import {
-  AboutPage,
-  HowItWorksPage,
-  SpatialIntelligencePage,
-  FAQPage,
-} from "./pages/static";
+// Static pages
+const AboutPage = React.lazy(() =>
+  import("./pages/static").then((m) => ({ default: m.AboutPage }))
+);
+const HowItWorksPage = React.lazy(() =>
+  import("./pages/static").then((m) => ({ default: m.HowItWorksPage }))
+);
+const SpatialIntelligencePage = React.lazy(() =>
+  import("./pages/static").then((m) => ({
+    default: m.SpatialIntelligencePage,
+  }))
+);
+const FAQPage = React.lazy(() =>
+  import("./pages/static").then((m) => ({ default: m.FAQPage }))
+);
 
-// Staff Signals Pages
-import { StaffSignalsPage, ActiveSignalsPage } from "./pages/StaffSignals";
+// Staff Signals
+const StaffSignalsPage = React.lazy(() =>
+  import("./pages/StaffSignals").then((m) => ({
+    default: m.StaffSignalsPage,
+  }))
+);
+const ActiveSignalsPage = React.lazy(() =>
+  import("./pages/StaffSignals").then((m) => ({
+    default: m.ActiveSignalsPage,
+  }))
+);
 
-// Trading Config Page
-import TradingConfigPage from "./pages/trading/TradingConfigPage";
+// Billing
+const PricingPage = React.lazy(() =>
+  import("./pages/billing2").then((m) => ({ default: m.PricingPage }))
+);
+const BillingDashboard = React.lazy(() =>
+  import("./pages/billing2").then((m) => ({ default: m.BillingDashboard }))
+);
+const SubscriptionPage = React.lazy(() =>
+  import("./pages/billing2").then((m) => ({ default: m.SubscriptionPage }))
+);
+const PaymentsPage = React.lazy(() =>
+  import("./pages/billing2").then((m) => ({ default: m.PaymentsPage }))
+);
+const InvoicesPage = React.lazy(() =>
+  import("./pages/billing2").then((m) => ({ default: m.InvoicesPage }))
+);
+const PaymentSuccess = React.lazy(() =>
+  import("./pages/billing2").then((m) => ({ default: m.PaymentSuccess }))
+);
+const PaymentFailed = React.lazy(() =>
+  import("./pages/billing2").then((m) => ({ default: m.PaymentFailed }))
+);
+const PaymentPartial = React.lazy(() =>
+  import("./pages/billing2").then((m) => ({ default: m.PaymentPartial }))
+);
+const PaymentPending = React.lazy(() =>
+  import("./pages/billing2").then((m) => ({ default: m.PaymentPending }))
+);
 
-// =========================================================================
-// Billing Pages
-// =========================================================================
-import {
-  PricingPage,
-  BillingDashboard,
-  SubscriptionPage,
-  PaymentsPage,
-  InvoicesPage,
-  PaymentSuccess,
-  PaymentFailed,
-  PaymentPartial,
-  PaymentPending,
-} from "./pages/billing2";
+// --------------------------------------------------------------------------
+// Loading fallback for lazy-loaded routes
+// --------------------------------------------------------------------------
+function RouteLoader() {
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#0f172a",
+      }}
+    >
+      <div
+        style={{
+          width: 36,
+          height: 36,
+          border: "3px solid #1e293b",
+          borderTopColor: "#06b6d4",
+          borderRadius: "50%",
+          animation: "spin 0.8s linear infinite",
+        }}
+      />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
 
+// --------------------------------------------------------------------------
+// Route definitions
+// --------------------------------------------------------------------------
 interface RouteConfig {
   path: string;
   element: React.ReactNode;
@@ -104,14 +200,8 @@ const publicRoutes: RouteConfig[] = [
     element: <CommunityPage />,
     layout: PublicLayout,
   },
-  // =========================================================================
-  // Static Pages (About, How It Works, etc.)
-  // =========================================================================
-  {
-    path: "/about",
-    element: <AboutPage />,
-    layout: PublicLayout,
-  },
+  // Static Pages
+  { path: "/about", element: <AboutPage />, layout: PublicLayout },
   {
     path: "/how-it-works",
     element: <HowItWorksPage />,
@@ -122,20 +212,9 @@ const publicRoutes: RouteConfig[] = [
     element: <SpatialIntelligencePage />,
     layout: PublicLayout,
   },
-  {
-    path: "/faq",
-    element: <FAQPage />,
-    layout: PublicLayout,
-  },
-  // =========================================================================
-  // Public Billing Routes
-  // =========================================================================
-  {
-    path: "/pricing",
-    element: <PricingPage />,
-    layout: PublicLayout,
-  },
-  // Payment Status Pages (users redirected from NOWPayments)
+  { path: "/faq", element: <FAQPage />, layout: PublicLayout },
+  // Public Billing
+  { path: "/pricing", element: <PricingPage />, layout: PublicLayout },
   {
     path: "/billing/success",
     element: <PaymentSuccess />,
@@ -177,9 +256,7 @@ const dashboardRoutes: RouteConfig[] = [
     layout: DashboardLayout,
     protected: true,
   },
-  // =========================================================================
-  // Billing Dashboard Routes
-  // =========================================================================
+  // Billing
   {
     path: "/dashboard/billing",
     element: <BillingDashboard />,
@@ -204,7 +281,7 @@ const dashboardRoutes: RouteConfig[] = [
     layout: DashboardLayout,
     protected: true,
   },
-  // =========================================================================
+  // Trading
   {
     path: "/dashboard/trading",
     element: <Trades />,
@@ -217,6 +294,7 @@ const dashboardRoutes: RouteConfig[] = [
     layout: DashboardLayout,
     protected: true,
   },
+  // Settings
   {
     path: "/dashboard/settings",
     element: <Profile />,
@@ -235,6 +313,7 @@ const dashboardRoutes: RouteConfig[] = [
     layout: DashboardLayout,
     protected: true,
   },
+  // Signals
   {
     path: "/dashboard/signals",
     element: <SignalsDashboard />,
@@ -253,6 +332,7 @@ const dashboardRoutes: RouteConfig[] = [
     layout: DashboardLayout,
     protected: true,
   },
+  // Affiliate & Referrals
   {
     path: "/dashboard/affiliate-dashboard",
     element: <AffiliatePage />,
@@ -265,9 +345,7 @@ const dashboardRoutes: RouteConfig[] = [
     layout: DashboardLayout,
     protected: true,
   },
-  // =========================================================================
-  // Staff Signals Routes
-  // =========================================================================
+  // Staff Signals
   {
     path: "/dashboard/staff-signals",
     element: <StaffSignalsPage />,
@@ -312,50 +390,55 @@ function renderRoute({
 
 function App() {
   return (
-    <QueryProvider>
-      <AuthProvider>
-        <ToastProvider>
-          <AnalyticsProvider>
-            <Router>
-              <div className="relative">
-                <Routes>
-                  {publicRoutes.map(renderRoute)}
-                  {dashboardRoutes.map(renderRoute)}
+    <ErrorBoundary>
+      <QueryProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <AnalyticsProvider>
+              <Router>
+                <Suspense fallback={<RouteLoader />}>
+                  <div className="relative">
+                    <Routes>
+                      {publicRoutes.map(renderRoute)}
+                      {dashboardRoutes.map(renderRoute)}
 
-                  {/* 404 Page */}
-                  <Route
-                    path="*"
-                    element={
-                      <PublicLayout>
-                        <div className="min-h-screen flex items-center justify-center bg-tokabi-light">
-                          <div className="text-center px-4">
-                            <h1 className="text-6xl font-bold text-tokabi-accent mb-4">
-                              404
-                            </h1>
-                            <h2 className="text-2xl font-semibold text-tokabi-primary mb-4">
-                              Page not found
-                            </h2>
-                            <p className="text-tokabi-secondary mb-8">
-                              The page you're looking for doesn't exist or has been moved.
-                            </p>
-                            <a
-                              href="/"
-                              className="inline-flex items-center justify-center px-6 py-3 bg-tokabi-accent text-white font-semibold rounded-btn hover:bg-tokabi-accent-hover transition-colors"
-                            >
-                              Back to Home
-                            </a>
-                          </div>
-                        </div>
-                      </PublicLayout>
-                    }
-                  />
-                </Routes>
-              </div>
-            </Router>
-          </AnalyticsProvider>
-        </ToastProvider>
-      </AuthProvider>
-    </QueryProvider>
+                      {/* 404 Page */}
+                      <Route
+                        path="*"
+                        element={
+                          <PublicLayout>
+                            <div className="min-h-screen flex items-center justify-center bg-tokabi-light">
+                              <div className="text-center px-4">
+                                <h1 className="text-6xl font-bold text-tokabi-accent mb-4">
+                                  404
+                                </h1>
+                                <h2 className="text-2xl font-semibold text-tokabi-primary mb-4">
+                                  Page not found
+                                </h2>
+                                <p className="text-tokabi-secondary mb-8">
+                                  The page you're looking for doesn't exist or
+                                  has been moved.
+                                </p>
+                                <a
+                                  href="/"
+                                  className="inline-flex items-center justify-center px-6 py-3 bg-tokabi-accent text-white font-semibold rounded-btn hover:bg-tokabi-accent-hover transition-colors"
+                                >
+                                  Back to Home
+                                </a>
+                              </div>
+                            </div>
+                          </PublicLayout>
+                        }
+                      />
+                    </Routes>
+                  </div>
+                </Suspense>
+              </Router>
+            </AnalyticsProvider>
+          </ToastProvider>
+        </AuthProvider>
+      </QueryProvider>
+    </ErrorBoundary>
   );
 }
 
