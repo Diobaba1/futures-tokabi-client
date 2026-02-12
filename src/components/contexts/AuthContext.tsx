@@ -71,6 +71,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (hasInitialized.current) return;
     hasInitialized.current = true;
 
+    // Clean up stale localStorage tokens from the old auth flow.
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+
     const initializeAuth = async () => {
       // Try to load profile — cookie is sent automatically.
       // If no valid cookie exists the API returns 401 and we stay logged out.
