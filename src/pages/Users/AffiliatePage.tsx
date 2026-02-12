@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { UserAffiliateService } from '../../api/services/UserAffiliateService';
 import { useAuth } from '../../components/contexts/AuthContext';
+import { sanitizeUrl } from '../../utils/urlSanitizer';
 import type {
   ApplicationStatusResponse,
   ProfileStatusResponse,
@@ -485,18 +486,25 @@ const ApplicationTab: React.FC<{
         <div>
           <div className="text-sm text-gray-400 mb-2">Social Links</div>
           <div className="space-y-2">
-            {application.social_links.map((link, index) => (
-              <a
-                key={index}
-                href={link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 break-all"
-              >
-                <ExternalLink className="w-4 h-4 flex-shrink-0" />
-                {link}
-              </a>
-            ))}
+            {application.social_links.map((link, index) => {
+              const safeUrl = sanitizeUrl(link);
+              return safeUrl ? (
+                <a
+                  key={index}
+                  href={safeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 break-all"
+                >
+                  <ExternalLink className="w-4 h-4 flex-shrink-0" />
+                  {link}
+                </a>
+              ) : (
+                <span key={index} className="flex items-center gap-2 text-gray-500 break-all">
+                  {link}
+                </span>
+              );
+            })}
           </div>
         </div>
 

@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { usePayments, usePaymentStatus } from '../../components/hooks/useBilling';
 import { PaymentStatus, type Payment } from '../../types/billings.types';
+import { sanitizeUrl } from '../../utils/urlSanitizer';
 
 // Payment status config
 const statusConfig: Record<PaymentStatus, { color: string; icon: React.ReactNode; label: string }> = {
@@ -127,7 +128,7 @@ const PaymentRow: React.FC<PaymentRowProps> = ({ payment, onClick }) => {
       <td className="px-4 py-4">
         {payment.payment_url && (
           <a
-            href={payment.payment_url}
+            href={sanitizeUrl(payment.payment_url) || '#'}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
@@ -221,7 +222,7 @@ const PaymentDetailModal: React.FC<PaymentDetailModalProps> = ({
         <div className="flex gap-3">
           {payment.payment_url && (currentStatus === 'waiting' || currentStatus === 'confirming') && (
             <a
-              href={payment.payment_url}
+              href={sanitizeUrl(payment.payment_url) || '#'}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors text-center flex items-center justify-center gap-2"
