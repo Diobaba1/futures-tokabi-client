@@ -8,6 +8,7 @@ import React, {
   useRef,
   useCallback,
 } from "react";
+import axiosInstance from "../../api/axiosConfig";
 import { authService } from "../../api/services";
 import {
   LoginRequest,
@@ -39,6 +40,20 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+/**
+ * Set in-memory Bearer token as fallback for browsers that block cross-site cookies.
+ * The backend accepts both httpOnly cookies and Authorization headers (header wins).
+ * This token lives only in memory — a page refresh clears it, which is acceptable:
+ * the user just logs in again (same as "session expired").
+ */
+function setBearerToken(token: string | null) {
+  if (token) {
+    axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  } else {
+    delete axiosInstance.defaults.headers.common["Authorization"];
+  }
+}
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,7 +61,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const hasInitialized = useRef(false);
 
   const clearAuth = useCallback(async () => {
-    // Cookies are httpOnly and cleared server-side on logout.
+    setBearerToken(null);
     setUser(null);
     setIsAuthenticated(false);
     setIsLoading(false);
@@ -54,7 +69,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshUser = useCallback(async () => {
     try {
-      // Cookie is sent automatically by axios withCredentials.
       const fetchedUser = await authService.getProfile();
       setUser(fetchedUser);
       setIsAuthenticated(true);
@@ -92,8 +106,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = useCallback(async (data: LoginRequest) => {
     setIsLoading(true);
     try {
-      // Cookies are set automatically by the server response.
-      await authService.login(data);
+      // Server returns tokens in body AND sets httpOnly cookies.
+      // We capture the token as a Bearer fallback for browsers that block
+      // cross-site cookies (tokabi.io → api.tokabi.org).
+      const response = await authService.login(data);
+      if (response?.access_token) {
+        setBearerToken(response.access_token);
+      }
       await refreshUser();
     } catch (error) {
       await clearAuth();
@@ -104,8 +123,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = useCallback(async (data: RegisterRequest): Promise<void> => {
     setIsLoading(true);
     try {
-      // Cookies are set automatically by the server response.
-      await authService.register(data);
+      const response = await authService.register(data);
+      if (response?.access_token) {
+        setBearerToken(response.access_token);
+      }
       await refreshUser();
     } catch (error) {
       await clearAuth();
