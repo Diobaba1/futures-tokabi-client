@@ -46,20 +46,29 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    // Clean up the data before sending - remove empty referral code
+    const dataToSend = {
+      email: formData.email,
+      full_name: formData.full_name,
+      password: formData.password,
+      // Only include referral_code if it's not empty
+      ...(formData.referral_code?.trim() && { referral_code: formData.referral_code.trim() })
+    };
+
     // ✅ DEBUG: Log what we're sending
     console.log('🚀 Submitting registration with data:', {
-      ...formData,
+      ...dataToSend,
       password: '****' // Don't log actual password
     });
-    
+
     try {
-      await register(formData);
+      await register(dataToSend);
       showToast('Registration successful! Redirecting...', 'success', 3000);
       navigate('/dashboard');
     } catch (err: any) {
       console.error('❌ Registration error:', err);
-      
+
       let errorMsg = 'Registration failed';
       if (err.response?.data?.detail) {
         if (Array.isArray(err.response.data.detail)) {
