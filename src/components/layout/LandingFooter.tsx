@@ -3,7 +3,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { TrendingUp, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
+import { TokabiFull } from '../brand/TokabiFull';
 
 interface FooterLink {
   name: string;
@@ -61,13 +62,8 @@ const LandingFooter: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12">
           {/* Brand Section */}
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-br from-cyan-600 to-cyan-800 rounded-xl flex items-center justify-center shadow-md shadow-cyan-700/20">
-                <TrendingUp className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-tokabi-primary dark:text-white tracking-tight">
-                TOKABI
-              </span>
+            <Link to="/" className="flex items-center mb-6">
+              <TokabiFull className="h-8 text-cyan-900 dark:text-white" />
             </Link>
 
             <p className="text-tokabi-secondary dark:text-gray-400 text-base max-w-sm leading-relaxed">

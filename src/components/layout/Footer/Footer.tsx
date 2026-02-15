@@ -2,7 +2,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { TrendingUp, Mail, ArrowRight } from 'lucide-react';
+import { Mail, ArrowRight } from 'lucide-react';
+import { TokabiFull } from '../../brand/TokabiFull';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -99,14 +100,8 @@ const Footer: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="lg:col-span-2"
           >
-            <Link to="/" className="flex items-center space-x-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/25">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-white font-light text-2xl tracking-tight">TOKABI</span>
-                <span className="text-cyan-400 text-sm font-medium tracking-wider">ALGORITHMIC TRADING</span>
-              </div>
+            <Link to="/" className="flex items-center mb-6">
+              <TokabiFull className="h-10 text-cyan-900" />
             </Link>
             
             <p className="text-gray-400 text-base mb-6 max-w-md font-light leading-relaxed">

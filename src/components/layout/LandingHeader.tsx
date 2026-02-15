@@ -3,10 +3,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { TokabiFull } from '../brand/TokabiFull';
 import {
   Menu,
   X,
-  TrendingUp,
   ArrowRight,
   Sun,
   Moon,
@@ -94,13 +94,8 @@ const LandingHeader: React.FC = () => {
               whileTap={{ scale: 0.98 }}
               className="flex-shrink-0"
             >
-              <Link to="/" className="flex items-center space-x-3 group">
-                <div className="w-10 h-10 bg-gradient-to-br from-cyan-600 to-cyan-800 rounded-xl flex items-center justify-center shadow-md shadow-cyan-700/20 group-hover:shadow-cyan-700/30 transition-all">
-                  <TrendingUp className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-2xl font-bold text-tokabi-primary dark:text-white tracking-tight">
-                  TOKABI
-                </span>
+              <Link to="/" className="flex items-center group">
+                <TokabiFull className="h-8 text-cyan-900 dark:text-white" />
               </Link>
             </motion.div>
 

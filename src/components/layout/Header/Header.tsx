@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { TokabiFull } from '../../brand/TokabiFull';
 import {
   Menu,
   X,
@@ -178,30 +179,12 @@ const Header: React.FC = () => {
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
               className="flex-shrink-0 flex items-center relative z-10"
             >
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 className="flex items-center space-x-3 group"
                 aria-label="TOKABI Home"
               >
-                <div className="relative w-11 h-11 bg-gradient-to-br from-cyan-500 via-cyan-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/50 group-hover:shadow-cyan-500/70 transition-all duration-300 backdrop-blur-xl border border-cyan-400/30 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
-                  <TrendingUp className="w-6 h-6 text-white relative z-10 drop-shadow-lg" />
-                  <motion.div 
-                    className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent"
-                    initial={{ y: '-100%' }}
-                    whileHover={{ y: '100%' }}
-                    transition={{ duration: 0.6 }}
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-white font-bold text-xl tracking-tight bg-gradient-to-r from-white to-cyan-100 bg-clip-text">
-                    TOKABI
-                  </span>
-                  <span className="text-cyan-400 text-xs font-medium tracking-wider flex items-center gap-1">
-                    <Sparkles className="w-3 h-3" />
-                    AI Trading Machine
-                  </span>
-                </div>
+                <TokabiFull className="h-9 text-cyan-900" />
               </Link>
             </motion.div>
 

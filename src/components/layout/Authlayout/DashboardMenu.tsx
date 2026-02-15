@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../contexts/AuthContext";
+import { TokabiFull, TokabiSymbol } from "../../brand/TokabiFull";
 import {
   LayoutDashboard,
   TrendingUp,
@@ -379,25 +380,12 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
 
         {!isCollapsed ? (
           <motion.div
-            className="relative flex items-center gap-3"
+            className="relative flex items-center"
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="relative">
-              <div className="absolute inset-0 bg-cyan-400 rounded-xl blur-md opacity-30 animate-pulse" />
-              <div className="relative w-10 h-10 bg-gradient-to-br from-cyan-400 via-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/30">
-                <Zap size={20} className="text-white" />
-              </div>
-            </div>
-            <div>
-              <h1 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                TOKABI
-              </h1>
-              <p className="text-[10px] text-cyan-400/60 font-medium tracking-wider">
-                AI-POWERED TRADING
-              </p>
-            </div>
+            <TokabiFull className="h-8 text-cyan-900" />
           </motion.div>
         ) : (
           <motion.div
@@ -405,10 +393,7 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
-            <div className="absolute inset-0 bg-cyan-400 rounded-xl blur-md opacity-30" />
-            <div className="relative w-10 h-10 bg-gradient-to-br from-cyan-400 via-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/30">
-              <Zap size={20} className="text-white" />
-            </div>
+            <TokabiSymbol className="h-10 w-10 text-cyan-900" />
           </motion.div>
         )}
       </div>
