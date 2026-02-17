@@ -12,6 +12,18 @@ import { logError, parseError } from '../utils/errorHandler';
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL!;
 
 // =============================================================================
+// Auth State Tracking
+// =============================================================================
+
+// Only show "Session Expired" if the user was previously authenticated.
+// Prevents false toasts on public pages when the initial auth check returns 401.
+let wasAuthenticated = false;
+
+export function setWasAuthenticated(value: boolean) {
+  wasAuthenticated = value;
+}
+
+// =============================================================================
 // Notification Debounce - Prevent duplicate toasts
 // =============================================================================
 
@@ -71,25 +83,23 @@ axiosInstance.interceptors.response.use(
     // Log error in development
     logError(error, `API Error ${status || 'Network'}`);
 
-    // Handle 401 Unauthorized - Session Expired
+    // Handle 401 Unauthorized
     if (status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      // Cookies are cleared server-side on logout.
       // Dispatch auth logout event so UI resets.
       window.dispatchEvent(new CustomEvent('auth:logout'));
 
-      // Show user-friendly notification for session expiry only (debounced)
-      if (shouldShowNotification('session-expired')) {
+      // Only show "Session Expired" if the user was previously authenticated.
+      // A 401 during the initial auth check (no prior session) is expected — not an expiry.
+      if (wasAuthenticated && shouldShowNotification('session-expired')) {
         dispatchNotification('warning', 'Session Expired', 'Your session has expired. Please log in again.');
       }
 
-      // Redirect to login
-      if (window.location.pathname !== '/login') {
-        setTimeout(() => {
-          window.location.href = '/login';
-        }, 1500);
-      }
+      wasAuthenticated = false;
+
+      // Navigation is handled by ProtectedRoute — no forced redirect here.
+      // This prevents unauthenticated users on public pages from being kicked to /login.
 
       return Promise.reject(error);
     }

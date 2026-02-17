@@ -112,13 +112,15 @@ export function useFeaturedPlans() {
 /**
  * Get current user's subscription
  * Backend: GET /api/subscriptions/me
+ * @param enabled - Pass false to skip the query (e.g. when user is not authenticated)
  */
-export function useCurrentSubscription() {
+export function useCurrentSubscription(enabled = true) {
   return useQuery({
     queryKey: billingKeys.subscriptionCurrent(),
     queryFn: () => subscriptionService.getCurrentSubscription(),
     staleTime: 60 * 1000, // 1 minute
     retry: false,
+    enabled,
   });
 }
 

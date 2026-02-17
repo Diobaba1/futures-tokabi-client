@@ -8,7 +8,7 @@ import React, {
   useRef,
   useCallback,
 } from "react";
-import axiosInstance from "../../api/axiosConfig";
+import axiosInstance, { setWasAuthenticated } from "../../api/axiosConfig";
 import { authService } from "../../api/services";
 import {
   LoginRequest,
@@ -65,6 +65,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     setIsLoading(false);
+    setWasAuthenticated(false);
   }, []);
 
   const refreshUser = useCallback(async () => {
@@ -72,6 +73,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const fetchedUser = await authService.getProfile();
       setUser(fetchedUser);
       setIsAuthenticated(true);
+      setWasAuthenticated(true);
     } catch (error) {
       console.error("Failed to refresh user:", error);
       await clearAuth();

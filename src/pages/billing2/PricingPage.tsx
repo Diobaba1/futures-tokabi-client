@@ -10,6 +10,7 @@
  */
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Bell,
   TrendingUp,
@@ -19,6 +20,7 @@ import {
   Zap,
   Loader2,
 } from 'lucide-react';
+import { useAuth } from '../../components/contexts/AuthContext';
 import { usePlans, useCurrentSubscription, useCreateSubscription } from '../../components/hooks/useBilling';
 import type { SubscriptionPlan } from '../../types/billings.types';
 
@@ -220,12 +222,20 @@ const CurrencyModal: React.FC<CurrencyModalProps> = ({
 const PricingPage: React.FC = () => {
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   const { data: plans, isLoading: plansLoading } = usePlans();
-  const { data: currentSubscription } = useCurrentSubscription();
+  // Only fetch subscription when logged in — avoids 401 for unauthenticated visitors
+  const { data: currentSubscription } = useCurrentSubscription(isAuthenticated);
   const createSubscription = useCreateSubscription();
 
   const handleSelectPlan = (plan: SubscriptionPlan) => {
+    if (!isAuthenticated) {
+      // Redirect unauthenticated users to login, then back to pricing
+      navigate('/login', { state: { from: '/pricing' } });
+      return;
+    }
     setSelectedPlan(plan);
     setShowCurrencyModal(true);
   };
