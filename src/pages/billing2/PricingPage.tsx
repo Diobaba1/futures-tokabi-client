@@ -291,8 +291,15 @@ const PricingPage: React.FC = () => {
           </div>
         )}
 
+        {/* Risk Disclaimer */}
+        <div className="mt-10 text-center">
+          <p className="text-yellow-500/80 text-sm">
+            Trading involves risk of loss. Tokabi is not an investment advisor.
+          </p>
+        </div>
+
         {/* FAQ or Additional Info */}
-        <div className="mt-16 text-center">
+        <div className="mt-8 text-center">
           <p className="text-gray-400">
             All payments are processed securely via cryptocurrency.{' '}
             <a href="/faq" className="text-purple-400 hover:text-purple-300">
@@ -301,7 +308,7 @@ const PricingPage: React.FC = () => {
           </p>
           <p className="text-gray-500 text-sm mt-2">
             Need help choosing?{' '}
-            <a href="/contact" className="text-purple-400 hover:text-purple-300">
+            <a href="mailto:support@tokabi.io" className="text-purple-400 hover:text-purple-300">
               Contact our team
             </a>
           </p>

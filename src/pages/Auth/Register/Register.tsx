@@ -2,7 +2,7 @@
 // FILE: src/pages/Register.tsx (WITH DEBUGGING & FIXES)
 // ============================================================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../../components/contexts/AuthContext';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { RegisterRequest } from '../../../types';
@@ -31,7 +31,11 @@ const Register: React.FC = () => {
   });
   
   const [hasShownReferralToast, setHasShownReferralToast] = useState(false);
-  
+  const [agreedTerms, setAgreedTerms] = useState(false);
+  const [agreedRisk, setAgreedRisk] = useState(false);
+  const [agreedPlatform, setAgreedPlatform] = useState(false);
+  const allAgreed = useMemo(() => agreedTerms && agreedRisk && agreedPlatform, [agreedTerms, agreedRisk, agreedPlatform]);
+
   const { register, isLoading } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -302,30 +306,52 @@ const Register: React.FC = () => {
             )}
           </div>
 
-          {/* Terms Agreement */}
-          <motion.div 
+          {/* Legal Agreements */}
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="flex items-start space-x-3 bg-cyan-500/5 p-4 rounded-lg border border-cyan-500/10"
+            className="space-y-3 bg-cyan-500/5 p-4 rounded-lg border border-cyan-500/10"
           >
-            <input
-              id="terms"
-              name="terms"
-              type="checkbox"
-              required
-              className="mt-1 w-4 h-4 text-cyan-500 focus:ring-cyan-500 border-cyan-500/30 rounded bg-gray-700/50"
-            />
-            <label htmlFor="terms" className="text-sm text-gray-300 font-light tracking-wide leading-relaxed">
-              I agree to the{' '}
-              <a href="/terms" className="text-cyan-400 hover:text-cyan-300 transition-colors duration-200 font-normal underline underline-offset-2">
-                Terms of Service
-              </a>{' '}
-              and{' '}
-              <a href="/privacy" className="text-cyan-400 hover:text-cyan-300 transition-colors duration-200 font-normal underline underline-offset-2">
-                Privacy Policy
-              </a>
-            </label>
+            <div className="flex items-start space-x-3">
+              <input
+                id="terms"
+                type="checkbox"
+                checked={agreedTerms}
+                onChange={(e) => setAgreedTerms(e.target.checked)}
+                className="mt-1 w-4 h-4 text-cyan-500 focus:ring-cyan-500 border-cyan-500/30 rounded bg-gray-700/50"
+              />
+              <label htmlFor="terms" className="text-sm text-gray-300 font-light tracking-wide leading-relaxed">
+                I have read and agree to Tokabi's{' '}
+                <a href="/terms" className="text-cyan-400 hover:text-cyan-300 transition-colors duration-200 font-normal underline underline-offset-2">
+                  Terms of Service
+                </a>
+              </label>
+            </div>
+            <div className="flex items-start space-x-3">
+              <input
+                id="risk"
+                type="checkbox"
+                checked={agreedRisk}
+                onChange={(e) => setAgreedRisk(e.target.checked)}
+                className="mt-1 w-4 h-4 text-cyan-500 focus:ring-cyan-500 border-cyan-500/30 rounded bg-gray-700/50"
+              />
+              <label htmlFor="risk" className="text-sm text-gray-300 font-light tracking-wide leading-relaxed">
+                I understand that trading involves substantial risk of loss
+              </label>
+            </div>
+            <div className="flex items-start space-x-3">
+              <input
+                id="platform"
+                type="checkbox"
+                checked={agreedPlatform}
+                onChange={(e) => setAgreedPlatform(e.target.checked)}
+                className="mt-1 w-4 h-4 text-cyan-500 focus:ring-cyan-500 border-cyan-500/30 rounded bg-gray-700/50"
+              />
+              <label htmlFor="platform" className="text-sm text-gray-300 font-light tracking-wide leading-relaxed">
+                I confirm that Tokabi is a software platform, not an investment advisor
+              </label>
+            </div>
           </motion.div>
 
           {/* Submit Button */}
@@ -334,7 +360,7 @@ const Register: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7 }}
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !allAgreed}
             className="group relative w-full py-4 px-4 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-cyan-500 via-cyan-600 to-blue-600 hover:from-cyan-400 hover:via-cyan-500 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-cyan-500/30 backdrop-blur-sm overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
