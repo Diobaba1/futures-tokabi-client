@@ -49,7 +49,7 @@ const tierConfig: Record<string, {
   borderColor: string;
   accentColor: string;
 }> = {
-  ESSENTIAL: {
+  ALPHA: {
     icon: <Bell className="w-6 h-6" />,
     gradient: 'from-slate-400/20 to-gray-500/20',
     glowColor: 'rgba(148, 163, 184, 0.15)',

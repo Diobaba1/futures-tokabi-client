@@ -33,7 +33,7 @@ const planIcons: Record<string, React.ReactNode> = {
 
 // Badge styles
 const badgeStyles: Record<string, string> = {
-  ESSENTIAL: 'bg-gray-600 text-gray-100',
+  ALPHA: 'bg-gray-600 text-gray-100',
   RECOMMENDED: 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white',
   PREMIUM: 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white',
 };
@@ -82,7 +82,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
       {/* Badge */}
       {isHighlighted && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-          <span className={`px-4 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${badgeStyles[badge] || badgeStyles.ESSENTIAL}`}>
+          <span className={`px-4 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${badgeStyles[badge] || badgeStyles.ALPHA}`}>
             {badge === 'RECOMMENDED' && <Star className="w-3 h-3" />}
             {badge === 'PREMIUM' && <Zap className="w-3 h-3" />}
             {badge}
