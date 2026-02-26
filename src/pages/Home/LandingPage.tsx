@@ -761,7 +761,7 @@ const FinalCTASection: React.FC = () => {
                 whileTap={{ scale: 0.97 }}
                 className="group relative px-10 py-5 bg-white dark:bg-gradient-to-r dark:from-cyan-500 dark:to-cyan-600 text-cyan-700 dark:text-white font-bold text-lg rounded-2xl shadow-[0_10px_50px_rgba(255,255,255,0.3)] dark:shadow-[0_10px_50px_rgba(14,116,144,0.4)] hover:shadow-[0_20px_60px_rgba(255,255,255,0.4)] dark:hover:shadow-[0_20px_60px_rgba(14,116,144,0.5)] transition-all duration-500 flex items-center gap-3 overflow-hidden"
               >
-                <span className="relative z-10">Start with Essential — $19.99/month</span>
+                <span className="relative z-10">Start with Alpha — $19.99/month</span>
                 <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-100 to-transparent dark:via-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
               </motion.button>

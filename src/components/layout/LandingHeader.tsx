@@ -166,7 +166,7 @@ const LandingHeader: React.FC = () => {
                       whileTap={{ scale: 0.98 }}
                       className="group px-6 py-2.5 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white font-semibold text-sm rounded-btn shadow-btn-cyan hover:from-cyan-700 hover:to-cyan-800 transition-all duration-300 flex items-center gap-2"
                     >
-                      Start with Essential
+                      Start with Alpha
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                     </motion.button>
                   </Link>
@@ -266,7 +266,7 @@ const LandingHeader: React.FC = () => {
                               onClick={() => setIsMobileMenuOpen(false)}
                               className="block px-4 py-3 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white font-semibold text-center rounded-lg hover:from-cyan-700 hover:to-cyan-800 transition-all"
                             >
-                              Start with Essential
+                              Start with Alpha
                             </Link>
                           </>
                         )}

@@ -299,7 +299,7 @@ const HowItWorksPage: React.FC = () => {
                   whileTap={{ scale: 0.98 }}
                   className="group px-8 py-4 bg-white dark:bg-gradient-to-r dark:from-cyan-500 dark:to-cyan-600 text-cyan-700 dark:text-white font-semibold rounded-xl shadow-glass-lg hover:shadow-glow-cyan transition-all duration-300 flex items-center gap-2"
                 >
-                  Start with Essential
+                  Start with Alpha
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </motion.button>
               </Link>

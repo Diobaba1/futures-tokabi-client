@@ -37,7 +37,7 @@ const FeaturesSection: React.FC = () => {
       bgColor: '',
       borderColor: 'border-amber-500/20',
       stats: { value: '24/7', label: 'Protection' },
-      badge: 'Essential'
+      badge: 'Alpha'
     },
     {
       icon: '📊',
