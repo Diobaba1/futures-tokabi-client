@@ -38,7 +38,7 @@ const SubscriptionPlans: React.FC = () => {
   const plans: SubscriptionPlan[] = [
     {
       id: "tier-1",
-      name: "Essential Signals",
+      name: "Alpha",
       price: "$19.99",
       period: "month",
       description: "Perfect for traders starting with automated signals",
@@ -58,19 +58,19 @@ const SubscriptionPlans: React.FC = () => {
         }
       ],
       popular: false,
-      ctaText: "Start with Signals",
+      ctaText: "Start with Alpha",
       gradient: "from-gray-900 to-gray-800",
       borderColor: "border-gray-700"
     },
     {
       id: "tier-2",
-      name: "Pro Analytics",
+      name: "Edge",
       price: "$29.99",
       period: "month",
       description: "Enhanced with instant notifications and AI analysis",
       features: [
         {
-          text: "Everything in Essential Signals",
+          text: "Everything in Alpha",
           icon: <Check className="w-4 h-4" />
         },
         {
@@ -89,20 +89,20 @@ const SubscriptionPlans: React.FC = () => {
         }
       ],
       popular: true,
-      ctaText: "Upgrade to Pro",
+      ctaText: "Upgrade to Edge",
       badge: "MOST POPULAR",
       gradient: "from-blue-900/80 via-purple-900/80 to-indigo-900/80",
       borderColor: "border-purple-500"
     },
     {
       id: "tier-3",
-      name: "Enterprise AI",
+      name: "Zenith",
       price: "$99.99",
       period: "month",
       description: "Complete automated trading with expert access",
       features: [
         {
-          text: "Everything in Pro Analytics",
+          text: "Everything in Edge",
           icon: <Check className="w-4 h-4" />
         },
         {
@@ -125,7 +125,7 @@ const SubscriptionPlans: React.FC = () => {
         }
       ],
       popular: false,
-      ctaText: "Go Enterprise",
+      ctaText: "Go Zenith",
       badge: "PREMIUM",
       gradient: "from-amber-900/80 via-orange-900/80 to-red-900/80",
       borderColor: "border-amber-500"

@@ -9,7 +9,7 @@ const PricingSection: React.FC = () => {
 
   const plans = [
     {
-      name: 'Essential Signals',
+      name: 'Alpha',
       monthlyPrice: '19.99',
       yearlyPrice: '16.59',
       description: 'Perfect for traders starting with automated signals',
@@ -24,18 +24,18 @@ const PricingSection: React.FC = () => {
       popular: false,
       gradient: 'from-gray-900 to-gray-800',
       color: 'text-gray-400',
-      badge: 'ESSENTIAL',
+      badge: 'ALPHA',
       icon: Bell,
-      ctaText: 'Start with Signals',
+      ctaText: 'Start with Alpha',
       highlight: false
     },
     {
-      name: 'Pro Analytics',
+      name: 'Edge',
       monthlyPrice: '29.99',
       yearlyPrice: '24.89',
       description: 'Enhanced with instant notifications and AI analysis',
       features: [
-        'Everything in Essential Signals',
+        'Everything in Alpha',
         'Instant Telegram notifications',
         'AI asset analysis for any futures asset',
         '2 assets analysis per 4 hours',
@@ -48,16 +48,16 @@ const PricingSection: React.FC = () => {
       color: 'text-blue-400',
       badge: 'RECOMMENDED',
       icon: TrendingUp,
-      ctaText: 'Upgrade to Pro',
+      ctaText: 'Upgrade to Edge',
       highlight: true
     },
     {
-      name: 'Enterprise AI',
+      name: 'Zenith',
       monthlyPrice: '99.99',
       yearlyPrice: '82.99',
       description: 'Complete automated trading with expert access',
       features: [
-        'Everything in Pro Analytics',
+        'Everything in Edge',
         'System auto-trades your assets',
         'Increased asset search limit (5 per 4 hours)',
         'Direct call with AI crypto expert',
@@ -71,7 +71,7 @@ const PricingSection: React.FC = () => {
       color: 'text-amber-400',
       badge: 'PREMIUM',
       icon: Shield,
-      ctaText: 'Go Enterprise',
+      ctaText: 'Go Zenith',
       highlight: false
     }
   ];
