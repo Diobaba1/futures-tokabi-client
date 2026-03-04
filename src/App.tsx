@@ -65,6 +65,9 @@ const ReferredUsersList = React.lazy(
 const TradingConfigPage = React.lazy(
   () => import("./pages/trading/TradingConfigPage")
 );
+const LiveTradingPage = React.lazy(
+  () => import("./pages/trading/LiveTradingPage")
+);
 
 // Static pages
 const AboutPage = React.lazy(() =>
@@ -285,6 +288,12 @@ const dashboardRoutes: RouteConfig[] = [
   {
     path: "/dashboard/trading",
     element: <Trades />,
+    layout: DashboardLayout,
+    protected: true,
+  },
+  {
+    path: "/dashboard/live-trading",
+    element: <LiveTradingPage />,
     layout: DashboardLayout,
     protected: true,
   },

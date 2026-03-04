@@ -111,12 +111,17 @@ const DashboardMenu: React.FC<DashboardMenuProps> = ({
           description: "Dashboard overview",
         },
         {
-          path: "/dashboard/trading",
-          label: "Live Trading",
+          path: "/dashboard/live-trading",
+          label: "Live Positions",
           icon: <TrendingUp size={20} />,
-          badge: "Active",
+          badge: "Live",
           badgeColor: "bg-emerald-500",
           badgeGlow: true,
+        },
+        {
+          path: "/dashboard/trading",
+          label: "Trade History",
+          icon: <History size={20} />,
         },
         {
           path: "/dashboard/trading-config",

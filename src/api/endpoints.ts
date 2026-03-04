@@ -172,6 +172,13 @@ export const API_ENDPOINTS = {
     STATS_SUMMARY: "/staff-signals/stats/summary",
   },
 
+  // User Positions (Live Trading)
+  POSITIONS: {
+    ACTIVE: "/positions/active",
+    DETAIL: (executionId: string) => `/positions/${executionId}`,
+    CLOSE: (executionId: string) => `/positions/${executionId}/close`,
+  },
+
   // Trades
   TRADES: {
     LIST: "/trades",
