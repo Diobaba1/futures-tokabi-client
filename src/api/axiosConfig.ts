@@ -71,6 +71,27 @@ axiosInstance.interceptors.request.use(
 );
 
 // =============================================================================
+// Token Refresh State — prevents concurrent refresh storms
+// =============================================================================
+
+let isRefreshing = false;
+let refreshSubscribers: Array<(success: boolean) => void> = [];
+
+function onRefreshComplete(success: boolean) {
+  refreshSubscribers.forEach((cb) => cb(success));
+  refreshSubscribers = [];
+}
+
+function forceLogout() {
+  const wasPreviouslyAuthenticated = wasAuthenticated;
+  wasAuthenticated = false;
+  window.dispatchEvent(new CustomEvent('auth:logout'));
+  if (wasPreviouslyAuthenticated && shouldShowNotification('session-expired')) {
+    dispatchNotification('warning', 'Session Expired', 'Your session has expired. Please log in again.');
+  }
+}
+
+// =============================================================================
 // Response Interceptor with Enhanced Error Handling
 // =============================================================================
 
@@ -83,25 +104,55 @@ axiosInstance.interceptors.response.use(
     // Log error in development
     logError(error, `API Error ${status || 'Network'}`);
 
-    // Handle 401 Unauthorized
+    // Handle 401 Unauthorized — attempt token refresh before logging out
     if (status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      // Dispatch auth logout event so UI resets.
-      window.dispatchEvent(new CustomEvent('auth:logout'));
-
-      // Only show "Session Expired" if the user was previously authenticated.
-      // A 401 during the initial auth check (no prior session) is expected — not an expiry.
-      if (wasAuthenticated && shouldShowNotification('session-expired')) {
-        dispatchNotification('warning', 'Session Expired', 'Your session has expired. Please log in again.');
+      // Never try to refresh on the refresh endpoint itself (prevents infinite loop)
+      const isRefreshRequest = originalRequest.url?.includes('/auth/refresh');
+      if (isRefreshRequest) {
+        forceLogout();
+        return Promise.reject(error);
       }
 
-      wasAuthenticated = false;
+      if (isRefreshing) {
+        // Another request is already refreshing — queue this one and wait
+        return new Promise((resolve, reject) => {
+          refreshSubscribers.push((success) => {
+            if (success) {
+              resolve(axiosInstance(originalRequest));
+            } else {
+              reject(error);
+            }
+          });
+        });
+      }
 
-      // Navigation is handled by ProtectedRoute — no forced redirect here.
-      // This prevents unauthenticated users on public pages from being kicked to /login.
+      isRefreshing = true;
 
-      return Promise.reject(error);
+      try {
+        // POST /auth/refresh — backend reads the httpOnly refresh_token cookie,
+        // validates it, and sets new access_token + refresh_token cookies in the response.
+        await axiosInstance.post('/auth/refresh');
+        // Clear any stale in-memory Bearer token — the refreshed cookie is now
+        // the source of truth. If the header were kept, the backend would use
+        // the old expired token (header wins over cookie).
+        delete axiosInstance.defaults.headers.common['Authorization'];
+        isRefreshing = false;
+        onRefreshComplete(true);
+        // Retry the original request — the new access_token cookie is now set
+        return axiosInstance(originalRequest);
+      } catch {
+        // Refresh token is also expired or invalid — user must log in again
+        isRefreshing = false;
+        onRefreshComplete(false);
+        if (wasAuthenticated && shouldShowNotification('session-expired')) {
+          dispatchNotification('warning', 'Session Expired', 'Your session has expired. Please log in again.');
+        }
+        wasAuthenticated = false;
+        window.dispatchEvent(new CustomEvent('auth:logout'));
+        return Promise.reject(error);
+      }
     }
 
     // Handle 403 Forbidden - Check for subscription errors

@@ -105,6 +105,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initializeAuth();
   }, [refreshUser, clearAuth]);
 
+  // Listen for auth:logout events dispatched by the axios interceptor
+  // when both access_token and refresh_token have expired mid-session.
+  useEffect(() => {
+    const handleAuthLogout = () => { clearAuth(); };
+    window.addEventListener('auth:logout', handleAuthLogout);
+    return () => window.removeEventListener('auth:logout', handleAuthLogout);
+  }, [clearAuth]);
+
   const login = useCallback(async (data: LoginRequest) => {
     setIsLoading(true);
     try {
