@@ -8,7 +8,7 @@ import React, {
   useRef,
   useCallback,
 } from "react";
-import axiosInstance, { setWasAuthenticated } from "../../api/axiosConfig";
+import axiosInstance, { setWasAuthenticated, saveAccessToken, loadStoredAccessToken } from "../../api/axiosConfig";
 import { authService } from "../../api/services";
 import {
   LoginRequest,
@@ -40,19 +40,6 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-/**
- * Set in-memory Bearer token as fallback for browsers that block cross-site cookies.
- * The backend accepts both httpOnly cookies and Authorization headers (header wins).
- * This token lives only in memory — a page refresh clears it, which is acceptable:
- * the user just logs in again (same as "session expired").
- */
-function setBearerToken(token: string | null) {
-  if (token) {
-    axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  } else {
-    delete axiosInstance.defaults.headers.common["Authorization"];
-  }
-}
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserResponse | null>(null);
@@ -61,7 +48,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const hasInitialized = useRef(false);
 
   const clearAuth = useCallback(async () => {
-    setBearerToken(null);
+    saveAccessToken(null);
     setUser(null);
     setIsAuthenticated(false);
     setIsLoading(false);
@@ -92,12 +79,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem("refreshToken");
 
     const initializeAuth = async () => {
-      // Try to load profile — cookie is sent automatically.
-      // If no valid cookie exists the API returns 401 and we stay logged out.
+      // Restore access token from sessionStorage (survives page refresh within same tab).
+      // This prevents logout-on-refresh when cross-origin cookies are blocked.
+      const storedToken = loadStoredAccessToken();
+      if (storedToken) {
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+      }
       try {
         await refreshUser();
       } catch {
-        // No valid session — stay logged out.
+        // No valid session — clear any stale stored token and stay logged out.
+        saveAccessToken(null);
         setIsLoading(false);
       }
     };
@@ -121,7 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // cross-site cookies (tokabi.io → api.tokabi.org).
       const response = await authService.login(data);
       if (response?.access_token) {
-        setBearerToken(response.access_token);
+        saveAccessToken(response.access_token);
       }
       await refreshUser();
     } catch (error) {
@@ -135,7 +127,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response = await authService.register(data);
       if (response?.access_token) {
-        setBearerToken(response.access_token);
+        saveAccessToken(response.access_token);
       }
       await refreshUser();
     } catch (error) {

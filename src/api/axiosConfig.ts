@@ -10,6 +10,37 @@ import { handleSubscriptionError } from '../utils/subscriptionErrorHandler';
 import { logError, parseError } from '../utils/errorHandler';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL!;
+const SESSION_TOKEN_KEY = 'tokabi_access_token';
+
+// =============================================================================
+// Session Token Helpers
+// Stores access_token in sessionStorage so it survives page refreshes within
+// the same tab. Cleared automatically when the tab/window is closed.
+// This is the primary auth mechanism when cross-origin httpOnly cookies are
+// blocked by browser SameSite policies.
+// =============================================================================
+
+export function saveAccessToken(token: string | null): void {
+  try {
+    if (token) {
+      sessionStorage.setItem(SESSION_TOKEN_KEY, token);
+      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } else {
+      sessionStorage.removeItem(SESSION_TOKEN_KEY);
+      delete axiosInstance.defaults.headers.common['Authorization'];
+    }
+  } catch {
+    // sessionStorage may be unavailable in certain private browsing modes
+  }
+}
+
+export function loadStoredAccessToken(): string | null {
+  try {
+    return sessionStorage.getItem(SESSION_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
 
 // =============================================================================
 // Auth State Tracking
@@ -85,6 +116,7 @@ function onRefreshComplete(success: boolean) {
 function forceLogout() {
   const wasPreviouslyAuthenticated = wasAuthenticated;
   wasAuthenticated = false;
+  saveAccessToken(null); // clear sessionStorage + Bearer header
   window.dispatchEvent(new CustomEvent('auth:logout'));
   if (wasPreviouslyAuthenticated && shouldShowNotification('session-expired')) {
     dispatchNotification('warning', 'Session Expired', 'Your session has expired. Please log in again.');
@@ -131,26 +163,32 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // POST /auth/refresh — backend reads the httpOnly refresh_token cookie,
-        // validates it, and sets new access_token + refresh_token cookies in the response.
-        await axiosInstance.post('/auth/refresh');
-        // Clear any stale in-memory Bearer token — the refreshed cookie is now
-        // the source of truth. If the header were kept, the backend would use
-        // the old expired token (header wins over cookie).
-        delete axiosInstance.defaults.headers.common['Authorization'];
+        // POST /auth/refresh — reads httpOnly refresh_token cookie.
+        // Response body includes the new access_token.
+        const refreshResponse = await axiosInstance.post('/auth/refresh');
+        const newToken: string | undefined = refreshResponse.data?.access_token;
+
+        // Persist new token in sessionStorage + set Bearer header for all future requests
+        saveAccessToken(newToken ?? null);
+
+        // Also update the header on the specific request being retried
+        // (its headers object may still contain the old stale token)
+        if (originalRequest.headers) {
+          if (newToken) {
+            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+          } else {
+            delete originalRequest.headers['Authorization'];
+          }
+        }
+
         isRefreshing = false;
         onRefreshComplete(true);
-        // Retry the original request — the new access_token cookie is now set
         return axiosInstance(originalRequest);
       } catch {
-        // Refresh token is also expired or invalid — user must log in again
+        // Both tokens expired — user must log in again
         isRefreshing = false;
         onRefreshComplete(false);
-        if (wasAuthenticated && shouldShowNotification('session-expired')) {
-          dispatchNotification('warning', 'Session Expired', 'Your session has expired. Please log in again.');
-        }
-        wasAuthenticated = false;
-        window.dispatchEvent(new CustomEvent('auth:logout'));
+        forceLogout();
         return Promise.reject(error);
       }
     }
