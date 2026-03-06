@@ -45,6 +45,7 @@ const Trades: React.FC = () => {
   const [platformTotalPages, setPlatformTotalPages] = useState(1);
   const [platformHasNext, setPlatformHasNext] = useState(false);
   const [platformHasPrev, setPlatformHasPrev] = useState(false);
+  const [serverStats, setServerStats] = useState<{ total: number; open: number; closed: number; total_pnl: number; win_rate: number } | null>(null);
 
   // Exchange history state
   const [exchangeData, setExchangeData] = useState<ExchangeHistoryResponse | null>(null);
@@ -65,12 +66,24 @@ const Trades: React.FC = () => {
     try {
       const params: any = { page: platformPage, page_size: platformPageSize };
       if (statusFilter) params.status = statusFilter;
-      const data = await tradeService.getTrades(params);
+      const [data, stats] = await Promise.all([
+        tradeService.getTrades(params),
+        tradeService.getTradeStats(),
+      ]);
       setPlatformTrades(data.items || []);
       setPlatformTotal(data.total || 0);
       setPlatformTotalPages(data.total_pages || 1);
       setPlatformHasNext(data.has_next || false);
       setPlatformHasPrev(data.has_prev || false);
+      if (stats) {
+        setServerStats({
+          total: stats.total_trades ?? 0,
+          open: stats.status_breakdown?.open ?? 0,
+          closed: stats.status_breakdown?.closed ?? 0,
+          total_pnl: stats.performance?.total_pnl ?? 0,
+          win_rate: stats.performance?.win_rate ?? 0,
+        });
+      }
       setLastRefresh(new Date());
     } catch (error) {
       console.error('Failed to load platform trades:', error);
@@ -141,8 +154,18 @@ const Trades: React.FC = () => {
     );
   }, [exchangeData, searchTerm]);
 
-  // Calculate stats for platform trades
+  // Calculate stats for platform trades — use server-side totals when available
   const platformStats = useMemo(() => {
+    if (serverStats) {
+      return {
+        total: serverStats.total,
+        open: serverStats.open,
+        closed: serverStats.closed,
+        totalPnl: serverStats.total_pnl,
+        winRate: serverStats.win_rate,
+      };
+    }
+    // Fallback: compute from current page (less accurate with pagination)
     const trades = platformTrades || [];
     const total = trades.length;
     const open = trades.filter((t) => t.status?.toLowerCase() === 'open').length;
@@ -150,9 +173,8 @@ const Trades: React.FC = () => {
     const totalPnl = trades.reduce((sum, t) => sum + (t.realized_pnl_usd || 0), 0);
     const winningTrades = trades.filter((t) => (t.realized_pnl_usd || 0) > 0).length;
     const winRate = closed > 0 ? (winningTrades / closed) * 100 : 0;
-
     return { total, open, closed, totalPnl, winRate };
-  }, [platformTrades]);
+  }, [platformTrades, serverStats]);
 
   // Calculate stats for exchange trades
   const exchangeStats = useMemo(() => {
