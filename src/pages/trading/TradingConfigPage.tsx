@@ -930,7 +930,7 @@ const TradingConfigPage: React.FC = () => {
               value={formData.max_position_per_signal_percent || 0}
               onChange={(v) => handleInputChange('max_position_per_signal_percent', v)}
               min={0.1}
-              max={isReadOnly ? 100 : 9999}
+              max={100}
               step={0.5}
               unit="%"
               tooltip="Maximum percentage of your balance to use per signal"
@@ -942,7 +942,7 @@ const TradingConfigPage: React.FC = () => {
               value={formData.max_total_exposure_percent || 0}
               onChange={(v) => handleInputChange('max_total_exposure_percent', v)}
               min={1}
-              max={isReadOnly ? 100 : 9999}
+              max={100}
               step={5}
               unit="%"
               tooltip="Maximum total exposure across all open positions"
@@ -1032,7 +1032,7 @@ const TradingConfigPage: React.FC = () => {
               value={formData.risk_per_trade_percent || 0}
               onChange={(v) => handleInputChange('risk_per_trade_percent', v)}
               min={0.1}
-              max={isReadOnly ? 10 : 9999}
+              max={isReadOnly ? 10 : 100}
               step={0.5}
               unit="%"
               tooltip="Maximum percentage of balance to risk per trade"
@@ -1059,7 +1059,7 @@ const TradingConfigPage: React.FC = () => {
                 value={formData.daily_loss_limit_percent || 0}
                 onChange={(v) => handleInputChange('daily_loss_limit_percent', v)}
                 min={1}
-                max={isReadOnly ? 100 : 9999}
+                max={100}
                 step={1}
                 unit="%"
                 tooltip="Stop trading when daily loss exceeds this"
@@ -1071,7 +1071,7 @@ const TradingConfigPage: React.FC = () => {
                 value={formData.weekly_loss_limit_percent || 0}
                 onChange={(v) => handleInputChange('weekly_loss_limit_percent', v)}
                 min={1}
-                max={isReadOnly ? 100 : 9999}
+                max={100}
                 step={5}
                 unit="%"
                 tooltip="Stop trading when weekly loss exceeds this"
@@ -1225,7 +1225,7 @@ const TradingConfigPage: React.FC = () => {
                     value={formData.trailing_stop_percent || 1}
                     onChange={(v) => handleInputChange('trailing_stop_percent', v)}
                     min={0.1}
-                    max={isReadOnly ? 20 : 9999}
+                    max={isReadOnly ? 20 : 100}
                     step={0.5}
                     unit="%"
                     tooltip="Distance from current price for trailing stop"
@@ -1236,7 +1236,7 @@ const TradingConfigPage: React.FC = () => {
                     value={formData.trailing_activation_percent || 1}
                     onChange={(v) => handleInputChange('trailing_activation_percent', v)}
                     min={0.1}
-                    max={isReadOnly ? 50 : 9999}
+                    max={isReadOnly ? 50 : 100}
                     step={0.5}
                     unit="%"
                     tooltip="Minimum profit % before trailing stop activates"
