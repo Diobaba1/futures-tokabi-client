@@ -1000,7 +1000,7 @@ const TradingConfigPage: React.FC = () => {
               value={formData.position_size_multiplier || 1}
               onChange={(v) => handleInputChange('position_size_multiplier', v)}
               min={0.1}
-              max={isReadOnly ? 3 : 9999}
+              max={isReadOnly ? 3 : 100}
               step={0.1}
               unit="x"
               tooltip="Multiply the calculated position size by this factor"
@@ -1045,7 +1045,7 @@ const TradingConfigPage: React.FC = () => {
               value={formData.max_leverage || 1}
               onChange={(v) => handleInputChange('max_leverage', v)}
               min={1}
-              max={isReadOnly ? 125 : 9999}
+              max={isReadOnly ? 125 : 100}
               step={1}
               unit="x"
               tooltip="Maximum leverage to use for positions"
@@ -1151,7 +1151,7 @@ const TradingConfigPage: React.FC = () => {
                     value={formData.min_consensus_for_auto_copy || 2}
                     onChange={(v) => handleInputChange('min_consensus_for_auto_copy', v)}
                     min={1}
-                    max={isReadOnly ? 10 : 9999}
+                    max={isReadOnly ? 10 : 100}
                     step={1}
                     unit=" signals"
                     tooltip="Minimum number of matching signals before auto-copying"
@@ -1194,7 +1194,7 @@ const TradingConfigPage: React.FC = () => {
                     value={formData.breakeven_after_tp_level || 1}
                     onChange={(v) => handleInputChange('breakeven_after_tp_level', v)}
                     min={1}
-                    max={isReadOnly ? 5 : 9999}
+                    max={isReadOnly ? 5 : 100}
                     step={1}
                     unit=""
                     tooltip="TP level that triggers breakeven SL"
