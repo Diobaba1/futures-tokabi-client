@@ -516,6 +516,12 @@ const PRESETS = {
   },
 };
 
+function computeRiskLevelFromValues(leverage: number, exposure: number, riskPerTrade: number): number {
+  const leverageScore = Math.min((leverage / 20) * 40, 40);
+  const exposureScore = Math.min((exposure / 50) * 30, 30);
+  const riskScore = Math.min((riskPerTrade / 5) * 30, 30);
+  return Math.round(leverageScore + exposureScore + riskScore);
+}
 
 const TradingConfigPage: React.FC = () => {
   const [config, setConfig] = useState<TradingConfig | null>(null);
