@@ -596,15 +596,9 @@ const TradingConfigPage: React.FC = () => {
         trailing_stop_percent: data.trailing_stop_percent,
         trailing_activation_percent: data.trailing_activation_percent,
       };
-      setFormData(fd);
-
-      // Detect which preset the loaded config corresponds to
-      const level = computeRiskLevelFromValues(
-        data.max_leverage,
-        data.max_total_exposure_percent,
-        data.risk_per_trade_percent,
-      );
-      setActivePreset(detectPreset(level));
+      // Always default to Conservative on load
+      setFormData({ ...fd, ...PRESETS.conservative });
+      setActivePreset('conservative');
     } catch (err: unknown) {
       const e = err as { response?: { data?: { detail?: string } } };
       setError(e.response?.data?.detail || 'Failed to load trading configuration');
