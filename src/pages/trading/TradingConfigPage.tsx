@@ -672,11 +672,8 @@ const TradingConfigPage: React.FC = () => {
         trailing_stop_percent: data.trailing_stop_percent,
         trailing_activation_percent: data.trailing_activation_percent,
       };
-      setFormData(fd);
-      const level = computeRiskLevelFromValues(
-        data.max_leverage, data.max_total_exposure_percent, data.risk_per_trade_percent,
-      );
-      setActivePreset(detectPreset(level));
+      setFormData({ ...fd, ...PRESETS.conservative });
+      setActivePreset('conservative');
       setShowWarning(false);
       setSuccess('Configuration reset to defaults');
       setHasChanges(false);
