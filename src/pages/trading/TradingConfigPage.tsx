@@ -516,18 +516,6 @@ const PRESETS = {
   },
 };
 
-function computeRiskLevelFromValues(leverage: number, exposure: number, riskPerTrade: number): number {
-  const leverageScore = Math.min((leverage / 20) * 40, 40);
-  const exposureScore = Math.min((exposure / 50) * 30, 30);
-  const riskScore = Math.min((riskPerTrade / 5) * 30, 30);
-  return Math.round(leverageScore + exposureScore + riskScore);
-}
-
-function detectPreset(level: number): RiskPreset {
-  if (level <= 30) return 'conservative';
-  if (level <= 60) return 'moderate';
-  return 'aggressive';
-}
 
 const TradingConfigPage: React.FC = () => {
   const [config, setConfig] = useState<TradingConfig | null>(null);
