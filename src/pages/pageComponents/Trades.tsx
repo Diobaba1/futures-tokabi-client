@@ -25,6 +25,8 @@ import {
   Wallet,
   Award,
   Link2,
+  Calendar,
+  X,
 } from 'lucide-react';
 
 // Tab types
@@ -56,6 +58,8 @@ const Trades: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
   // Load platform trades
@@ -66,6 +70,8 @@ const Trades: React.FC = () => {
     try {
       const params: any = { page: platformPage, page_size: platformPageSize };
       if (statusFilter) params.status = statusFilter;
+      if (startDate) params.start_date = startDate;
+      if (endDate) params.end_date = endDate;
       const [data, stats] = await Promise.all([
         tradeService.getTrades(params),
         tradeService.getTradeStats(),
@@ -92,7 +98,7 @@ const Trades: React.FC = () => {
       setPlatformLoading(false);
       setRefreshing(false);
     }
-  }, [statusFilter, platformPage, platformPageSize]);
+  }, [statusFilter, platformPage, platformPageSize, startDate, endDate]);
 
   // Load exchange history
   const loadExchangeHistory = useCallback(async (isRefresh = false) => {
@@ -101,7 +107,10 @@ const Trades: React.FC = () => {
     setExchangeError(null);
 
     try {
-      const data = await tradeService.getExchangeHistory({ limit: 200 });
+      const params: any = { limit: 200 };
+      if (startDate) params.start_date = startDate;
+      if (endDate) params.end_date = endDate;
+      const data = await tradeService.getExchangeHistory(params);
       setExchangeData(data);
       setLastRefresh(new Date());
     } catch (error: any) {
@@ -113,7 +122,7 @@ const Trades: React.FC = () => {
       setExchangeLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [startDate, endDate]);
 
   // Initial load
   useEffect(() => {
@@ -444,6 +453,42 @@ const Trades: React.FC = () => {
                 placeholder="Search by symbol or order ID..."
                 className="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-900/50 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all"
               />
+            </div>
+
+            {/* Date Filters */}
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => { setStartDate(e.target.value); setPlatformPage(1); }}
+                  placeholder="From"
+                  className="pl-9 pr-3 py-3 rounded-xl bg-gray-900/50 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all [color-scheme:dark]"
+                />
+              </div>
+              <span className="text-gray-500 text-sm">to</span>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => { setEndDate(e.target.value); setPlatformPage(1); }}
+                  placeholder="To"
+                  className="pl-9 pr-3 py-3 rounded-xl bg-gray-900/50 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all [color-scheme:dark]"
+                />
+              </div>
+              {(startDate || endDate) && (
+                <motion.button
+                  onClick={() => { setStartDate(''); setEndDate(''); setPlatformPage(1); }}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all"
+                  title="Clear date filter"
+                >
+                  <X className="w-4 h-4" />
+                </motion.button>
+              )}
             </div>
 
             {/* Status Filter (Platform trades only) */}

@@ -16,6 +16,8 @@ export const tradeService = {
     symbol?: string;
     page?: number;
     page_size?: number;
+    start_date?: string;
+    end_date?: string;
   }): Promise<{
     items: any[];
     total: number;
@@ -55,6 +57,8 @@ export const tradeService = {
   getExchangeHistory: async (params?: {
     symbol?: string;
     limit?: number;
+    start_date?: string;
+    end_date?: string;
   }): Promise<ExchangeHistoryResponse> => {
     const response = await axiosInstance.get(API_ENDPOINTS.TRADES.EXCHANGE_HISTORY, { params });
     return response.data;
