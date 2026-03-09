@@ -590,9 +590,16 @@ const TradingConfigPage: React.FC = () => {
         trailing_stop_percent: data.trailing_stop_percent,
         trailing_activation_percent: data.trailing_activation_percent,
       };
-      // Always default to Conservative on load
-      setFormData({ ...fd, ...PRESETS.conservative });
-      setActivePreset('conservative');
+      // Restore the user's saved strategy level from the backend
+      const savedPreset: RiskPreset = data.strategy_level || 'conservative';
+      if (savedPreset === 'conservative' || savedPreset === 'moderate') {
+        // Read-only presets: apply preset values over loaded data
+        setFormData({ ...fd, ...PRESETS[savedPreset] });
+      } else {
+        // Aggressive: use the user's saved custom values as-is
+        setFormData(fd);
+      }
+      setActivePreset(savedPreset);
     } catch (err: unknown) {
       const e = err as { response?: { data?: { detail?: string } } };
       setError(e.response?.data?.detail || 'Failed to load trading configuration');
@@ -666,8 +673,10 @@ const TradingConfigPage: React.FC = () => {
         trailing_stop_percent: data.trailing_stop_percent,
         trailing_activation_percent: data.trailing_activation_percent,
       };
-      setFormData({ ...fd, ...PRESETS.conservative });
-      setActivePreset('conservative');
+      // Reset returns conservative defaults from backend
+      const resetPreset: RiskPreset = data.strategy_level || 'conservative';
+      setFormData({ ...fd, ...PRESETS[resetPreset] });
+      setActivePreset(resetPreset);
       setShowWarning(false);
       setSuccess('Configuration reset to defaults');
       setHasChanges(false);

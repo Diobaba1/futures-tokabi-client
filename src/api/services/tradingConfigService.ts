@@ -8,6 +8,7 @@ import axiosInstance from '../axiosConfig';
 export interface TradingConfig {
   id: string;
   user_id: string;
+  strategy_level: 'conservative' | 'moderate' | 'aggressive';
   // Position Sizing
   max_position_per_signal_percent: number;
   max_total_exposure_percent: number;
