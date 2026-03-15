@@ -262,11 +262,11 @@ const LandingHeader: React.FC = () => {
                               Sign In
                             </Link>
                             <Link
-                              to="/pricing"
+                              to="/register"
                               onClick={() => setIsMobileMenuOpen(false)}
                               className="block px-4 py-3 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white font-semibold text-center rounded-lg hover:from-cyan-700 hover:to-cyan-800 transition-all"
                             >
-                              Start with Alpha
+                            Sign Up
                             </Link>
                           </>
                         )}
