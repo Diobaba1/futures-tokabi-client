@@ -68,8 +68,8 @@ const Register: React.FC = () => {
 
     try {
       await register(dataToSend);
-      showToast('Registration successful! Redirecting...', 'success', 3000);
-      navigate('/dashboard');
+      showToast('Registration successful! Choose a plan to get started.', 'success', 3000);
+      navigate('/pricing');
     } catch (err: any) {
       console.error('❌ Registration error:', err);
 
