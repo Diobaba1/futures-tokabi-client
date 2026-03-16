@@ -160,13 +160,13 @@ const LandingHeader: React.FC = () => {
                   >
                     Sign In
                   </Link>
-                  <Link to="/pricing">
+                  <Link to="/register">
                     <motion.button
                       whileHover={{ scale: 1.02, y: -1 }}
                       whileTap={{ scale: 0.98 }}
                       className="group px-6 py-2.5 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white font-semibold text-sm rounded-btn shadow-btn-cyan hover:from-cyan-700 hover:to-cyan-800 transition-all duration-300 flex items-center gap-2"
                     >
-                      Start with Alpha
+                      Get Started
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                     </motion.button>
                   </Link>
