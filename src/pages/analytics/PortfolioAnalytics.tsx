@@ -38,6 +38,42 @@ import {
   Circle,
 } from "lucide-react";
 
+// Exchange branding config
+const EXCHANGE_BRANDING = {
+  binance: {
+    name: 'Binance',
+    gradient: 'from-yellow-500 to-amber-500',
+    bgGradient: 'from-yellow-500/10 to-amber-500/10',
+    borderColor: 'border-yellow-500/30',
+    textColor: 'text-yellow-400',
+    badgeBg: 'bg-yellow-500/20',
+    logo: (
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 1.5L5.5 8l2.25 2.25L12 6l4.25 4.25L18.5 8 12 1.5zm-6.5 9L3.25 12.75 5.5 15l2.25-2.25L5.5 10.5zm13 0l-2.25 2.25L18.5 15l2.25-2.25L18.5 10.5zM12 9l-3 3 3 3 3-3-3-3zm0 13.5l6.5-6.5-2.25-2.25L12 18l-4.25-4.25L5.5 16 12 22.5z"/>
+      </svg>
+    ),
+    accountLabel: 'Futures Account',
+    balanceLabel: 'Wallet Balance',
+    marginLabel: 'Cross Margin Balance',
+  },
+  bybit: {
+    name: 'Bybit',
+    gradient: 'from-orange-500 to-red-500',
+    bgGradient: 'from-orange-500/10 to-red-500/10',
+    borderColor: 'border-orange-500/30',
+    textColor: 'text-orange-400',
+    badgeBg: 'bg-orange-500/20',
+    logo: (
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+    ),
+    accountLabel: 'Unified Trading Account',
+    balanceLabel: 'Equity',
+    marginLabel: 'Account Margin Balance',
+  },
+} as const;
+
 // Asset icon mapping with enhanced styling
 const ASSET_ICONS: { [key: string]: React.ElementType } = {
   BTC: Bitcoin,
@@ -430,11 +466,24 @@ const PortfolioAnalyticsComponent: React.FC = () => {
                     <BarChart3 className="w-6 h-6 text-cyan-400" />
                   </motion.div>
                   <div>
-                    <h1 className="text-2xl lg:text-3xl font-bold text-white">
-                      Portfolio Overview
-                    </h1>
+                    <div className="flex items-center gap-3">
+                      <h1 className="text-2xl lg:text-3xl font-bold text-white">
+                        Portfolio Overview
+                      </h1>
+                      {portfolio?.exchange_type && EXCHANGE_BRANDING[portfolio.exchange_type] && (
+                        <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${EXCHANGE_BRANDING[portfolio.exchange_type].badgeBg} ${EXCHANGE_BRANDING[portfolio.exchange_type].textColor} ${EXCHANGE_BRANDING[portfolio.exchange_type].borderColor} border`}>
+                          {EXCHANGE_BRANDING[portfolio.exchange_type].logo}
+                          {EXCHANGE_BRANDING[portfolio.exchange_type].name}
+                          {portfolio.is_testnet && (
+                            <span className="ml-1 px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 text-[10px]">Testnet</span>
+                          )}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-gray-500 text-sm">
-                      Real-time portfolio monitoring and analytics
+                      {portfolio?.exchange_type && EXCHANGE_BRANDING[portfolio.exchange_type]
+                        ? `${EXCHANGE_BRANDING[portfolio.exchange_type].accountLabel} — Real-time monitoring`
+                        : 'Real-time portfolio monitoring and analytics'}
                     </p>
                   </div>
                 </div>
@@ -500,7 +549,11 @@ const PortfolioAnalyticsComponent: React.FC = () => {
                   {/* Main Value */}
                   <div className="lg:col-span-2">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-gray-400 text-sm font-medium">Total Portfolio Value</span>
+                      <span className="text-gray-400 text-sm font-medium">
+                        {portfolio.exchange_type && EXCHANGE_BRANDING[portfolio.exchange_type]
+                          ? EXCHANGE_BRANDING[portfolio.exchange_type].balanceLabel
+                          : 'Total Portfolio Value'}
+                      </span>
                       <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getPnLBgColor(portfolio.total_unrealized_profit)}`}>
                         {portfolio.total_unrealized_profit >= 0 ? (
                           <ArrowUp className="w-3 h-3" />
@@ -585,6 +638,31 @@ const PortfolioAnalyticsComponent: React.FC = () => {
       {/* Main Content */}
       <div className="px-6 pb-10">
         <div className="max-w-6xl mx-auto space-y-8">
+          {/* Exchange Context Banner */}
+          {portfolio.exchange_type && EXCHANGE_BRANDING[portfolio.exchange_type] && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r ${EXCHANGE_BRANDING[portfolio.exchange_type].bgGradient} border ${EXCHANGE_BRANDING[portfolio.exchange_type].borderColor}`}
+            >
+              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${EXCHANGE_BRANDING[portfolio.exchange_type].gradient} flex items-center justify-center text-white shadow-lg`}>
+                {EXCHANGE_BRANDING[portfolio.exchange_type].logo}
+              </div>
+              <div className="flex-1">
+                <p className={`text-sm font-medium ${EXCHANGE_BRANDING[portfolio.exchange_type].textColor}`}>
+                  Connected to {EXCHANGE_BRANDING[portfolio.exchange_type].name}
+                  {portfolio.is_testnet && ' (Testnet)'}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Data sourced from your {EXCHANGE_BRANDING[portfolio.exchange_type].accountLabel.toLowerCase()}
+                </p>
+              </div>
+              <div className="text-xs text-gray-500">
+                Last synced: {portfolio.last_synced ? new Date(portfolio.last_synced).toLocaleTimeString() : 'Never'}
+              </div>
+            </motion.div>
+          )}
+
           {/* Key Metrics Grid */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -603,7 +681,9 @@ const PortfolioAnalyticsComponent: React.FC = () => {
                 iconColor="text-cyan-400"
                 iconBg="from-cyan-500/20 to-blue-500/20"
                 borderColor="border-cyan-500/20"
-                title="Wallet Balance"
+                title={portfolio.exchange_type && EXCHANGE_BRANDING[portfolio.exchange_type]
+                  ? EXCHANGE_BRANDING[portfolio.exchange_type].balanceLabel
+                  : 'Wallet Balance'}
                 value={formatCurrency(portfolio.total_wallet_balance)}
                 subtitle={`Available: ${formatCurrency(portfolio.available_balance)}`}
                 trend={unrealized_pnl_percent}
@@ -616,7 +696,9 @@ const PortfolioAnalyticsComponent: React.FC = () => {
                 iconColor="text-emerald-400"
                 iconBg="from-emerald-500/20 to-green-500/20"
                 borderColor="border-emerald-500/20"
-                title="Margin Balance"
+                title={portfolio.exchange_type && EXCHANGE_BRANDING[portfolio.exchange_type]
+                  ? EXCHANGE_BRANDING[portfolio.exchange_type].marginLabel
+                  : 'Margin Balance'}
                 value={formatCurrency(portfolio.total_margin_balance)}
                 subtitle={`Initial: ${formatCurrency(portfolio.total_initial_margin)}`}
                 delay={0.05}

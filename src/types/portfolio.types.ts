@@ -14,4 +14,6 @@ export interface PortfolioResponse extends PortfolioBase {
   id: string;
   user_id: string;
   last_synced: string;
+  exchange_type?: 'binance' | 'bybit' | null;
+  is_testnet?: boolean;
 }

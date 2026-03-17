@@ -28,6 +28,7 @@ export const API_ENDPOINTS = {
 
     API_KEYS: "/users/api-keys",
     API_KEYS_ID: (keyId: string) => `/users/api-keys/${keyId}`,
+    API_KEYS_TEST: "/users/api-keys/test-connection",
     SUBSCRIPTION: "/users/subscription",
 
     // Telegram Config

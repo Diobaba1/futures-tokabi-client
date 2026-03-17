@@ -10,8 +10,23 @@ import {
 } from '../../types/user.types';
 
 export const userService = {
-  async addApiKey(data: APIKeyAdd): Promise<{ status: string; message: string }> {
+  async addApiKey(data: APIKeyAdd): Promise<{
+    status: string;
+    message: string;
+    api_key?: { id: string; validation_status: string };
+    validation?: { valid: boolean; error?: string };
+  }> {
     const response = await axiosInstance.post(API_ENDPOINTS.USERS.API_KEYS, data);
+    return response.data;
+  },
+
+  async testConnection(): Promise<{
+    exchange: string;
+    testnet: boolean;
+    validation?: { valid: boolean };
+    error?: string;
+  }> {
+    const response = await axiosInstance.post(API_ENDPOINTS.USERS.API_KEYS_TEST);
     return response.data;
   },
 

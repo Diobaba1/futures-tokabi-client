@@ -162,21 +162,39 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({ onKeysUpdate }) => {
 
     try {
       setIsAdding(true);
-      await userService.addApiKey({
+      const result = await userService.addApiKey({
         ...formData,
         label: formData.label?.trim() || `${EXCHANGES[formData.exchange_type as ExchangeType].name} Key`,
       });
 
-      showSuccess('Exchange connected successfully!', { title: 'Connected' });
-      setShowConnectModal(false);
-      setSelectedExchange(null);
-      setFormData({
-        api_key: '',
-        api_secret: '',
-        label: '',
-        testnet: false,
-        exchange_type: 'binance',
-      });
+      if (result.validation?.valid) {
+        showSuccess('Exchange connected and verified! Trades will be executed automatically.', { title: 'Connected & Verified' });
+        setShowConnectModal(false);
+        setSelectedExchange(null);
+        setFormData({
+          api_key: '',
+          api_secret: '',
+          label: '',
+          testnet: false,
+          exchange_type: 'binance',
+        });
+      } else {
+        showError(
+          result.validation?.error || 'API key saved but could not be verified. Please check your credentials and try reconnecting.',
+          { title: 'Verification Failed' }
+        );
+        // Key was saved but invalid — close modal so user can see the status
+        // and disconnect/reconnect with correct credentials
+        setShowConnectModal(false);
+        setSelectedExchange(null);
+        setFormData({
+          api_key: '',
+          api_secret: '',
+          label: '',
+          testnet: false,
+          exchange_type: 'binance',
+        });
+      }
       await loadApiKeys();
     } catch (err: unknown) {
       showError(getUserFriendlyError(err), { title: 'Connection Failed' });
@@ -758,7 +776,7 @@ const ConnectModal: React.FC<ConnectModalProps> = ({
               {isAdding ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Connecting...</span>
+                  <span>Connecting & Verifying...</span>
                 </>
               ) : (
                 <>
