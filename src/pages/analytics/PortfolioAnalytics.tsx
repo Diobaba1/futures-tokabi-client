@@ -3,6 +3,7 @@ import React, { useEffect, useState, useCallback, useRef, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../components/contexts/AuthContext";
 import { portfolioService } from "../../api/services/portfolioService";
+import tradingConfigService, { TradingConfig } from "../../api/services/tradingConfigService";
 import { PortfolioResponse } from "../../types/portfolio.types";
 import {
   TrendingUp,
@@ -185,6 +186,7 @@ const ProgressRing: React.FC<{
 const PortfolioAnalyticsComponent: React.FC = () => {
   const { user } = useAuth();
   const [portfolio, setPortfolio] = useState<PortfolioResponse | null>(null);
+  const [tradingConfig, setTradingConfig] = useState<TradingConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
@@ -197,8 +199,12 @@ const PortfolioAnalyticsComponent: React.FC = () => {
     try {
       setIsLoading(true);
       if (!isRetry) setError(null);
-      const portfolioData = await portfolioService.getPortfolio();
+      const [portfolioData, configData] = await Promise.all([
+        portfolioService.getPortfolio(),
+        tradingConfigService.getMyConfig().catch(() => null),
+      ]);
       setPortfolio(portfolioData);
+      if (configData) setTradingConfig(configData);
       setLastRefresh(new Date());
     } catch (err: any) {
       const errorMsg = isRetry
@@ -1017,6 +1023,175 @@ const PortfolioAnalyticsComponent: React.FC = () => {
               </div>
             </motion.div>
           </div>
+
+          {/* Trading Activity & Limits */}
+          {tradingConfig && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="rounded-2xl bg-gray-900/50 backdrop-blur-xl border border-white/5 overflow-hidden"
+            >
+              <div className="p-5 border-b border-white/5 flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-cyan-400" />
+                  Trading Activity
+                </h3>
+                {tradingConfig.trading_paused && (
+                  <span className="px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs font-medium flex items-center gap-1">
+                    <AlertTriangle size={12} />
+                    Trading Paused{tradingConfig.pause_reason ? ` — ${tradingConfig.pause_reason}` : ''}
+                  </span>
+                )}
+              </div>
+
+              <div className="p-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Daily Trades */}
+                  {(() => {
+                    const used = tradingConfig.daily_trade_count;
+                    const limit = tradingConfig.max_trades_per_day;
+                    const pct = limit > 0 ? (used / limit) * 100 : 0;
+                    const barColor = pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-yellow-500' : 'bg-cyan-500';
+                    return (
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-gray-400 text-sm">Daily Trades</span>
+                          <span className="text-white font-bold text-lg">{used}<span className="text-gray-500 text-sm font-normal">/{limit}</span></span>
+                        </div>
+                        <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                          <motion.div
+                            className={`h-full rounded-full ${barColor}`}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min(pct, 100)}%` }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                          />
+                        </div>
+                        <p className="text-gray-500 text-xs mt-1.5">{limit - used} remaining today</p>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Open Positions */}
+                  {(() => {
+                    const open = portfolio?.positions?.length || 0;
+                    const limit = tradingConfig.max_concurrent_positions;
+                    const pct = limit > 0 ? (open / limit) * 100 : 0;
+                    const barColor = pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-yellow-500' : 'bg-emerald-500';
+                    return (
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-gray-400 text-sm">Open Positions</span>
+                          <span className="text-white font-bold text-lg">{open}<span className="text-gray-500 text-sm font-normal">/{limit}</span></span>
+                        </div>
+                        <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                          <motion.div
+                            className={`h-full rounded-full ${barColor}`}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min(pct, 100)}%` }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                          />
+                        </div>
+                        <p className="text-gray-500 text-xs mt-1.5">{Math.max(0, limit - open)} slots available</p>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Daily P&L vs Loss Limit */}
+                  {(() => {
+                    const pnl = tradingConfig.daily_pnl_usd;
+                    const lossLimitPct = tradingConfig.daily_loss_limit_percent;
+                    const balance = portfolio?.total_wallet_balance || 0;
+                    const lossLimitUsd = balance * (lossLimitPct / 100);
+                    const pnlColor = pnl >= 0 ? 'text-emerald-400' : 'text-red-400';
+                    const pnlIcon = pnl >= 0 ? <ArrowUpRight size={14} className="text-emerald-400" /> : <ArrowDownRight size={14} className="text-red-400" />;
+                    const lossUsedPct = pnl < 0 && lossLimitUsd > 0 ? (Math.abs(pnl) / lossLimitUsd) * 100 : 0;
+                    const barColor = lossUsedPct >= 80 ? 'bg-red-500' : lossUsedPct >= 50 ? 'bg-yellow-500' : 'bg-emerald-500';
+                    return (
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-gray-400 text-sm">Daily P&L</span>
+                          <span className={`font-bold text-lg flex items-center gap-1 ${pnlColor}`}>
+                            {pnlIcon}
+                            ${Math.abs(pnl).toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                          <motion.div
+                            className={`h-full rounded-full ${pnl >= 0 ? 'bg-emerald-500' : barColor}`}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${pnl >= 0 ? Math.min((pnl / Math.max(lossLimitUsd, 1)) * 100, 100) : Math.min(lossUsedPct, 100)}%` }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                          />
+                        </div>
+                        <p className="text-gray-500 text-xs mt-1.5">
+                          Loss limit: ${lossLimitUsd.toFixed(2)} ({lossLimitPct}% of balance)
+                        </p>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Win / Loss Today */}
+                  {(() => {
+                    return (
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-gray-400 text-sm">Positions P&L</span>
+                        </div>
+                        <div className="flex items-center gap-4 mt-1">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                            <span className="text-emerald-400 font-semibold text-lg">{positionMetrics.winningPositions}</span>
+                            <span className="text-gray-500 text-xs">winning</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                            <span className="text-red-400 font-semibold text-lg">{positionMetrics.losingPositions}</span>
+                            <span className="text-gray-500 text-xs">losing</span>
+                          </div>
+                        </div>
+                        <p className="text-gray-500 text-xs mt-2.5">
+                          {positionMetrics.winningPositions + positionMetrics.losingPositions > 0
+                            ? `${((positionMetrics.winningPositions / (positionMetrics.winningPositions + positionMetrics.losingPositions)) * 100).toFixed(0)}% win rate`
+                            : 'No positions open'
+                          }
+                        </p>
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* Strategy & SL Settings Row */}
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    tradingConfig.strategy_level === 'aggressive'
+                      ? 'bg-red-500/20 text-red-400'
+                      : tradingConfig.strategy_level === 'moderate'
+                        ? 'bg-yellow-500/20 text-yellow-400'
+                        : 'bg-green-500/20 text-green-400'
+                  }`}>
+                    {tradingConfig.strategy_level.charAt(0).toUpperCase() + tradingConfig.strategy_level.slice(1)}
+                  </span>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    tradingConfig.enable_breakeven_sl ? 'bg-cyan-500/20 text-cyan-400' : 'bg-gray-700/50 text-gray-500'
+                  }`}>
+                    Breakeven SL {tradingConfig.enable_breakeven_sl ? 'ON' : 'OFF'}
+                  </span>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    tradingConfig.enable_trailing_sl ? 'bg-cyan-500/20 text-cyan-400' : 'bg-gray-700/50 text-gray-500'
+                  }`}>
+                    Trailing SL {tradingConfig.enable_trailing_sl ? 'ON' : 'OFF'}
+                  </span>
+                  <span className="px-3 py-1 rounded-full bg-gray-700/50 text-gray-400 text-xs font-medium">
+                    {tradingConfig.max_leverage}x Leverage
+                  </span>
+                  <span className="px-3 py-1 rounded-full bg-gray-700/50 text-gray-400 text-xs font-medium">
+                    {tradingConfig.risk_per_trade_percent}% Risk/Trade
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {/* Error Notice */}
           {error && portfolio && (
