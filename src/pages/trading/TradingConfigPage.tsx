@@ -538,7 +538,7 @@ const TradingConfigPage: React.FC = () => {
   const [showWarning, setShowWarning] = useState(false);
   const warningStartRef = useRef<number | null>(null);
 
-  const isReadOnly = activePreset !== 'aggressive';
+  const isReadOnly = false;
 
   // Warning countdown effect
   useEffect(() => {
@@ -590,15 +590,9 @@ const TradingConfigPage: React.FC = () => {
         trailing_stop_percent: data.trailing_stop_percent,
         trailing_activation_percent: data.trailing_activation_percent,
       };
-      // Restore the user's saved strategy level from the backend
+      // Restore the user's saved strategy level and custom values from the backend
       const savedPreset: RiskPreset = data.strategy_level || 'conservative';
-      if (savedPreset === 'conservative' || savedPreset === 'moderate') {
-        // Read-only presets: apply preset values over loaded data
-        setFormData({ ...fd, ...PRESETS[savedPreset] });
-      } else {
-        // Aggressive: use the user's saved custom values as-is
-        setFormData(fd);
-      }
+      setFormData(fd);
       setActivePreset(savedPreset);
     } catch (err: unknown) {
       const e = err as { response?: { data?: { detail?: string } } };
@@ -611,10 +605,9 @@ const TradingConfigPage: React.FC = () => {
   useEffect(() => { fetchConfig(); }, []);
 
   const handleInputChange = useCallback((field: keyof TradingConfigUpdate, value: number | boolean) => {
-    if (isReadOnly) return;
     setFormData(prev => ({ ...prev, [field]: value }));
     setHasChanges(true);
-  }, [isReadOnly]);
+  }, []);
 
   const applyPreset = (preset: RiskPreset) => {
     if (preset === 'aggressive') {
@@ -743,11 +736,6 @@ const TradingConfigPage: React.FC = () => {
             </h1>
             <p className="text-gray-400 mt-2 max-w-xl">
               Customize your trading parameters, risk management, and automation settings.
-              {isReadOnly && (
-                <span className="ml-2 text-yellow-400 text-sm">
-                  Switch to <strong>Aggressive</strong> to edit individual parameters.
-                </span>
-              )}
             </p>
           </div>
           <motion.button
@@ -856,7 +844,7 @@ const TradingConfigPage: React.FC = () => {
           <div className="flex items-center gap-2 mb-4">
             <Layers className="text-cyan-400" size={20} />
             <span className="text-white font-medium">Strategy Presets</span>
-            <Tooltip text="Conservative and Moderate are fixed presets. Only Aggressive can be customized.">
+            <Tooltip text="Presets apply default values. You can customize any setting after selecting a preset.">
               <HelpCircle size={14} className="text-gray-500" />
             </Tooltip>
           </div>
@@ -869,7 +857,6 @@ const TradingConfigPage: React.FC = () => {
               borderColor="green-500/50"
               onClick={() => applyPreset('conservative')}
               isActive={activePreset === 'conservative'}
-              locked
             />
             <PresetButton
               label="Moderate"
@@ -879,7 +866,6 @@ const TradingConfigPage: React.FC = () => {
               borderColor="yellow-500/50"
               onClick={() => applyPreset('moderate')}
               isActive={activePreset === 'moderate'}
-              locked
             />
             <PresetButton
               label="Aggressive"
@@ -892,19 +878,6 @@ const TradingConfigPage: React.FC = () => {
             />
           </div>
 
-          {isReadOnly && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mt-4 flex items-center gap-2 p-3 bg-gray-700/30 border border-gray-600/30 rounded-xl"
-            >
-              <Lock size={14} className="text-gray-400 flex-shrink-0" />
-              <p className="text-gray-400 text-sm">
-                <strong className="text-gray-300">{activePreset === 'conservative' ? 'Conservative' : 'Moderate'}</strong> is a fixed preset.
-                Individual parameters are read-only. Select <strong className="text-red-400">Aggressive</strong> to unlock custom values.
-              </p>
-            </motion.div>
-          )}
         </div>
       </div>
 
@@ -1261,12 +1234,6 @@ const TradingConfigPage: React.FC = () => {
                 </motion.div>
               )}
             </AnimatePresence>
-            {isReadOnly && (
-              <div className="flex items-center gap-2 text-gray-500 text-sm">
-                <Lock size={14} />
-                <span>Read-only — switch to Aggressive to edit</span>
-              </div>
-            )}
           </div>
           <div className="flex items-center gap-3">
             <motion.button
