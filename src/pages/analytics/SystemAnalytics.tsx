@@ -63,7 +63,7 @@ const SystemAnalyticsComponent: React.FC = () => {
   // Show loading state
   if (systemLoading && !system) {
     return (
-      <div className="min-h-96 bg-gray-800/20 backdrop-blur-sm rounded-xl border border-gray-700/30 flex items-center justify-center">
+      <div className="min-h-96 bg-dark-elevated/20 backdrop-blur-sm rounded-xl border border-dark-border/30 flex items-center justify-center">
         <div className="text-center">
           <RefreshCw className="w-12 h-12 text-cyan-400 mx-auto mb-4 animate-spin" />
           <h3 className="text-xl font-light text-white mb-2">Loading System Analytics</h3>
@@ -76,7 +76,7 @@ const SystemAnalyticsComponent: React.FC = () => {
   // Show error state
   if (systemError && !system) {
     return (
-      <div className="min-h-96 bg-gray-800/20 backdrop-blur-sm rounded-xl border border-red-500/20 flex items-center justify-center">
+      <div className="min-h-96 bg-dark-elevated/20 backdrop-blur-sm rounded-xl border border-red-500/20 flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
           <h3 className="text-xl font-light text-white mb-2">Data Connection Issue</h3>
@@ -97,7 +97,7 @@ const SystemAnalyticsComponent: React.FC = () => {
   // Show empty state
   if (!system) {
     return (
-      <div className="min-h-96 bg-gray-800/20 backdrop-blur-sm rounded-xl border border-gray-700/30 flex items-center justify-center">
+      <div className="min-h-96 bg-dark-elevated/20 backdrop-blur-sm rounded-xl border border-dark-border/30 flex items-center justify-center">
         <div className="text-center">
           <Database className="w-12 h-12 text-gray-500 mx-auto mb-4" />
           <h3 className="text-xl font-light text-white mb-2">No Analytics Data</h3>
@@ -195,14 +195,14 @@ const SystemAnalyticsComponent: React.FC = () => {
               <span className="text-red-400 text-sm font-light">Sync issue</span>
             </div>
           )}
-          <div className="flex items-center gap-2 px-3 py-2 bg-gray-800/30 rounded-lg border border-gray-700/30">
+          <div className="flex items-center gap-2 px-3 py-2 bg-dark-elevated/30 rounded-lg border border-dark-border/30">
             <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>
             <span className="text-sm text-gray-400 font-light">Live Data</span>
           </div>
           <button
             onClick={handleRefresh}
             disabled={systemLoading || isRefreshing}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-800/30 border border-gray-700/30 rounded-lg text-gray-400 hover:text-white hover:border-gray-600/50 transition-all duration-300 disabled:opacity-50 text-sm font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-dark-elevated/30 border border-dark-border/30 rounded-lg text-gray-400 hover:text-white hover:border-dark-border/50 transition-all duration-300 disabled:opacity-50 text-sm font-medium"
           >
             <RefreshCw className={`w-4 h-4 ${systemLoading || isRefreshing ? 'animate-spin' : ''}`} />
             Refresh
@@ -226,7 +226,7 @@ const SystemAnalyticsComponent: React.FC = () => {
       {/* Key Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Signals */}
-        <div className="bg-gray-800/20 backdrop-blur-sm rounded-xl p-5 border border-gray-700/30 hover:border-gray-600/50 transition-all duration-200">
+        <div className="bg-dark-elevated/20 backdrop-blur-sm rounded-xl p-5 border border-dark-border/30 hover:border-dark-border/50 transition-all duration-200">
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-lg flex items-center justify-center border border-cyan-500/30">
               <Zap className="w-5 h-5 text-cyan-400" />
@@ -240,7 +240,7 @@ const SystemAnalyticsComponent: React.FC = () => {
         </div>
 
         {/* Average Consensus */}
-        <div className="bg-gray-800/20 backdrop-blur-sm rounded-xl p-5 border border-gray-700/30 hover:border-gray-600/50 transition-all duration-200">
+        <div className="bg-dark-elevated/20 backdrop-blur-sm rounded-xl p-5 border border-dark-border/30 hover:border-dark-border/50 transition-all duration-200">
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 bg-gradient-to-br from-violet-500/20 to-purple-500/20 rounded-lg flex items-center justify-center border border-violet-500/30">
               <Target className="w-5 h-5 text-violet-400" />
@@ -254,7 +254,7 @@ const SystemAnalyticsComponent: React.FC = () => {
         </div>
 
         {/* System PnL */}
-        <div className="bg-gray-800/20 backdrop-blur-sm rounded-xl p-5 border border-gray-700/30 hover:border-gray-600/50 transition-all duration-200">
+        <div className="bg-dark-elevated/20 backdrop-blur-sm rounded-xl p-5 border border-dark-border/30 hover:border-dark-border/50 transition-all duration-200">
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded-lg flex items-center justify-center border border-emerald-500/30">
               <BarChart3 className="w-5 h-5 text-emerald-400" />
@@ -268,7 +268,7 @@ const SystemAnalyticsComponent: React.FC = () => {
         </div>
 
         {/* Success Rate */}
-        <div className="bg-gray-800/20 backdrop-blur-sm rounded-xl p-5 border border-gray-700/30 hover:border-gray-600/50 transition-all duration-200">
+        <div className="bg-dark-elevated/20 backdrop-blur-sm rounded-xl p-5 border border-dark-border/30 hover:border-dark-border/50 transition-all duration-200">
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-lg flex items-center justify-center border border-amber-500/30">
               <Award className="w-5 h-5 text-amber-400" />
@@ -285,7 +285,7 @@ const SystemAnalyticsComponent: React.FC = () => {
       {/* Secondary Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Average Leverage */}
-        <div className="bg-gray-800/20 rounded-lg p-4 border border-gray-700/30">
+        <div className="bg-dark-elevated/20 rounded-lg p-4 border border-dark-border/30">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded flex items-center justify-center border border-blue-500/30">
               <TrendingUp className="w-4 h-4 text-blue-400" />
@@ -300,7 +300,7 @@ const SystemAnalyticsComponent: React.FC = () => {
         </div>
 
         {/* Futures Ready */}
-        <div className="bg-gray-800/20 rounded-lg p-4 border border-gray-700/30">
+        <div className="bg-dark-elevated/20 rounded-lg p-4 border border-dark-border/30">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded flex items-center justify-center border border-emerald-500/30">
               <Rocket className="w-4 h-4 text-emerald-400" />
@@ -315,7 +315,7 @@ const SystemAnalyticsComponent: React.FC = () => {
         </div>
 
         {/* High Quality Signals */}
-        <div className="bg-gray-800/20 rounded-lg p-4 border border-gray-700/30">
+        <div className="bg-dark-elevated/20 rounded-lg p-4 border border-dark-border/30">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gradient-to-br from-violet-500/20 to-purple-500/20 rounded flex items-center justify-center border border-violet-500/30">
               <Shield className="w-4 h-4 text-violet-400" />
@@ -331,14 +331,14 @@ const SystemAnalyticsComponent: React.FC = () => {
       </div>
 
       {/* Signal Quality Distribution */}
-      <div className="bg-gray-800/20 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
+      <div className="bg-dark-elevated/20 backdrop-blur-sm rounded-xl p-6 border border-dark-border/30">
         <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
           <LineChart className="w-5 h-5 text-cyan-400" />
           Signal Quality Distribution
         </h3>
         <div className="grid grid-cols-2 md:grid-c-5 gap-4">
           {Object.entries(safePeriodStats.signal_quality_distribution).map(([quality, count]) => (
-            <div key={quality} className="text-center p-3 bg-gray-700/20 rounded-lg border border-gray-600/20">
+            <div key={quality} className="text-center p-3 bg-dark-surface/20 rounded-lg border border-dark-border/20">
               <div className={`text-xl font-light ${getSignalQualityColor(quality)} mb-1`}>
                 {count as number}
               </div>
@@ -352,14 +352,14 @@ const SystemAnalyticsComponent: React.FC = () => {
 
       {/* Most Active Symbols */}
       {safePeriodStats.most_active_symbols.length > 0 && (
-        <div className="bg-gray-800/20 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
+        <div className="bg-dark-elevated/20 backdrop-blur-sm rounded-xl p-6 border border-dark-border/30">
           <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
             <Activity className="w-5 h-5 text-amber-400" />
             Most Active Instruments
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {safePeriodStats.most_active_symbols.map(({ symbol, signal_count }: MostActiveSymbol) => (
-              <div key={symbol} className="text-center p-3 bg-gray-700/20 rounded-lg border border-gray-600/20">
+              <div key={symbol} className="text-center p-3 bg-dark-surface/20 rounded-lg border border-dark-border/20">
                 <div className="text-xl font-light text-white mb-1">
                   {signal_count}
                 </div>
@@ -374,14 +374,14 @@ const SystemAnalyticsComponent: React.FC = () => {
 
       {/* Recent Signals */}
       {safeRecentSignals.length > 0 && (
-        <div className="bg-gray-800/20 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
+        <div className="bg-dark-elevated/20 backdrop-blur-sm rounded-xl p-6 border border-dark-border/30">
           <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
             <Cpu className="w-5 h-5 text-blue-400" />
             Recent Signal Activity
           </h3>
           <div className="space-y-2">
             {safeRecentSignals.slice(0, 5).map((signal: SignalSummary) => (
-              <div key={signal.id} className="flex items-center justify-between p-3 bg-gray-700/20 rounded-lg border border-gray-600/20 hover:border-gray-500/30 transition-all duration-200">
+              <div key={signal.id} className="flex items-center justify-between p-3 bg-dark-surface/20 rounded-lg border border-dark-border/20 hover:border-gray-500/30 transition-all duration-200">
                 <div className="flex items-center gap-3">
                   <span className={`px-2 py-1 rounded text-xs font-medium ${
                     signal.decision === 'long' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 

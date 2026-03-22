@@ -372,7 +372,7 @@ const CommunityPage = () => {
                 className="relative group"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/15 to-cyan-900/15 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative p-6 bg-gray-800/30 backdrop-blur-xl rounded-2xl border border-gray-700/30 group-hover:border-cyan-500/30 transition-all duration-300">
+                <div className="relative p-6 bg-dark-elevated/30 backdrop-blur-xl rounded-2xl border border-dark-border/30 group-hover:border-cyan-500/30 transition-all duration-300">
                   <div className="text-3xl font-light text-transparent bg-clip-text bg-gradient-to-br from-cyan-700 to-cyan-700 mb-2 tracking-tight">
                     {stat.value}
                   </div>
@@ -417,7 +417,7 @@ const CommunityPage = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full sm:w-auto px-8 py-5 bg-gray-800/50 border-2 border-gray-600/30 rounded-2xl font-medium text-lg text-white hover:border-cyan-500/30 hover:bg-gray-800/60 transition-all duration-300 backdrop-blur-xl tracking-wide"
+              className="w-full sm:w-auto px-8 py-5 bg-dark-elevated/50 border-2 border-gray-600/30 rounded-2xl font-medium text-lg text-white hover:border-cyan-500/30 hover:bg-dark-elevated/60 transition-all duration-300 backdrop-blur-xl tracking-wide"
             >
               <Play className="w-5 h-5 inline mr-2" />
               View Platform Overview
@@ -478,7 +478,7 @@ const CommunityPage = () => {
                   className="group relative"
                 >
                   <div className="absolute -inset-0.5 bg-gradient-to-br from-cyan-500/30 to-cyan-900/30 rounded-3xl blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
-                  <div className="relative h-full bg-gray-800/40 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/30 group-hover:border-cyan-500/30 transition-all duration-300 text-center">
+                  <div className="relative h-full bg-dark-elevated/40 backdrop-blur-xl rounded-3xl p-8 border border-dark-border/30 group-hover:border-cyan-500/30 transition-all duration-300 text-center">
                     <div className={`inline-flex p-3 rounded-2xl bg-gradient-to-br ${step.color} shadow-2xl mb-4 group-hover:scale-105 transition-transform duration-300 mx-auto backdrop-blur-sm`}>
                       <Icon className="w-6 h-6 text-white" />
                     </div>
@@ -539,7 +539,7 @@ const CommunityPage = () => {
                   className="group relative"
                 >
                   <div className="absolute -inset-0.5 bg-gradient-to-br from-cyan-500/30 to-cyan-900/30 rounded-3xl blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
-                  <div className="relative h-full bg-gray-800/40 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/30 group-hover:border-cyan-500/30 transition-all duration-300">
+                  <div className="relative h-full bg-dark-elevated/40 backdrop-blur-xl rounded-3xl p-8 border border-dark-border/30 group-hover:border-cyan-500/30 transition-all duration-300">
                     <div className="absolute top-4 right-4">
                       <span className="px-3 py-1 bg-cyan-500/15 border border-cyan-500/25 rounded-full text-cyan-700 text-xs font-medium tracking-wide">
                         {feature.badge}
@@ -600,7 +600,7 @@ const CommunityPage = () => {
                       whileHover={{ scale: 1.03 }}
                       className="relative group"
                     >
-                      <div className="h-full bg-gray-900/40 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/30 group-hover:border-cyan-500/30 transition-all duration-300">
+                      <div className="h-full bg-dark-elevated/40 backdrop-blur-sm rounded-2xl p-6 border border-dark-border/30 group-hover:border-cyan-500/30 transition-all duration-300">
                         <div className="flex items-start gap-4 mb-3">
                           <div className="flex-shrink-0 p-3 bg-cyan-500/15 rounded-xl group-hover:bg-cyan-500/20 transition-colors backdrop-blur-sm">
                             <Icon className="w-5 h-5 text-cyan-700" />
@@ -620,7 +620,7 @@ const CommunityPage = () => {
                   );
                 })}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 pt-8 border-t border-gray-700/30">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 pt-8 border-t border-dark-border/30">
                 {benefits.slice(4).map((benefit, index) => {
                   const Icon = benefit.icon;
                   return (
@@ -633,7 +633,7 @@ const CommunityPage = () => {
                       whileHover={{ scale: 1.03 }}
                       className="relative group"
                     >
-                      <div className="h-full bg-gray-900/40 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/30 group-hover:border-cyan-500/30 transition-all duration-300">
+                      <div className="h-full bg-dark-elevated/40 backdrop-blur-sm rounded-2xl p-6 border border-dark-border/30 group-hover:border-cyan-500/30 transition-all duration-300">
                         <div className="flex items-start gap-4 mb-3">
                           <div className="flex-shrink-0 p-3 bg-cyan-500/15 rounded-xl group-hover:bg-cyan-500/20 transition-colors backdrop-blur-sm">
                             <Icon className="w-5 h-5 text-cyan-700" />
@@ -685,7 +685,7 @@ const CommunityPage = () => {
                 className="group relative"
               >
                 <div className="absolute -inset-0.5 bg-gradient-to-br from-cyan-500/20 to-cyan-900/20 rounded-3xl blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
-                <div className="relative h-full bg-gray-800/40 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/30 group-hover:border-cyan-500/30 transition-all duration-300">
+                <div className="relative h-full bg-dark-elevated/40 backdrop-blur-xl rounded-3xl p-8 border border-dark-border/30 group-hover:border-cyan-500/30 transition-all duration-300">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="relative">
                       <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-cyan-900 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm">
@@ -694,7 +694,7 @@ const CommunityPage = () => {
                         </span>
                       </div>
                       {testimonial.verified && (
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center border-2 border-gray-800/50">
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center border-2 border-dark-border/50">
                           <CheckCircle2 className="w-3 h-3 text-white" />
                         </div>
                       )}
@@ -707,7 +707,7 @@ const CommunityPage = () => {
                   
                   <p className="text-gray-300 mb-6 leading-relaxed italic font-light tracking-wide">"{testimonial.message}"</p>
                   
-                  <div className="flex items-center justify-between pt-6 border-t border-gray-700/30">
+                  <div className="flex items-center justify-between pt-6 border-t border-dark-border/30">
                     <div>
                       <div className="text-2xl font-light text-transparent bg-clip-text bg-gradient-to-r from-cyan-700 to-cyan-700 tracking-tight">
                         {testimonial.profit}

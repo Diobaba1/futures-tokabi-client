@@ -73,10 +73,10 @@ const PlanCard: React.FC<PlanCardProps> = ({
 
   return (
     <div
-      className={`relative bg-gray-800/50 backdrop-blur-sm border rounded-2xl p-6 transition-all duration-300 hover:scale-105 ${
+      className={`relative bg-dark-elevated backdrop-blur-sm border rounded-2xl p-6 transition-all duration-300 hover:scale-105 ${
         isHighlighted
           ? 'border-purple-500 shadow-lg shadow-purple-500/20'
-          : 'border-gray-700 hover:border-gray-600'
+          : 'border-dark-border hover:border-gray-600'
       }`}
     >
       {/* Badge */}
@@ -179,7 +179,7 @@ const CurrencyModal: React.FC<CurrencyModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 border border-gray-700 rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
+      <div className="bg-dark-elevated border border-dark-border rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
         <h3 className="text-xl font-bold text-white mb-4">
           Select Payment Currency
         </h3>

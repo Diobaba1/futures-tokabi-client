@@ -146,7 +146,7 @@ const HowItWorks: React.FC = () => {
   };
 
   return (
-    <section id="how-it-works" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-950 relative overflow-hidden">
+    <section id="how-it-works" className="py-24 px-4 sm:px-6 lg:px-8 bg-dark-base relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/10 to-gray-950"></div>
       
@@ -168,7 +168,7 @@ const HowItWorks: React.FC = () => {
         >
           <motion.div
             variants={itemVariants}
-            className="inline-flex items-center px-4 py-2 rounded-full bg-gray-800/60 border border-gray-700/50 text-gray-300 text-sm font-light tracking-wider mb-8 backdrop-blur-sm"
+            className="inline-flex items-center px-4 py-2 rounded-full bg-dark-elevated/60 border border-dark-border/50 text-gray-300 text-sm font-light tracking-wider mb-8 backdrop-blur-sm"
           >
             <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full mr-2"></div>
             PROCESS OVERVIEW
@@ -231,7 +231,7 @@ const HowItWorks: React.FC = () => {
                     initial="hidden"
                     animate={inView ? "visible" : "hidden"}
                     variants={iconVariants}
-                    className="absolute -top-2 lg:top-16 lg:-left-2 w-8 h-8 bg-gray-900 border border-gray-700 rounded-full flex items-center justify-center z-20 group-hover:border-cyan-400/50 transition-colors duration-300"
+                    className="absolute -top-2 lg:top-16 lg:-left-2 w-8 h-8 bg-dark-elevated border border-dark-border rounded-full flex items-center justify-center z-20 group-hover:border-cyan-400/50 transition-colors duration-300"
                   >
                     <span className="text-cyan-400 font-medium text-xs">{step.step}</span>
                   </motion.div>
@@ -271,12 +271,12 @@ const HowItWorks: React.FC = () => {
                     </div>
 
                     {/* Progress Indicator */}
-                    <div className="mt-4 pt-4 border-t border-gray-700/30">
+                    <div className="mt-4 pt-4 border-t border-dark-border/30">
                       <div className="flex items-center justify-between text-xs text-gray-500">
                         <span>Progress</span>
                         <span>{step.step}/05</span>
                       </div>
-                      <div className="w-full bg-gray-800 rounded-full h-1 mt-2">
+                      <div className="w-full bg-dark-elevated rounded-full h-1 mt-2">
                         <motion.div 
                           className={`h-1 rounded-full bg-gradient-to-r ${step.gradient}`}
                           initial="hidden"
@@ -318,7 +318,7 @@ const HowItWorks: React.FC = () => {
           transition={{ duration: 0.8, delay: 1.5 }}
           className="text-center mt-20"
         >
-          <div className="bg-gray-800/30 backdrop-blur-lg border border-gray-700/50 rounded-2xl p-8 max-w-2xl mx-auto">
+          <div className="bg-dark-elevated/30 backdrop-blur-lg border border-dark-border/50 rounded-2xl p-8 max-w-2xl mx-auto">
             <div className="flex items-center justify-center mb-4">
               <Zap className="w-6 h-6 text-cyan-400 mr-3" />
               <h3 className="text-xl font-semibold text-white">

@@ -46,7 +46,7 @@ const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, 
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 5 }}
-            className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg shadow-xl text-sm text-gray-300 whitespace-nowrap max-w-xs"
+            className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-dark-elevated border border-dark-border rounded-lg shadow-xl text-sm text-gray-300 whitespace-nowrap max-w-xs"
           >
             {text}
             <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1">
@@ -145,7 +145,7 @@ const SliderInput: React.FC<SliderInputProps> = ({
             value={value}
             onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
             step={step}
-            className="w-20 bg-gray-800/50 border border-gray-600 rounded-lg px-2 py-1 text-white text-right text-sm focus:border-cyan-500 focus:outline-none"
+            className="w-20 bg-dark-elevated border border-gray-600 rounded-lg px-2 py-1 text-white text-right text-sm focus:border-cyan-500 focus:outline-none"
           />
           {unit && <span className="text-gray-400 text-sm min-w-[30px]">{unit}</span>}
         </div>
@@ -207,10 +207,10 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
     onClick={() => !disabled && onChange(!enabled)}
     className={`flex items-center justify-between p-4 rounded-xl border transition-all ${
       disabled
-        ? 'opacity-50 cursor-not-allowed bg-gray-800/20 border-gray-700/30'
+        ? 'opacity-50 cursor-not-allowed bg-dark-elevated/20 border-dark-border/30'
         : enabled
         ? 'bg-cyan-500/10 border-cyan-500/30 cursor-pointer'
-        : 'bg-gray-800/30 border-gray-700/50 hover:border-gray-600 cursor-pointer'
+        : 'bg-dark-elevated/30 border-dark-border/50 hover:border-gray-600 cursor-pointer'
     }`}
   >
     <div className="flex items-center gap-3">
@@ -328,7 +328,7 @@ const RiskMeter: React.FC<{ riskLevel: number }> = ({ riskLevel }) => {
   };
   const riskInfo = getRiskInfo(riskLevel);
   return (
-    <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-6">
+    <div className="bg-dark-elevated border border-dark-border/50 rounded-2xl p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Gauge className="text-cyan-400" size={20} />
@@ -381,7 +381,7 @@ const PresetButton: React.FC<PresetButtonProps> = ({
     className={`flex-1 p-4 rounded-xl border transition-all text-left relative overflow-hidden ${
       isActive
         ? `bg-${color}-500/20 border-${borderColor}`
-        : 'bg-gray-800/30 border-gray-700/50 hover:border-gray-600'
+        : 'bg-dark-elevated/30 border-dark-border/50 hover:border-gray-600'
     }`}
   >
     {locked && isActive && (
@@ -418,7 +418,7 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, icon, trend, color = 
   return (
     <motion.div
       whileHover={{ y: -2 }}
-      className="bg-gradient-to-br from-gray-800/80 to-gray-800/40 border border-gray-700/50 rounded-2xl p-5 backdrop-blur-sm"
+      className="bg-gradient-to-br from-gray-800/80 to-gray-800/40 border border-dark-border/50 rounded-2xl p-5 backdrop-blur-sm"
     >
       <div className="flex items-start justify-between">
         <div>
@@ -452,10 +452,10 @@ const SectionCard: React.FC<SectionCardProps> = ({ title, description, icon, chi
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     className={`bg-gradient-to-br from-gray-800/60 to-gray-900/60 border rounded-2xl overflow-hidden backdrop-blur-sm ${
-      locked ? 'border-gray-700/30' : 'border-gray-700/50'
+      locked ? 'border-dark-border/30' : 'border-dark-border/50'
     }`}
   >
-    <div className={`px-6 py-4 border-b border-gray-700/50 bg-gradient-to-r from-${color}-500/5 to-transparent`}>
+    <div className={`px-6 py-4 border-b border-dark-border/50 bg-gradient-to-r from-${color}-500/5 to-transparent`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className={`p-2 rounded-xl bg-${color}-500/10`}>
@@ -474,7 +474,7 @@ const SectionCard: React.FC<SectionCardProps> = ({ title, description, icon, chi
         )}
       </div>
     </div>
-    <div className={`p-6 ${locked ? 'bg-gray-900/20' : ''}`}>{children}</div>
+    <div className={`p-6 ${locked ? 'bg-dark-elevated/20' : ''}`}>{children}</div>
   </motion.div>
 );
 
@@ -713,7 +713,7 @@ const TradingConfigPage: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-700 border-t-cyan-500" />
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-dark-border border-t-cyan-500" />
             <Settings className="absolute inset-0 m-auto text-cyan-400" size={24} />
           </div>
           <p className="text-gray-400">Loading configuration...</p>
@@ -840,7 +840,7 @@ const TradingConfigPage: React.FC = () => {
         <div className="lg:col-span-1">
           <RiskMeter riskLevel={calculateRiskLevel()} />
         </div>
-        <div className="lg:col-span-2 bg-gray-800/50 border border-gray-700/50 rounded-2xl p-6">
+        <div className="lg:col-span-2 bg-dark-elevated border border-dark-border/50 rounded-2xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <Layers className="text-cyan-400" size={20} />
             <span className="text-white font-medium">Strategy Presets</span>
@@ -932,8 +932,8 @@ const TradingConfigPage: React.FC = () => {
                     readOnly={isReadOnly}
                     className={`w-full border rounded-xl px-4 py-3 text-white focus:outline-none pr-16 ${
                       isReadOnly
-                        ? 'bg-gray-800/20 border-gray-700/30 text-gray-400 cursor-not-allowed'
-                        : 'bg-gray-800/50 border-gray-600 focus:border-cyan-500'
+                        ? 'bg-dark-elevated/20 border-dark-border/30 text-gray-400 cursor-not-allowed'
+                        : 'bg-dark-elevated border-gray-600 focus:border-cyan-500'
                     }`}
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">USDT</span>
@@ -954,8 +954,8 @@ const TradingConfigPage: React.FC = () => {
                     readOnly={isReadOnly}
                     className={`w-full border rounded-xl px-4 py-3 text-white focus:outline-none pr-16 ${
                       isReadOnly
-                        ? 'bg-gray-800/20 border-gray-700/30 text-gray-400 cursor-not-allowed'
-                        : 'bg-gray-800/50 border-gray-600 focus:border-cyan-500'
+                        ? 'bg-dark-elevated/20 border-dark-border/30 text-gray-400 cursor-not-allowed'
+                        : 'bg-dark-elevated border-gray-600 focus:border-cyan-500'
                     }`}
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">USDT</span>
@@ -1061,8 +1061,8 @@ const TradingConfigPage: React.FC = () => {
                   readOnly={isReadOnly}
                   className={`w-full border rounded-xl px-4 py-3 text-white focus:outline-none ${
                     isReadOnly
-                      ? 'bg-gray-800/20 border-gray-700/30 text-gray-400 cursor-not-allowed'
-                      : 'bg-gray-800/50 border-gray-600 focus:border-cyan-500'
+                      ? 'bg-dark-elevated/20 border-dark-border/30 text-gray-400 cursor-not-allowed'
+                      : 'bg-dark-elevated border-gray-600 focus:border-cyan-500'
                   }`}
                 />
               </div>
@@ -1080,8 +1080,8 @@ const TradingConfigPage: React.FC = () => {
                   readOnly={isReadOnly}
                   className={`w-full border rounded-xl px-4 py-3 text-white focus:outline-none ${
                     isReadOnly
-                      ? 'bg-gray-800/20 border-gray-700/30 text-gray-400 cursor-not-allowed'
-                      : 'bg-gray-800/50 border-gray-600 focus:border-cyan-500'
+                      ? 'bg-dark-elevated/20 border-dark-border/30 text-gray-400 cursor-not-allowed'
+                      : 'bg-dark-elevated border-gray-600 focus:border-cyan-500'
                   }`}
                 />
               </div>
@@ -1217,7 +1217,7 @@ const TradingConfigPage: React.FC = () => {
       </div>
 
       {/* Fixed Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 lg:left-80 bg-gray-900/95 backdrop-blur-md border-t border-gray-700/50 p-4 z-20">
+      <div className="fixed bottom-0 left-0 right-0 lg:left-80 bg-dark-elevated/95 backdrop-blur-md border-t border-dark-border/50 p-4 z-20">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <AnimatePresence>

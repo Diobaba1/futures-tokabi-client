@@ -59,7 +59,7 @@ const PaymentPending: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8 text-center">
+        <div className="bg-dark-elevated backdrop-blur-sm border border-dark-border rounded-2xl p-8 text-center">
           {/* Pending Icon with Animation */}
           <div className="w-20 h-20 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6 relative">
             <Clock className="w-12 h-12 text-purple-500" />
@@ -126,7 +126,7 @@ const PaymentPending: React.FC = () => {
         </div>
         
         {/* Help Box */}
-        <div className="bg-gray-800/30 border border-gray-700 rounded-lg p-4 mt-4 text-sm text-gray-400">
+        <div className="bg-dark-elevated/30 border border-dark-border rounded-lg p-4 mt-4 text-sm text-gray-400">
           <p className="font-medium text-gray-300 mb-2">Why is this taking time?</p>
           <p>
             Cryptocurrency transactions require blockchain confirmations. 

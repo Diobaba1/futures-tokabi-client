@@ -104,7 +104,7 @@ const FeaturesSection: React.FC = () => {
   };
 
   return (
-    <section id="features" className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gray-950" ref={ref}>
+    <section id="features" className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden bg-dark-base" ref={ref}>
       {/* Background Video */}
       <div className="absolute inset-0">
         <video
@@ -166,7 +166,7 @@ const FeaturesSection: React.FC = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center px-4 py-2 rounded-full bg-gray-800/50 border border-gray-700/50 backdrop-blur-sm mb-8"
+            className="inline-flex items-center px-4 py-2 rounded-full bg-dark-elevated/50 border border-gray-700/50 backdrop-blur-sm mb-8"
           >
             <span className="text-cyan-400 text-sm font-light tracking-wider">PROFESSIONAL TOOLS</span>
           </motion.div>
@@ -221,7 +221,7 @@ const FeaturesSection: React.FC = () => {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.5 + index * 0.1 }}
-                    className={`inline-block px-2 py-1 rounded text-xs font-medium bg-gray-800/80 text-gray-300 backdrop-blur-sm border border-gray-700/50`}
+                    className={`inline-block px-2 py-1 rounded text-xs font-medium bg-dark-elevated/80 text-gray-300 backdrop-blur-sm border border-gray-700/50`}
                   >
                     {feature.badge}
                   </motion.span>
@@ -300,7 +300,7 @@ const FeaturesSection: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="relative px-8 py-4 bg-gray-800/60 border border-gray-700/50 rounded-lg font-medium text-white transition-all duration-300 backdrop-blur-sm overflow-hidden group hover:border-gray-600/60"
+            className="relative px-8 py-4 bg-dark-elevated/60 border border-gray-700/50 rounded-lg font-medium text-white transition-all duration-300 backdrop-blur-sm overflow-hidden group hover:border-gray-600/60"
           >
             <span className="relative z-10 flex items-center gap-2 text-sm tracking-wide">
               Explore All Capabilities
@@ -326,7 +326,7 @@ const FeaturesSection: React.FC = () => {
         <motion.div
           initial={{ opacity: 1 }}
           animate={{ opacity: videoLoaded ? 0 : 1 }}
-          className="absolute inset-0 bg-gray-950 flex items-center justify-center"
+          className="absolute inset-0 bg-dark-base flex items-center justify-center"
         >
           <motion.div
             animate={{ rotate: 360 }}

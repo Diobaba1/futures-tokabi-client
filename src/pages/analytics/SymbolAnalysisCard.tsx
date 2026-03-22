@@ -57,7 +57,7 @@ const getDecisionBgClass = (decision?: string | null): string => {
     case "short":
       return "bg-rose-500/10 border-rose-500/30 text-rose-400";
     default:
-      return "bg-slate-500/10 border-slate-500/30 text-slate-400";
+      return "bg-slate-500/10 border-slate-500/30 text-gray-400";
   }
 };
 
@@ -84,7 +84,7 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
   // =========================================================================
   if (status === "pending") {
     return (
-      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6 shadow-xl">
+      <div className="bg-dark-elevated backdrop-blur-sm border border-dark-border rounded-2xl p-6 shadow-xl">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 bg-amber-500/20 rounded-xl flex items-center justify-center">
             <ClockIcon className="w-7 h-7 text-amber-400 animate-pulse" />
@@ -96,10 +96,10 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
                 Analyzing...
               </span>
             </div>
-            <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-dark-surface rounded-full h-2 overflow-hidden">
               <div className="bg-gradient-to-r from-amber-500 to-amber-400 h-2 rounded-full animate-pulse w-2/3"></div>
             </div>
-            <p className="text-sm text-slate-400 mt-2">
+            <p className="text-sm text-gray-400 mt-2">
               AI models are analyzing market data...
             </p>
           </div>
@@ -113,7 +113,7 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
   // =========================================================================
   if (status === "error") {
     return (
-      <div className="bg-slate-800/50 backdrop-blur-sm border border-rose-500/30 rounded-2xl p-6 shadow-xl">
+      <div className="bg-dark-elevated backdrop-blur-sm border border-rose-500/30 rounded-2xl p-6 shadow-xl">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 bg-rose-500/20 rounded-xl flex items-center justify-center">
             <AlertCircleIcon className="w-7 h-7 text-rose-400" />
@@ -149,28 +149,28 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
   };
 
   const getConsensusColor = (strength?: number | null) => {
-    if (!strength) return "text-slate-400";
+    if (!strength) return "text-gray-400";
     if (strength >= 85) return "text-emerald-400";
     if (strength >= 70) return "text-amber-400";
     return "text-rose-400";
   };
 
   const getLeverageColor = (leverage?: number | null) => {
-    if (!leverage) return "text-slate-400";
+    if (!leverage) return "text-gray-400";
     if (leverage >= 5) return "text-rose-400";
     if (leverage >= 3) return "text-amber-400";
     return "text-emerald-400";
   };
 
   const getRRColor = (rr?: number | null) => {
-    if (!rr) return "text-slate-400";
+    if (!rr) return "text-gray-400";
     if (rr >= 2) return "text-emerald-400";
     if (rr >= 1.5) return "text-amber-400";
-    return "text-slate-400";
+    return "text-gray-400";
   };
 
   return (
-    <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:border-slate-600">
+    <div className="bg-dark-elevated backdrop-blur-sm border border-dark-border rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:border-dark-border">
       {/* Header - Always Visible */}
       <div className="p-6">
         <div className="flex items-start justify-between">
@@ -191,8 +191,8 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
                   {decision.toUpperCase()}
                 </div>
                 {consensus_strength !== undefined && consensus_strength !== null && (
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-700/50 border border-slate-600">
-                    <ShieldIcon className="w-4 h-4 text-slate-400" />
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-dark-surface/50 border border-dark-border">
+                    <ShieldIcon className="w-4 h-4 text-gray-400" />
                     <span className={`font-semibold ${getConsensusColor(consensus_strength)}`}>
                       {consensus_strength.toFixed(0)}%
                     </span>
@@ -232,7 +232,7 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
           {/* Expand Toggle */}
           <button
             onClick={handleToggle}
-            className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors ml-4"
+            className="p-2 text-gray-400 hover:text-white hover:bg-dark-surface/50 rounded-lg transition-colors ml-4"
           >
             {isExpanded ? (
               <ChevronUpIcon className="w-6 h-6" />
@@ -245,7 +245,7 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
 
       {/* Expandable Details */}
       {isExpanded && (
-        <div className="border-t border-slate-700 p-6 space-y-6 bg-slate-800/30">
+        <div className="border-t border-dark-border p-6 space-y-6 bg-dark-elevated/30">
           {/* Price Levels */}
           {risk_metrics && (
             <Section title="Price Levels" icon={<TargetIcon className="w-4 h-4" />}>
@@ -363,7 +363,7 @@ export const SymbolAnalysisCard: React.FC<SymbolAnalysisCardProps> = ({
           )}
 
           {/* Timestamp */}
-          <div className="pt-4 border-t border-slate-700/50 flex items-center justify-between text-sm text-slate-500">
+          <div className="pt-4 border-t border-dark-border/50 flex items-center justify-between text-sm text-gray-500">
             <div className="flex items-center gap-2">
               <ClockIcon className="w-4 h-4" />
               <span>Analysis completed</span>
@@ -387,8 +387,8 @@ const Section: React.FC<{
 }> = ({ title, icon, children }) => (
   <div>
     <div className="flex items-center gap-2 mb-4">
-      {icon && <span className="text-slate-400">{icon}</span>}
-      <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">{title}</h3>
+      {icon && <span className="text-gray-400">{icon}</span>}
+      <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">{title}</h3>
     </div>
     {children}
   </div>
@@ -400,7 +400,7 @@ const QuickStat: React.FC<{
   valueClass?: string;
 }> = ({ label, value, valueClass = "text-white" }) => (
   <div>
-    <p className="text-xs text-slate-500 mb-1">{label}</p>
+    <p className="text-xs text-gray-500 mb-1">{label}</p>
     <p className={`text-sm font-semibold ${valueClass}`}>{value}</p>
   </div>
 );
@@ -438,12 +438,12 @@ const MetricBox: React.FC<{
     rose: "text-rose-400",
     amber: "text-amber-400",
     sky: "text-sky-400",
-    slate: "text-slate-300",
+    slate: "text-gray-300",
   };
 
   return (
-    <div className="p-3 bg-slate-700/30 rounded-xl border border-slate-700/50">
-      <p className="text-xs text-slate-500 mb-1">{label}</p>
+    <div className="p-3 bg-dark-surface/30 rounded-xl border border-dark-border/50">
+      <p className="text-xs text-gray-500 mb-1">{label}</p>
       <p className={`text-sm font-semibold ${colorClasses[color]}`}>{value}</p>
     </div>
   );
@@ -465,13 +465,13 @@ const IndicatorBox: React.FC<{
       case "oversold":
         return "text-emerald-400";
       default:
-        return "text-slate-300";
+        return "text-gray-300";
     }
   };
 
   return (
-    <div className="p-3 bg-slate-700/30 rounded-xl border border-slate-700/50">
-      <p className="text-xs text-slate-500 mb-1">{label}</p>
+    <div className="p-3 bg-dark-surface/30 rounded-xl border border-dark-border/50">
+      <p className="text-xs text-gray-500 mb-1">{label}</p>
       <p className={`text-sm font-semibold ${getStatusColor()}`}>{value}</p>
       {status && (status === "overbought" || status === "oversold") && (
         <p className="text-xs mt-1 opacity-70 capitalize">{status}</p>

@@ -34,7 +34,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-dark-base relative overflow-hidden">
       {/* Background Video */}
       <div className="absolute inset-0 w-full h-full">
         <video
@@ -126,7 +126,7 @@ const Login: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="mt-8 space-y-6 bg-gray-900/40 backdrop-blur-2xl border border-cyan-500/20 rounded-3xl shadow-2xl shadow-cyan-500/10 p-8 relative overflow-hidden"
+          className="mt-8 space-y-6 bg-dark-elevated/40 backdrop-blur-2xl border border-cyan-500/20 rounded-3xl shadow-2xl shadow-cyan-500/10 p-8 relative overflow-hidden"
           onSubmit={handleSubmit}
         >
           {/* Glass reflection effect */}
@@ -154,7 +154,7 @@ const Login: React.FC = () => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
-                  className="block w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-cyan-500/30 rounded-xl placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:border-cyan-400/60 transition-all duration-300 backdrop-blur-xl font-light tracking-wide hover:border-cyan-400/50 hover:bg-gray-800/70"
+                  className="block w-full pl-12 pr-4 py-4 bg-dark-elevated border border-cyan-500/30 rounded-xl placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:border-cyan-400/60 transition-all duration-300 backdrop-blur-xl font-light tracking-wide hover:border-cyan-400/50 hover:bg-gray-800/70"
                 />
               </div>
             </motion.div>
@@ -179,7 +179,7 @@ const Login: React.FC = () => {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
-                  className="block w-full pl-12 pr-12 py-4 bg-gray-800/50 border border-cyan-500/30 rounded-xl placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:border-cyan-400/60 transition-all duration-300 backdrop-blur-xl font-light tracking-wide hover:border-cyan-400/50 hover:bg-gray-800/70"
+                  className="block w-full pl-12 pr-12 py-4 bg-dark-elevated border border-cyan-500/30 rounded-xl placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:border-cyan-400/60 transition-all duration-300 backdrop-blur-xl font-light tracking-wide hover:border-cyan-400/50 hover:bg-gray-800/70"
                 />
                 <button
                   type="button"
@@ -213,7 +213,7 @@ const Login: React.FC = () => {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
-                className="h-4 w-4 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-gray-900 border-cyan-500/30 rounded bg-gray-800/50 transition-all cursor-pointer"
+                className="h-4 w-4 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-gray-900 border-cyan-500/30 rounded bg-dark-elevated transition-all cursor-pointer"
               />
               <label htmlFor="remember-me" className="ml-3 block text-sm text-cyan-200/80 font-light group-hover:text-cyan-100 transition-colors cursor-pointer">
                 Keep me signed in
@@ -280,7 +280,7 @@ const Login: React.FC = () => {
               <div className="w-full border-t border-cyan-500/20"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-gray-900/40 text-cyan-300/70 font-light tracking-wide backdrop-blur-xl">New to our platform?</span>
+              <span className="px-4 bg-dark-elevated/40 text-cyan-300/70 font-light tracking-wide backdrop-blur-xl">New to our platform?</span>
             </div>
           </motion.div>
 

@@ -54,7 +54,7 @@ const tierConfig: Record<string, {
     gradient: 'from-slate-400/20 to-gray-500/20',
     glowColor: 'rgba(148, 163, 184, 0.15)',
     borderColor: 'border-slate-500/30',
-    accentColor: 'text-slate-300',
+    accentColor: 'text-gray-300',
   },
   STARTER: {
     icon: <Rocket className="w-6 h-6" />,

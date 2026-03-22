@@ -44,12 +44,12 @@ const StatCard: React.FC<StatCardProps> = ({
 }) => (
   <div
     onClick={onClick}
-    className={`bg-gray-800/50 border border-gray-700 rounded-xl p-5 ${
+    className={`bg-dark-elevated border border-dark-border rounded-xl p-5 ${
       onClick ? 'cursor-pointer hover:border-gray-600 transition-colors' : ''
     }`}
   >
     <div className="flex items-start justify-between mb-3">
-      <div className="p-2 bg-gray-700/50 rounded-lg text-purple-400">
+      <div className="p-2 bg-dark-border/50 rounded-lg text-purple-400">
         {icon}
       </div>
       {trend && (
@@ -86,7 +86,7 @@ const RecentPayment: React.FC<RecentPaymentProps> = ({ payment }) => {
   const isPending = payment.status === 'waiting' || payment.status === 'confirming';
 
   return (
-    <div className="flex items-center justify-between py-3 border-b border-gray-700 last:border-0">
+    <div className="flex items-center justify-between py-3 border-b border-dark-border last:border-0">
       <div className="flex items-center gap-3">
         <div
           className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -148,10 +148,10 @@ const RecentInvoice: React.FC<RecentInvoiceProps> = ({ invoice, onClick }) => {
   return (
     <div
       onClick={onClick}
-      className="flex items-center justify-between py-3 border-b border-gray-700 last:border-0 cursor-pointer hover:bg-gray-700/20 -mx-2 px-2 rounded transition-colors"
+      className="flex items-center justify-between py-3 border-b border-dark-border last:border-0 cursor-pointer hover:bg-dark-surface/20 -mx-2 px-2 rounded transition-colors"
     >
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-gray-400">
+        <div className="w-8 h-8 rounded-full bg-dark-surface flex items-center justify-center text-gray-400">
           <FileText className="w-4 h-4" />
         </div>
         <div>
@@ -319,7 +319,7 @@ const BillingDashboard: React.FC = () => {
         {/* Recent Activity */}
         <div className="grid md:grid-cols-2 gap-6">
           {/* Recent Payments */}
-          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-5">
+          <div className="bg-dark-elevated border border-dark-border rounded-xl p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-white">Recent Payments</h3>
               <button
@@ -345,7 +345,7 @@ const BillingDashboard: React.FC = () => {
           </div>
 
           {/* Recent Invoices */}
-          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-5">
+          <div className="bg-dark-elevated border border-dark-border rounded-xl p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-white">Recent Invoices</h3>
               <button
@@ -376,30 +376,30 @@ const BillingDashboard: React.FC = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-8 bg-gray-800/30 border border-gray-700 rounded-xl p-4">
+        <div className="mt-8 bg-dark-elevated/30 border border-dark-border rounded-xl p-4">
           <h3 className="text-sm font-medium text-gray-400 mb-3">Quick Actions</h3>
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => navigate('/pricing')}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors"
+              className="px-4 py-2 bg-dark-surface hover:bg-gray-600 text-white rounded-lg text-sm transition-colors"
             >
               View Plans
             </button>
             <button
               onClick={() => navigate('/billing/payments')}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors"
+              className="px-4 py-2 bg-dark-surface hover:bg-gray-600 text-white rounded-lg text-sm transition-colors"
             >
               Payment History
             </button>
             <button
               onClick={() => navigate('/billing/invoices')}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors"
+              className="px-4 py-2 bg-dark-surface hover:bg-gray-600 text-white rounded-lg text-sm transition-colors"
             >
               Download Invoices
             </button>
             <a
               href="/contact"
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors"
+              className="px-4 py-2 bg-dark-surface hover:bg-gray-600 text-white rounded-lg text-sm transition-colors"
             >
               Contact Support
             </a>

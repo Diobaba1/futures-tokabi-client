@@ -23,7 +23,7 @@ const PaymentFailed: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         {/* Failed Card */}
-        <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8 text-center">
+        <div className="bg-dark-elevated backdrop-blur-sm border border-dark-border rounded-2xl p-8 text-center">
           {/* Error Icon */}
           <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
             <XCircle className="w-12 h-12 text-red-500" />

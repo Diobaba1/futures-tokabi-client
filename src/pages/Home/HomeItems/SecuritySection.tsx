@@ -104,7 +104,7 @@ const SecuritySection: React.FC = () => {
   };
 
   return (
-    <section id="security" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-950 relative overflow-hidden">
+    <section id="security" className="py-24 px-4 sm:px-6 lg:px-8 bg-dark-base relative overflow-hidden">
       {/* Subtle Background Elements */}
       <motion.div 
         animate={{ 
@@ -147,7 +147,7 @@ const SecuritySection: React.FC = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center px-4 py-2 rounded-full bg-gray-800/60 border border-gray-700/50 text-gray-300 text-sm font-light tracking-wider mb-8 backdrop-blur-sm"
+            className="inline-flex items-center px-4 py-2 rounded-full bg-dark-elevated/60 border border-gray-700/50 text-gray-300 text-sm font-light tracking-wider mb-8 backdrop-blur-sm"
           >
             <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full mr-2"></div>
             ENTERPRISE SECURITY
@@ -205,7 +205,7 @@ const SecuritySection: React.FC = () => {
                 whileHover={{ y: -4 }}
                 className="group relative"
               >
-                <div className="relative p-6 bg-gray-800/30 backdrop-blur-lg rounded-xl border border-gray-700/30 hover:border-gray-600/50 transition-all duration-300 h-full">
+                <div className="relative p-6 bg-dark-elevated/30 backdrop-blur-lg rounded-xl border border-gray-700/30 hover:border-gray-600/50 transition-all duration-300 h-full">
                   
                   {/* Icon */}
                   <motion.div
@@ -240,7 +240,7 @@ const SecuritySection: React.FC = () => {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="text-center"
         >
-          <div className="bg-gray-800/30 backdrop-blur-lg rounded-xl p-8 border border-gray-700/30 max-w-2xl mx-auto">
+          <div className="bg-dark-elevated/30 backdrop-blur-lg rounded-xl p-8 border border-gray-700/30 max-w-2xl mx-auto">
             <div className="flex items-center justify-center mb-4">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 mr-4">
                 <Shield className="w-6 h-6 text-white" />

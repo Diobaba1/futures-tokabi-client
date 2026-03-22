@@ -178,7 +178,7 @@ const HeroSection: React.FC = () => {
             <span className="block mt-2 bg-gradient-to-r from-cyan-500 via-cyan-400 to-cyan-600 dark:from-cyan-300 dark:via-cyan-400 dark:to-cyan-500 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
               Market Intelligence
             </span>
-            <span className="block text-4xl md:text-5xl lg:text-6xl font-bold text-slate-600 dark:text-slate-400 mt-4">
+            <span className="block text-4xl md:text-5xl lg:text-6xl font-bold text-gray-600 dark:text-gray-400 mt-4">
               for disciplined execution.
             </span>
           </h1>
@@ -188,7 +188,7 @@ const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-lg md:text-xl lg:text-2xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-12 leading-relaxed font-medium"
+            className="text-lg md:text-xl lg:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-12 leading-relaxed font-medium"
           >
             Replace impulse with intelligence. Spatial awareness powered by AI that tells you{' '}
             <span className="text-cyan-600 dark:text-cyan-400 font-semibold">when to act</span>,{' '}
@@ -282,7 +282,7 @@ const ProblemSection: React.FC = () => {
               >
                 Markets do not punish
                 <br />
-                <span className="text-slate-400 dark:text-slate-500">lack of information.</span>
+                <span className="text-gray-400 dark:text-gray-500">lack of information.</span>
               </motion.p>
 
               <motion.div
@@ -307,7 +307,7 @@ const ProblemSection: React.FC = () => {
                 transition={{ duration: 0.8, delay: 0.8 }}
                 className="space-y-4 pt-6"
               >
-                <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto">
+                <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl mx-auto">
                   Most participants fail not because they lack data, but because they act on emotion.
                   Poor timing. Impulsive entries. Holding losers too long.
                 </p>
@@ -345,7 +345,7 @@ const BentoSection: React.FC = () => {
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mt-8 mb-6 tracking-tight">
             Intelligence delivered
           </h2>
-          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             A three-pillar system that transforms raw data into actionable insight.
           </p>
         </motion.div>
@@ -367,7 +367,7 @@ const BentoSection: React.FC = () => {
                 <h3 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
                   AI-Powered Processing
                 </h3>
-                <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-8">
+                <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
                   Continuous data streams analyzed across multiple time horizons. Pattern recognition.
                   Momentum tracking. Structural positioning. Our AI never sleeps.
                 </p>
@@ -380,7 +380,7 @@ const BentoSection: React.FC = () => {
                   ].map((item, i) => (
                     <div key={i} className="flex items-center gap-3 p-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-white/30 dark:border-white/10">
                       <item.icon className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
-                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{item.label}</span>
+                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{item.label}</span>
                     </div>
                   ))}
                 </div>
@@ -401,7 +401,7 @@ const BentoSection: React.FC = () => {
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
                 Expert Validation
               </h3>
-              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                 Human traders filter noise, identify edge cases, and apply judgment. Every signal passes review.
               </p>
             </GlassCard>
@@ -420,7 +420,7 @@ const BentoSection: React.FC = () => {
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
                 Precise Insight
               </h3>
-              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                 Structured frameworks for decision-making. Not predictions—clarity.
               </p>
             </GlassCard>
@@ -460,14 +460,14 @@ const SpatialSection: React.FC = () => {
           <h2 className="text-4xl md:text-5xl lg:text-7xl font-black text-white mt-10 mb-8 leading-[1.1] tracking-tight">
             Most traders see
             <br />
-            <span className="text-slate-400">price movement.</span>
+            <span className="text-gray-400">price movement.</span>
             <br />
             <span className="bg-gradient-to-r from-cyan-400 via-cyan-300 to-cyan-500 bg-clip-text text-transparent">
               Tokabi sees position.
             </span>
           </h2>
 
-          <p className="text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto mb-12 leading-relaxed">
+          <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed">
             Spatial intelligence means understanding markets across structure, time, momentum,
             and participant behavior—<span className="text-cyan-400 font-semibold">simultaneously</span>.
           </p>
@@ -489,7 +489,7 @@ const SpatialSection: React.FC = () => {
                     <item.icon className="w-7 h-7 text-cyan-400" />
                   </div>
                   <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-                  <p className="text-slate-400 leading-relaxed">{item.desc}</p>
+                  <p className="text-gray-400 leading-relaxed">{item.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -603,7 +603,7 @@ const AudienceSection: React.FC = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
             Built for disciplined market participants who value{' '}
             <span className="font-bold text-slate-900 dark:text-white">process over excitement</span>,{' '}
             <span className="font-bold text-slate-900 dark:text-white">consistency over thrill</span>, and{' '}
@@ -624,7 +624,7 @@ const AudienceSection: React.FC = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white">This is for you if:</h3>
               </div>
-              <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
                 You measure success by consistency rather than adrenaline. You understand that the best trade
                 is often no trade. <span className="font-semibold text-green-600 dark:text-green-400">Tokabi will serve you.</span>
               </p>
@@ -643,7 +643,7 @@ const AudienceSection: React.FC = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white">This is NOT for you if:</h3>
               </div>
-              <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
                 You treat trading as speculation rather than strategy. You chase excitement over edge.
                 <span className="font-semibold text-red-600 dark:text-red-400"> Tokabi will frustrate you.</span>
               </p>
@@ -682,13 +682,13 @@ const PhilosophySection: React.FC = () => {
           transition={{ duration: 0.8 }}
           className="space-y-8"
         >
-          <p className="text-xl md:text-2xl text-slate-500 dark:text-slate-400">
+          <p className="text-xl md:text-2xl text-gray-500 dark:text-gray-400">
             Tokabi does not promise guaranteed outcomes.
           </p>
-          <p className="text-xl md:text-2xl text-slate-500 dark:text-slate-400">
+          <p className="text-xl md:text-2xl text-gray-500 dark:text-gray-400">
             No platform can. Markets remain uncertain.
           </p>
-          <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-300">
+          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300">
             What Tokabi <span className="font-bold text-slate-900 dark:text-white">does</span> guarantee:
             improved decision quality and risk discipline.
           </p>
@@ -750,7 +750,7 @@ const FinalCTASection: React.FC = () => {
             </span>
           </h2>
 
-          <p className="text-xl md:text-2xl text-cyan-100 dark:text-slate-300 mb-12 max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl text-cyan-100 dark:text-gray-300 mb-12 max-w-2xl mx-auto">
             See how Tokabi structures the next trade decision—before emotion enters the equation.
           </p>
 

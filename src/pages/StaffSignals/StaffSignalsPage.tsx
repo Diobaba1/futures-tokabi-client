@@ -177,7 +177,7 @@ const StaffSignalsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950">
+    <div className="min-h-screen bg-dark-base">
       {/* Background gradient */}
       <div className="fixed inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 pointer-events-none" />
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-900/20 via-transparent to-transparent pointer-events-none" />
@@ -198,7 +198,7 @@ const StaffSignalsPage: React.FC = () => {
             <button
               onClick={handleRefresh}
               disabled={isLoading}
-              className="p-2.5 bg-gray-800 border border-gray-700 rounded-lg text-gray-400 hover:text-white hover:border-gray-600 transition-all disabled:opacity-50"
+              className="p-2.5 bg-dark-elevated border border-dark-border rounded-lg text-gray-400 hover:text-white hover:border-gray-600 transition-all disabled:opacity-50"
             >
               <RefreshCw size={18} className={isLoading ? "animate-spin" : ""} />
             </button>
@@ -208,7 +208,7 @@ const StaffSignalsPage: React.FC = () => {
               className={`p-2.5 rounded-lg border transition-all ${
                 showStats
                   ? "bg-cyan-500/20 border-cyan-500/50 text-cyan-400"
-                  : "bg-gray-800 border-gray-700 text-gray-400 hover:text-white"
+                  : "bg-dark-elevated border-dark-border text-gray-400 hover:text-white"
               }`}
             >
               <BarChart3 size={18} />
@@ -248,7 +248,7 @@ const StaffSignalsPage: React.FC = () => {
         )}
 
         {/* Filters & Search Bar */}
-        <div className="bg-gray-900/80 backdrop-blur-sm border border-gray-800 rounded-xl p-4 mb-6">
+        <div className="bg-dark-elevated/80 backdrop-blur-sm border border-dark-border rounded-xl p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
             <form onSubmit={handleSearch} className="flex-1">
@@ -262,7 +262,7 @@ const StaffSignalsPage: React.FC = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by symbol..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 bg-dark-elevated border border-dark-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors"
                 />
               </div>
             </form>
@@ -277,7 +277,7 @@ const StaffSignalsPage: React.FC = () => {
                     position_type: (e.target.value as PositionType) || undefined,
                   })
                 }
-                className="px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-cyan-500 transition-colors"
+                className="px-3 py-2.5 bg-dark-elevated border border-dark-border rounded-lg text-gray-300 focus:outline-none focus:border-cyan-500 transition-colors"
               >
                 <option value="">All Positions</option>
                 <option value="buy">Buy Only</option>
@@ -297,7 +297,7 @@ const StaffSignalsPage: React.FC = () => {
                     });
                   }
                 }}
-                className="px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-cyan-500 transition-colors"
+                className="px-3 py-2.5 bg-dark-elevated border border-dark-border rounded-lg text-gray-300 focus:outline-none focus:border-cyan-500 transition-colors"
               >
                 <option value="">All Status</option>
                 <option value="active">Active</option>
@@ -320,7 +320,7 @@ const StaffSignalsPage: React.FC = () => {
               )}
 
               {/* View Mode Toggle */}
-              <div className="flex items-center bg-gray-800 border border-gray-700 rounded-lg p-1">
+              <div className="flex items-center bg-dark-elevated border border-dark-border rounded-lg p-1">
                 <button
                   onClick={() => setViewMode("grid")}
                   className={`p-1.5 rounded transition-colors ${
@@ -352,25 +352,25 @@ const StaffSignalsPage: React.FC = () => {
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="bg-gray-900/80 border border-gray-800 rounded-xl p-5 animate-pulse"
+                className="bg-dark-elevated/80 border border-dark-border rounded-xl p-5 animate-pulse"
               >
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-gray-800 rounded-lg" />
+                  <div className="w-10 h-10 bg-dark-elevated rounded-lg" />
                   <div>
-                    <div className="h-5 w-24 bg-gray-800 rounded mb-2" />
-                    <div className="h-3 w-16 bg-gray-800 rounded" />
+                    <div className="h-5 w-24 bg-dark-elevated rounded mb-2" />
+                    <div className="h-3 w-16 bg-dark-elevated rounded" />
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <div className="h-12 bg-gray-800 rounded-lg" />
-                  <div className="h-12 bg-gray-800 rounded-lg" />
+                  <div className="h-12 bg-dark-elevated rounded-lg" />
+                  <div className="h-12 bg-dark-elevated rounded-lg" />
                 </div>
               </div>
             ))}
           </div>
         ) : signals.length === 0 ? (
-          <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-12 text-center">
-            <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="bg-dark-elevated/80 border border-dark-border rounded-xl p-12 text-center">
+            <div className="w-16 h-16 bg-dark-elevated rounded-full flex items-center justify-center mx-auto mb-4">
               <TrendingUp size={32} className="text-gray-600" />
             </div>
             <h3 className="text-lg font-semibold text-gray-400 mb-2">
@@ -414,7 +414,7 @@ const StaffSignalsPage: React.FC = () => {
 
         {/* Pagination */}
         {pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-800">
+          <div className="flex items-center justify-between mt-8 pt-6 border-t border-dark-border">
             <p className="text-sm text-gray-500">
               Showing {(pagination.page - 1) * pagination.pageSize + 1} to{" "}
               {Math.min(pagination.page * pagination.pageSize, pagination.total)}{" "}
@@ -425,7 +425,7 @@ const StaffSignalsPage: React.FC = () => {
               <button
                 onClick={() => handlePageChange(pagination.page - 1)}
                 disabled={pagination.page === 1}
-                className="p-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-400 hover:text-white hover:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="p-2 bg-dark-elevated border border-dark-border rounded-lg text-gray-400 hover:text-white hover:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 <ChevronLeft size={18} />
               </button>
@@ -450,7 +450,7 @@ const StaffSignalsPage: React.FC = () => {
                       className={`w-10 h-10 rounded-lg font-medium transition-all ${
                         pagination.page === pageNum
                           ? "bg-cyan-500 text-white"
-                          : "bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700"
+                          : "bg-dark-elevated text-gray-400 hover:text-white hover:bg-gray-700"
                       }`}
                     >
                       {pageNum}
@@ -462,7 +462,7 @@ const StaffSignalsPage: React.FC = () => {
               <button
                 onClick={() => handlePageChange(pagination.page + 1)}
                 disabled={pagination.page === pagination.totalPages}
-                className="p-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-400 hover:text-white hover:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="p-2 bg-dark-elevated border border-dark-border rounded-lg text-gray-400 hover:text-white hover:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 <ChevronRight size={18} />
               </button>

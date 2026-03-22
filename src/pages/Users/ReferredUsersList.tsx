@@ -200,7 +200,7 @@ const ReferredUsersList: React.FC = () => {
               {/* Referral URL Display */}
               {referralUrl && (
                 <div className="mb-4">
-                  <div className="flex items-center gap-2 bg-slate-900/50 border border-slate-700 rounded-lg p-3">
+                  <div className="flex items-center gap-2 bg-dark-elevated border border-dark-border rounded-lg p-3">
                     <input
                       type="text"
                       readOnly
@@ -243,7 +243,7 @@ const ReferredUsersList: React.FC = () => {
       {response.has_referrals && (
         <>
           {/* Filters */}
-          <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
+          <div className="bg-dark-elevated border border-dark-border rounded-xl p-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {/* Search */}
               <div className="md:col-span-2">
@@ -257,7 +257,7 @@ const ReferredUsersList: React.FC = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                     placeholder="Search by email or name..."
-                    className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500"
+                    className="flex-1 bg-dark-elevated border border-dark-border rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500"
                   />
                   <button
                     onClick={handleSearch}
@@ -276,7 +276,7 @@ const ReferredUsersList: React.FC = () => {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-dark-elevated border border-dark-border rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500"
                 >
                   <option value="">All Statuses</option>
                   <option value="pending">Pending</option>
@@ -293,7 +293,7 @@ const ReferredUsersList: React.FC = () => {
                 <select
                   value={subscriptionFilter}
                   onChange={(e) => setSubscriptionFilter(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-dark-elevated border border-dark-border rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500"
                 >
                   <option value="">All</option>
                   <option value="subscribed">Subscribed</option>
@@ -305,7 +305,7 @@ const ReferredUsersList: React.FC = () => {
 
           {/* User Cards or No Results */}
           {users.length === 0 ? (
-            <div className="text-center py-12 bg-slate-900/50 border border-slate-800 rounded-xl">
+            <div className="text-center py-12 bg-dark-elevated border border-dark-border rounded-xl">
               <Filter className="w-16 h-16 text-gray-600 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-white mb-2">
                 No Matching Referrals
@@ -318,7 +318,7 @@ const ReferredUsersList: React.FC = () => {
                     setSubscriptionFilter('');
                     setSearchTerm('');
                   }}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                  className="px-4 py-2 bg-dark-elevated hover:bg-dark-surface rounded-lg transition-colors"
                 >
                   Clear Filters
                 </button>
@@ -329,7 +329,7 @@ const ReferredUsersList: React.FC = () => {
               {users.map((user) => (
                 <div
                   key={user.referral_id}
-                  className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 hover:border-slate-700 transition-colors"
+                  className="bg-dark-elevated border border-dark-border rounded-xl p-6 hover:border-dark-border transition-colors"
                 >
                   {/* User Header */}
                   <div className="flex items-start justify-between mb-4">
@@ -395,7 +395,7 @@ const ReferredUsersList: React.FC = () => {
                   )}
 
                   {/* Conversion Stage */}
-                  <div className="mt-4 pt-4 border-t border-slate-800">
+                  <div className="mt-4 pt-4 border-t border-dark-border">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-gray-500">Conversion Stage:</span>
                       <span className="text-gray-400 font-medium capitalize">

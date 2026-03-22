@@ -45,7 +45,7 @@ const HeroSection: React.FC = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden bg-gray-950">
+    <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden bg-dark-base">
       {/* Background Video */}
       <div className="absolute inset-0">
         <video
@@ -147,7 +147,7 @@ const HeroSection: React.FC = () => {
         >
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="inline-flex items-center px-6 py-3 rounded-full bg-gray-900/60 border border-emerald-500/30 text-emerald-200 text-sm font-light tracking-wide backdrop-blur-md cursor-default mt-5"
+            className="inline-flex items-center px-6 py-3 rounded-full bg-dark-elevated/60 border border-emerald-500/30 text-emerald-200 text-sm font-light tracking-wide backdrop-blur-md cursor-default mt-5"
           >
             <motion.div 
               animate={{ scale: [1, 1.1, 1] }}
@@ -274,7 +274,7 @@ const HeroSection: React.FC = () => {
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="relative px-10 py-4 bg-gray-900/60 border border-gray-600/30 rounded-xl font-medium text-lg text-white hover:border-gray-500/50 transition-all duration-300 backdrop-blur-md overflow-hidden"
+              className="relative px-10 py-4 bg-dark-elevated/60 border border-gray-600/30 rounded-xl font-medium text-lg text-white hover:border-gray-500/50 transition-all duration-300 backdrop-blur-md overflow-hidden"
             >
               <span className="relative z-10 flex items-center gap-2 tracking-wide">
                 View Live Demo
@@ -331,7 +331,7 @@ const HeroSection: React.FC = () => {
               }}
               className="relative group cursor-default"
             >
-              <div className="relative text-center p-8 bg-gray-900/40 rounded-2xl backdrop-blur-lg border border-gray-700/30 hover:border-gray-600/50 transition-all duration-300 overflow-hidden">
+              <div className="relative text-center p-8 bg-dark-elevated/40 rounded-2xl backdrop-blur-lg border border-gray-700/30 hover:border-gray-600/50 transition-all duration-300 overflow-hidden">
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-br from-gray-800/50 to-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                 />
@@ -370,7 +370,7 @@ const HeroSection: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 2 + i * 0.1 }}
               whileHover={{ scale: 1.03 }}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-900/30 rounded-lg border border-gray-700/30 backdrop-blur-sm hover:border-gray-600/40 transition-all"
+              className="flex items-center gap-2 px-4 py-2 bg-dark-elevated/30 rounded-lg border border-gray-700/30 backdrop-blur-sm hover:border-gray-600/40 transition-all"
             >
               <span className="text-xs">{badge.icon}</span>
               <span className="font-light tracking-wide">{badge.text}</span>
@@ -410,7 +410,7 @@ const HeroSection: React.FC = () => {
         <motion.div
           initial={{ opacity: 1 }}
           animate={{ opacity: isVideoLoaded ? 0 : 1 }}
-          className="absolute inset-0 bg-gray-950 flex items-center justify-center"
+          className="absolute inset-0 bg-dark-base flex items-center justify-center"
         >
           <motion.div
             animate={{ rotate: 360 }}

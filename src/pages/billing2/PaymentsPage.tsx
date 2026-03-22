@@ -97,7 +97,7 @@ const PaymentRow: React.FC<PaymentRowProps> = ({ payment, onClick }) => {
   return (
     <tr
       onClick={onClick}
-      className="border-b border-gray-700 hover:bg-gray-700/30 cursor-pointer transition-colors"
+      className="border-b border-dark-border hover:bg-gray-700/30 cursor-pointer transition-colors"
     >
       <td className="px-4 py-4">
         <div className="font-mono text-sm text-gray-300">
@@ -165,7 +165,7 @@ const PaymentDetailModal: React.FC<PaymentDetailModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 border border-gray-700 rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-dark-elevated border border-dark-border rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold text-white">Payment Details</h3>
           <PaymentStatusBadge status={currentStatus as PaymentStatus} />
@@ -293,7 +293,7 @@ const PaymentsPage: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-4 mb-6">
+        <div className="bg-dark-elevated border border-dark-border rounded-xl p-4 mb-6">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-gray-400">
               <Filter className="w-4 h-4" />
@@ -318,7 +318,7 @@ const PaymentsPage: React.FC = () => {
         </div>
 
         {/* Payments Table */}
-        <div className="bg-gray-800/50 border border-gray-700 rounded-xl overflow-hidden">
+        <div className="bg-dark-elevated border border-dark-border rounded-xl overflow-hidden">
           {isLoading ? (
             <div className="flex items-center justify-center py-20">
               <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
@@ -355,7 +355,7 @@ const PaymentsPage: React.FC = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between px-4 py-3 border-t border-gray-700">
+                <div className="flex items-center justify-between px-4 py-3 border-t border-dark-border">
                   <p className="text-sm text-gray-400">
                     Showing {(page - 1) * pageSize + 1} to{' '}
                     {Math.min(page * pageSize, data.total)} of {data.total} payments

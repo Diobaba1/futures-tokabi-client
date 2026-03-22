@@ -43,7 +43,7 @@ const Dashboard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <div className="min-h-screen bg-dark-base flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -64,7 +64,7 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950">
+    <div className="min-h-screen bg-dark-base">
       {/* First-login disclaimer overlay */}
       <AnimatePresence>
         {showDisclaimer && (
@@ -79,7 +79,7 @@ const Dashboard: React.FC = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.3 }}
-              className="bg-gray-900 border border-cyan-500/20 rounded-2xl p-8 max-w-lg w-full shadow-2xl shadow-cyan-500/10"
+              className="bg-dark-elevated border border-cyan-500/20 rounded-2xl p-8 max-w-lg w-full shadow-2xl shadow-cyan-500/10"
             >
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center">
@@ -97,7 +97,7 @@ const Dashboard: React.FC = () => {
                     type="checkbox"
                     checked={checkIntelligence}
                     onChange={(e) => setCheckIntelligence(e.target.checked)}
-                    className="mt-1 w-4 h-4 text-cyan-500 focus:ring-cyan-500 border-cyan-500/30 rounded bg-gray-700/50"
+                    className="mt-1 w-4 h-4 text-cyan-500 focus:ring-cyan-500 border-cyan-500/30 rounded bg-dark-border/50"
                   />
                   <span className="text-sm text-gray-300 leading-relaxed group-hover:text-gray-200 transition-colors">
                     I understand Tokabi provides market intelligence software, not investment advice
@@ -109,7 +109,7 @@ const Dashboard: React.FC = () => {
                     type="checkbox"
                     checked={checkRisk}
                     onChange={(e) => setCheckRisk(e.target.checked)}
-                    className="mt-1 w-4 h-4 text-cyan-500 focus:ring-cyan-500 border-cyan-500/30 rounded bg-gray-700/50"
+                    className="mt-1 w-4 h-4 text-cyan-500 focus:ring-cyan-500 border-cyan-500/30 rounded bg-dark-border/50"
                   />
                   <span className="text-sm text-gray-300 leading-relaxed group-hover:text-gray-200 transition-colors">
                     I understand trading involves substantial risk of loss
@@ -121,7 +121,7 @@ const Dashboard: React.FC = () => {
                     type="checkbox"
                     checked={checkResponsibility}
                     onChange={(e) => setCheckResponsibility(e.target.checked)}
-                    className="mt-1 w-4 h-4 text-cyan-500 focus:ring-cyan-500 border-cyan-500/30 rounded bg-gray-700/50"
+                    className="mt-1 w-4 h-4 text-cyan-500 focus:ring-cyan-500 border-cyan-500/30 rounded bg-dark-border/50"
                   />
                   <span className="text-sm text-gray-300 leading-relaxed group-hover:text-gray-200 transition-colors">
                     I am responsible for my own trading decisions
@@ -135,7 +135,7 @@ const Dashboard: React.FC = () => {
                 className={`w-full py-3.5 px-6 rounded-xl font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 ${
                   allChecked
                     ? 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-lg shadow-cyan-500/30 hover:scale-[1.02] active:scale-[0.98]'
-                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                    : 'bg-dark-surface text-gray-500 cursor-not-allowed'
                 }`}
               >
                 I Understand — Enter Dashboard

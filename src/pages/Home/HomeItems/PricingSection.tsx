@@ -99,7 +99,7 @@ const PricingSection: React.FC = () => {
   };
 
   return (
-    <section id="pricing" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-950 relative overflow-hidden">
+    <section id="pricing" className="py-24 px-4 sm:px-6 lg:px-8 bg-dark-base relative overflow-hidden">
       {/* Enhanced Static Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-slate-950 to-blue-950/30">
         {/* Animated Gradient Orbs */}
@@ -158,7 +158,7 @@ const PricingSection: React.FC = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center px-4 py-2 rounded-full bg-gray-800/60 border border-gray-700/50 text-gray-300 text-sm font-light tracking-wider mb-8 backdrop-blur-sm"
+            className="inline-flex items-center px-4 py-2 rounded-full bg-dark-elevated/60 border border-gray-700/50 text-gray-300 text-sm font-light tracking-wider mb-8 backdrop-blur-sm"
           >
             <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2"></div>
             AI TRADING SIGNALS
@@ -253,14 +253,14 @@ const PricingSection: React.FC = () => {
                 {/* Plan Badge */}
                 {!plan.popular && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
-                    <div className={`px-4 py-1.5 ${plan.color} bg-gray-800/80 backdrop-blur-sm rounded-full text-xs font-medium tracking-wide border border-gray-700`}>
+                    <div className={`px-4 py-1.5 ${plan.color} bg-dark-elevated/80 backdrop-blur-sm rounded-full text-xs font-medium tracking-wide border border-gray-700`}>
                       {plan.badge}
                     </div>
                   </div>
                 )}
                 
                 {/* Main Card */}
-                <div className={`relative h-full bg-gray-800/40 backdrop-blur-lg rounded-2xl border-2 ${
+                <div className={`relative h-full bg-dark-elevated/40 backdrop-blur-lg rounded-2xl border-2 ${
                   plan.popular 
                     ? 'border-blue-500/40 shadow-2xl shadow-blue-500/20' 
                     : 'border-gray-700/30 hover:border-gray-600/50'
@@ -375,7 +375,7 @@ const PricingSection: React.FC = () => {
           transition={{ delay: 0.8, duration: 0.6 }}
           className="text-center mt-20"
         >
-          <div className="bg-gray-800/30 backdrop-blur-lg rounded-2xl p-8 border border-gray-700/30 max-w-2xl mx-auto">
+          <div className="bg-dark-elevated/30 backdrop-blur-lg rounded-2xl p-8 border border-gray-700/30 max-w-2xl mx-auto">
             <div className="flex items-center justify-center mb-4">
               <Bot className="w-6 h-6 text-blue-400 mr-2" />
               <h3 className="text-lg font-semibold text-white">Custom Enterprise Solutions</h3>

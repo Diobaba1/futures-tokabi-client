@@ -195,7 +195,7 @@ export const SearchHistoryPanel: React.FC<SearchHistoryPanelProps> = ({
               placeholder="Search symbols..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400 transition-all duration-200"
+              className="pl-10 pr-4 py-2 bg-dark-elevated border border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400 transition-all duration-200"
             />
           </div>
 
@@ -203,7 +203,7 @@ export const SearchHistoryPanel: React.FC<SearchHistoryPanelProps> = ({
           <div className="relative">
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-750 text-white transition-colors duration-200"
+              className="flex items-center gap-2 px-4 py-2 bg-dark-elevated border border-dark-border rounded-lg hover:bg-gray-750 text-white transition-colors duration-200"
             >
               <FilterIcon className="w-4 h-4" />
               <span className="capitalize">{filter}</span>
@@ -211,7 +211,7 @@ export const SearchHistoryPanel: React.FC<SearchHistoryPanelProps> = ({
             </button>
             
             {isFilterOpen && (
-              <div className="absolute top-full left-0 mt-1 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-10 backdrop-blur-sm">
+              <div className="absolute top-full left-0 mt-1 w-48 bg-dark-elevated border border-dark-border rounded-lg shadow-lg z-10 backdrop-blur-sm">
                 {(['all', 'completed', 'processing', 'failed'] as FilterType[]).map((filterOption) => (
                   <button
                     key={filterOption}
@@ -234,7 +234,7 @@ export const SearchHistoryPanel: React.FC<SearchHistoryPanelProps> = ({
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortType)}
-            className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white transition-all duration-200"
+            className="px-4 py-2 bg-dark-elevated border border-dark-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white transition-all duration-200"
           >
             <option value="newest">Newest First</option>
             <option value="oldest">Oldest First</option>
@@ -264,7 +264,7 @@ export const SearchHistoryPanel: React.FC<SearchHistoryPanelProps> = ({
           return (
             <div
               key={search.id}
-              className={`bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 hover:shadow-xl transition-all duration-300 border-l-4 ${statusColor} group hover:bg-gray-800/70 hover:border-gray-600`}
+              className={`bg-dark-elevated backdrop-blur-sm border border-dark-border rounded-xl p-6 hover:shadow-xl transition-all duration-300 border-l-4 ${statusColor} group hover:bg-dark-elevated/70 hover:border-gray-600`}
             >
               <div className="flex items-start justify-between">
                 {/* Left Content */}
@@ -319,7 +319,7 @@ export const SearchHistoryPanel: React.FC<SearchHistoryPanelProps> = ({
                     disabled={!search.has_results || isProcessing}
                     className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                       !search.has_results || isProcessing
-                        ? 'text-gray-500 bg-gray-700 cursor-not-allowed'
+                        ? 'text-gray-500 bg-dark-surface cursor-not-allowed'
                         : 'text-blue-400 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/10'
                     }`}
                   >
@@ -329,10 +329,10 @@ export const SearchHistoryPanel: React.FC<SearchHistoryPanelProps> = ({
                   
                   {/* Additional actions */}
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-200">
+                    <button className="p-2 text-gray-400 hover:text-white hover:bg-dark-surface rounded-lg transition-all duration-200">
                       <DownloadIcon className="w-4 h-4" />
                     </button>
-                    <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-200">
+                    <button className="p-2 text-gray-400 hover:text-white hover:bg-dark-surface rounded-lg transition-all duration-200">
                       <ShareIcon className="w-4 h-4" />
                     </button>
                   </div>
@@ -341,7 +341,7 @@ export const SearchHistoryPanel: React.FC<SearchHistoryPanelProps> = ({
 
               {/* Progress Bar for Processing Items */}
               {isProcessing && (
-                <div className="mt-4 pt-4 border-t border-gray-700">
+                <div className="mt-4 pt-4 border-t border-dark-border">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-white">
                       Processing symbols...
@@ -350,7 +350,7 @@ export const SearchHistoryPanel: React.FC<SearchHistoryPanelProps> = ({
                       {stats.success + stats.error}/{stats.total}
                     </span>
                   </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2">
+                  <div className="w-full bg-dark-surface rounded-full h-2">
                     <div 
                       className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500 ease-out shadow-lg shadow-blue-500/25"
                       style={{ 

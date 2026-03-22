@@ -427,14 +427,14 @@ const ExchangeCard: React.FC<ExchangeCardProps> = ({
         isConnected
           ? `bg-gradient-to-br ${exchange.bgGradient} ${exchange.borderColor}`
           : isDisabled
-          ? 'bg-gray-900/30 border-white/5 opacity-60'
-          : 'bg-gray-900/50 border-white/5 hover:border-white/10'
+          ? 'bg-dark-elevated/30 border-white/5 opacity-60'
+          : 'bg-dark-elevated/50 border-white/5 hover:border-white/10'
       }`}
     >
       {/* Disabled Overlay */}
       {isDisabled && (
-        <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-[1px] z-10 flex items-center justify-center">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800/80 border border-white/10">
+        <div className="absolute inset-0 bg-dark-elevated/40 backdrop-blur-[1px] z-10 flex items-center justify-center">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-dark-elevated/80 border border-white/10">
             <Ban className="w-4 h-4 text-gray-400" />
             <span className="text-sm text-gray-400">Disconnect other exchange first</span>
           </div>
@@ -632,7 +632,7 @@ const ConnectModal: React.FC<ConnectModalProps> = ({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="relative w-full max-w-lg bg-gray-900 rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
+        className="relative w-full max-w-lg bg-dark-elevated rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -815,7 +815,7 @@ const SetupGuide: React.FC = () => {
   };
 
   return (
-    <div className="rounded-2xl border border-white/5 bg-gray-900/30 overflow-hidden">
+    <div className="rounded-2xl border border-white/5 bg-dark-elevated/30 overflow-hidden">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-all"

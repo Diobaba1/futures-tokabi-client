@@ -252,8 +252,8 @@ const AffiliatePage: React.FC = () => {
         )}
 
         {/* Tabs */}
-        <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-xl overflow-hidden">
-          <div className="border-b border-slate-800 overflow-x-auto">
+        <div className="bg-dark-elevated backdrop-blur-sm border border-dark-border rounded-xl overflow-hidden">
+          <div className="border-b border-dark-border overflow-x-auto">
             <div className="flex">
               <Tab
                 active={activeTab === 'overview'}
@@ -382,7 +382,7 @@ const Tab: React.FC<{
     className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors whitespace-nowrap ${
       active
         ? 'text-cyan-400 border-b-2 border-cyan-400 bg-cyan-500/5'
-        : 'text-gray-400 hover:text-gray-300 hover:bg-slate-800/50'
+        : 'text-gray-400 hover:text-gray-300 hover:bg-dark-elevated'
     }`}
   >
     {icon}
@@ -407,19 +407,19 @@ const OverviewTab: React.FC<{ stats: AffiliateStatsResponse | null }> = ({ stats
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700">
+        <div className="bg-dark-elevated rounded-lg p-6 border border-dark-border">
           <div className="text-gray-400 text-sm mb-1">Pending Earnings</div>
           <div className="text-2xl font-bold text-amber-400">
             ${(stats.pending_earnings / 100).toFixed(2)}
           </div>
         </div>
-        <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700">
+        <div className="bg-dark-elevated rounded-lg p-6 border border-dark-border">
           <div className="text-gray-400 text-sm mb-1">Paid Earnings</div>
           <div className="text-2xl font-bold text-emerald-400">
             ${(stats.paid_earnings / 100).toFixed(2)}
           </div>
         </div>
-        <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700">
+        <div className="bg-dark-elevated rounded-lg p-6 border border-dark-border">
           <div className="text-gray-400 text-sm mb-1">Commission Rates</div>
           <div className="text-lg font-bold text-cyan-400">
             {stats.initial_commission_rate}% / {stats.renewal_commission_rate}%
@@ -482,7 +482,7 @@ const ApplicationTab: React.FC<{
         </div>
       </div>
 
-      <div className="bg-slate-800/30 rounded-lg p-6 space-y-4">
+      <div className="bg-dark-elevated/30 rounded-lg p-6 space-y-4">
         <div>
           <div className="text-sm text-gray-400 mb-2">Social Links</div>
           <div className="space-y-2">
@@ -525,7 +525,7 @@ const ApplicationTab: React.FC<{
           </div>
         )}
 
-        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 border-t border-slate-700 pt-4">
+        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 border-t border-dark-border pt-4">
           <span>Applied: {new Date(application.created_at).toLocaleDateString()}</span>
           {application.reviewed_at && (
             <span>Reviewed: {new Date(application.reviewed_at).toLocaleDateString()}</span>
@@ -554,7 +554,7 @@ const ReferralTab: React.FC<{
     <div className="space-y-6">
       <div>
         <h3 className="text-xl font-semibold mb-4">Your Referral Link</h3>
-        <div className="bg-slate-800/30 rounded-lg p-4 flex items-center justify-between gap-4">
+        <div className="bg-dark-elevated/30 rounded-lg p-4 flex items-center justify-between gap-4">
           <div className="flex-1 min-w-0">
             <input
               type="text"
@@ -599,10 +599,10 @@ const ReferralTab: React.FC<{
         </div>
       </div>
 
-      <div className="bg-slate-800/30 rounded-lg p-6">
+      <div className="bg-dark-elevated/30 rounded-lg p-6">
         <h4 className="font-semibold mb-4">Your Commission Rates</h4>
         <div className="space-y-3">
-          <div className="flex justify-between items-center py-3 border-b border-slate-700">
+          <div className="flex justify-between items-center py-3 border-b border-dark-border">
             <div>
               <div className="font-medium">Initial Subscription</div>
               <div className="text-sm text-gray-400">One-time commission on first purchase</div>
@@ -694,7 +694,7 @@ const CommissionsTab: React.FC<{
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-slate-700">
+            <tr className="border-b border-dark-border">
               <th className="text-left py-3 px-4 text-gray-400 font-medium">Date</th>
               <th className="text-left py-3 px-4 text-gray-400 font-medium">Type</th>
               <th className="text-right py-3 px-4 text-gray-400 font-medium">Subscription</th>
@@ -705,7 +705,7 @@ const CommissionsTab: React.FC<{
           </thead>
           <tbody>
             {commissions.map((commission) => (
-              <tr key={commission.id} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+              <tr key={commission.id} className="border-b border-dark-border/50 hover:bg-dark-elevated/30 transition-colors">
                 <td className="py-4 px-4 text-sm">
                   {new Date(commission.created_at).toLocaleDateString()}
                 </td>
@@ -791,19 +791,19 @@ const ProfileTab: React.FC<{
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-slate-800/30 rounded-lg p-6 border border-slate-700">
+        <div className="bg-dark-elevated/30 rounded-lg p-6 border border-dark-border">
           <div className="text-sm text-gray-400 mb-1">Total Earnings</div>
           <div className="text-2xl font-bold text-cyan-400">
             ${(profile.total_earnings / 100).toFixed(2)}
           </div>
         </div>
-        <div className="bg-slate-800/30 rounded-lg p-6 border border-slate-700">
+        <div className="bg-dark-elevated/30 rounded-lg p-6 border border-dark-border">
           <div className="text-sm text-gray-400 mb-1">Pending</div>
           <div className="text-2xl font-bold text-amber-400">
             ${(profile.pending_earnings / 100).toFixed(2)}
           </div>
         </div>
-        <div className="bg-slate-800/30 rounded-lg p-6 border border-slate-700">
+        <div className="bg-dark-elevated/30 rounded-lg p-6 border border-dark-border">
           <div className="text-sm text-gray-400 mb-1">Paid Out</div>
           <div className="text-2xl font-bold text-emerald-400">
             ${(profile.paid_earnings / 100).toFixed(2)}
@@ -883,9 +883,9 @@ const ApplicationModal: React.FC<{
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-900 rounded-xl border border-slate-700 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-dark-elevated rounded-xl border border-dark-border max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Modal Header */}
-        <div className="sticky top-0 bg-slate-900 border-b border-slate-700 p-6 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-dark-elevated border-b border-dark-border p-6 flex items-center justify-between z-10">
           <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
             Apply for Affiliate Program
           </h2>
@@ -921,7 +921,7 @@ const ApplicationModal: React.FC<{
                     value={link}
                     onChange={(e) => updateSocialLink(index, e.target.value)}
                     placeholder="https://twitter.com/username"
-                    className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500"
+                    className="flex-1 bg-dark-elevated border border-dark-border rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500"
                   />
                   {socialLinks.length > 1 && (
                     <button
@@ -960,7 +960,7 @@ const ApplicationModal: React.FC<{
               onChange={(e) => setReason(e.target.value)}
               rows={5}
               placeholder="I have a dedicated audience of crypto traders who would benefit from Tokabi's automated trading features..."
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 resize-none"
+              className="w-full bg-dark-elevated border border-dark-border rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 resize-none"
             />
             <div className={`text-xs mt-1 ${reason.length >= 50 ? 'text-emerald-400' : 'text-gray-500'}`}>
               {reason.length} / 50 characters {reason.length >= 50 && '✓'}
@@ -980,7 +980,7 @@ const ApplicationModal: React.FC<{
               onChange={(e) => setHowFound(e.target.value)}
               rows={3}
               placeholder="I discovered Tokabi through..."
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 resize-none"
+              className="w-full bg-dark-elevated border border-dark-border rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 resize-none"
             />
             <div className={`text-xs mt-1 ${howFound.length >= 10 ? 'text-emerald-400' : 'text-gray-500'}`}>
               {howFound.length} / 10 characters {howFound.length >= 10 && '✓'}
@@ -1016,7 +1016,7 @@ const ApplicationModal: React.FC<{
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="flex-1 px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg font-medium transition-colors disabled:opacity-50"
+              className="flex-1 px-6 py-3 bg-dark-elevated hover:bg-dark-surface rounded-lg font-medium transition-colors disabled:opacity-50"
             >
               Cancel
             </button>

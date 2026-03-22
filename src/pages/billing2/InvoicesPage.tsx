@@ -99,8 +99,8 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, onPay }) => {
   const isOverdue = invoice.status === 'overdue';
 
   return (
-    <div className={`bg-gray-800/50 border rounded-xl p-5 transition-all hover:border-gray-600 ${
-      isOverdue ? 'border-red-500/50' : 'border-gray-700'
+    <div className={`bg-dark-elevated border rounded-xl p-5 transition-all hover:border-dark-border ${
+      isOverdue ? 'border-red-500/50' : 'border-dark-border'
     }`}>
       <div className="flex items-start justify-between mb-4">
         <div>
@@ -158,7 +158,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, onPay }) => {
 
       {/* Amount Breakdown */}
       {((invoice.discount_amount && invoice.discount_amount > 0) || (invoice.tax_amount && invoice.tax_amount > 0)) && (
-        <div className="border-t border-gray-700 pt-3 mb-4 space-y-1 text-sm">
+        <div className="border-t border-dark-border pt-3 mb-4 space-y-1 text-sm">
           <div className="flex justify-between text-gray-400">
             <span>Subtotal</span>
             <span>${invoice.subtotal?.toFixed(2) || '0.00'}</span>
@@ -223,7 +223,7 @@ const PayInvoiceModal: React.FC<PayInvoiceModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 border border-gray-700 rounded-2xl p-6 max-w-md w-full">
+      <div className="bg-dark-elevated border border-dark-border rounded-2xl p-6 max-w-md w-full">
         <h3 className="text-xl font-bold text-white mb-2">
           Pay Invoice {invoice.invoice_number}
         </h3>
@@ -241,7 +241,7 @@ const PayInvoiceModal: React.FC<PayInvoiceModalProps> = ({
               <button
                 key={currency.code}
                 onClick={() => onPay(currency.code)}
-                className="flex items-center gap-3 p-3 bg-gray-700/50 hover:bg-gray-700 border border-gray-600 rounded-lg transition-all"
+                className="flex items-center gap-3 p-3 bg-dark-surface/50 hover:bg-dark-surface border border-dark-border rounded-lg transition-all"
               >
                 <div className="text-left">
                   <p className="text-white font-medium">{currency.code.toUpperCase()}</p>
@@ -308,7 +308,7 @@ const InvoicesPage: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-4 mb-6">
+        <div className="bg-dark-elevated border border-dark-border rounded-xl p-4 mb-6">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-gray-400">
               <Calendar className="w-4 h-4" />
@@ -320,7 +320,7 @@ const InvoicesPage: React.FC = () => {
                 setStatusFilter(e.target.value);
                 setPage(1);
               }}
-              className="bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-purple-500"
+              className="bg-dark-surface border border-dark-border rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-purple-500"
             >
               <option value="">All Statuses</option>
               <option value="paid">Paid</option>
@@ -337,7 +337,7 @@ const InvoicesPage: React.FC = () => {
             <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
           </div>
         ) : !data?.invoices?.length ? (
-          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-20 text-center">
+          <div className="bg-dark-elevated border border-dark-border rounded-xl p-20 text-center">
             <FileText className="w-12 h-12 text-gray-600 mx-auto mb-4" />
             <p className="text-gray-400">No invoices found</p>
           </div>

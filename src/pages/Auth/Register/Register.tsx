@@ -86,7 +86,7 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="py-8 min-h-screen flex items-center justify-center bg-gray-900 relative overflow-hidden">
+    <div className="py-8 min-h-screen flex items-center justify-center bg-dark-base relative overflow-hidden">
       {/* Background Video */}
       <div className="absolute inset-0 w-full h-full">
         <video
@@ -191,7 +191,7 @@ const Register: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="mt-8 space-y-6 bg-gray-800/50 backdrop-blur-xl border border-cyan-500/20 rounded-2xl shadow-2xl shadow-cyan-500/10 p-8"
+          className="mt-8 space-y-6 bg-dark-elevated backdrop-blur-xl border border-cyan-500/20 rounded-2xl shadow-2xl shadow-cyan-500/10 p-8"
           onSubmit={handleSubmit}
         >
           <div className="space-y-5">
@@ -395,7 +395,7 @@ const Register: React.FC = () => {
               <div className="w-full border-t border-cyan-500/20"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-gray-800/50 text-gray-400 font-light tracking-wide">Already have an account?</span>
+              <span className="px-4 bg-dark-elevated text-gray-400 font-light tracking-wide">Already have an account?</span>
             </div>
           </motion.div>
 

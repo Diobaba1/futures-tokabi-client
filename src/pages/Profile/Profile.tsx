@@ -186,14 +186,14 @@ const Profile: React.FC = () => {
       </AnimatePresence>
 
       {/* Tab Navigation */}
-      <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-1 backdrop-blur-sm">
+      <div className="bg-dark-elevated border border-dark-border/50 rounded-2xl p-1 backdrop-blur-sm">
         <div className="flex space-x-1">
           <button
             onClick={() => setActiveTab('profile')}
             className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
               activeTab === 'profile'
                 ? 'bg-cyan-900/10 text-cyan-800 border border-cyan-900/20'
-                : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                : 'text-gray-400 hover:text-white hover:bg-dark-border/50'
             }`}
           >
             <div className="flex items-center justify-center space-x-2">
@@ -208,7 +208,7 @@ const Profile: React.FC = () => {
             className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
               activeTab === 'api-keys'
                 ? 'bg-cyan-900/10 text-cyan-800 border border-cyan-900/20'
-                : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                : 'text-gray-400 hover:text-white hover:bg-dark-border/50'
             }`}
           >
             <div className="flex items-center justify-center space-x-2">
@@ -228,7 +228,7 @@ const Profile: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-6 backdrop-blur-sm"
+            className="bg-dark-elevated border border-dark-border/50 rounded-2xl p-6 backdrop-blur-sm"
           >
             <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
               <svg className="w-6 h-6 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -240,36 +240,36 @@ const Profile: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
-                <div className="p-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white">
+                <div className="p-3 bg-dark-border/50 border border-dark-border/50 rounded-xl text-white">
                   {user?.email}
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Account Status</label>
-                <div className="p-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white">
+                <div className="p-3 bg-dark-border/50 border border-dark-border/50 rounded-xl text-white">
                   {user?.is_subscribed ? 'Premium' : 'Free Tier'}
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
-                <div className="p-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white">
+                <div className="p-3 bg-dark-border/50 border border-dark-border/50 rounded-xl text-white">
                   {user?.full_name || 'Not set'}
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Member Since</label>
-                <div className="p-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white">
+                <div className="p-3 bg-dark-border/50 border border-dark-border/50 rounded-xl text-white">
                   {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
                 </div>
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-gray-700/50">
+            <div className="mt-8 pt-6 border-t border-dark-border/50">
               <h3 className="text-lg font-semibold text-white mb-4">Subscription Management</h3>
-              <div className="flex items-center justify-between p-4 bg-gray-700/30 border border-gray-600/30 rounded-xl">
+              <div className="flex items-center justify-between p-4 bg-dark-surface/30 border border-dark-border/30 rounded-xl">
                 <div>
                   <div className="text-white font-semibold">
                     {user?.is_subscribed ? 'Premium Plan' : 'Free Plan'}
@@ -322,7 +322,7 @@ const Profile: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 onClick={() => setShowAddForm(true)}
-                className="w-full p-6 bg-gray-800/50 border border-gray-700/50 rounded-2xl hover:border-gray-600/50 transition-all duration-200 group"
+                className="w-full p-6 bg-dark-elevated border border-dark-border/50 rounded-2xl hover:border-dark-border/50 transition-all duration-200 group"
               >
                 <div className="flex items-center justify-center space-x-3 text-gray-400 group-hover:text-cyan-800">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -340,13 +340,13 @@ const Profile: React.FC = () => {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-6 backdrop-blur-sm overflow-hidden"
+                  className="bg-dark-elevated border border-dark-border/50 rounded-2xl p-6 backdrop-blur-sm overflow-hidden"
                 >
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-semibold text-white">Add New API Key</h3>
                     <button
                       onClick={() => setShowAddForm(false)}
-                      className="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg transition-all duration-200"
+                      className="p-2 text-gray-400 hover:text-white hover:bg-dark-border/50 rounded-lg transition-all duration-200"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -364,7 +364,7 @@ const Profile: React.FC = () => {
                         value={newKey.label}
                         onChange={(e) => setNewKey({ ...newKey, label: e.target.value })}
                         placeholder="e.g., Binance Main Account"
-                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/50 focus:border-cyan-900/50 transition-all duration-200"
+                        className="w-full px-4 py-3 bg-dark-border/50 border border-dark-border/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/50 focus:border-cyan-900/50 transition-all duration-200"
                       />
                     </div>
 
@@ -391,7 +391,7 @@ const Profile: React.FC = () => {
                         value={newKey.api_key}
                         onChange={(e) => setNewKey({ ...newKey, api_key: e.target.value })}
                         placeholder="Enter your API Key"
-                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/50 focus:border-cyan-900/50 transition-all duration-200 font-mono"
+                        className="w-full px-4 py-3 bg-dark-border/50 border border-dark-border/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/50 focus:border-cyan-900/50 transition-all duration-200 font-mono"
                       />
                     </div>
 
@@ -405,7 +405,7 @@ const Profile: React.FC = () => {
                         value={newKey.api_secret}
                         onChange={(e) => setNewKey({ ...newKey, api_secret: e.target.value })}
                         placeholder="Enter your API Secret"
-                        className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/50 focus:border-cyan-900/50 transition-all duration-200 font-mono"
+                        className="w-full px-4 py-3 bg-dark-border/50 border border-dark-border/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-900/50 focus:border-cyan-900/50 transition-all duration-200 font-mono"
                       />
                     </div>
 
@@ -415,7 +415,7 @@ const Profile: React.FC = () => {
                         onClick={() => setShowAddForm(false)}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className="flex-1 py-3 bg-gray-700/50 border border-gray-600/50 text-gray-300 rounded-xl hover:bg-gray-600/50 hover:text-white transition-all duration-200"
+                        className="flex-1 py-3 bg-dark-border/50 border border-dark-border/50 text-gray-300 rounded-xl hover:bg-gray-600/50 hover:text-white transition-all duration-200"
                       >
                         Cancel
                       </motion.button>
@@ -435,8 +435,8 @@ const Profile: React.FC = () => {
             </AnimatePresence>
 
             {/* API Keys List */}
-            <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl backdrop-blur-sm">
-              <div className="p-6 border-b border-gray-700/50">
+            <div className="bg-dark-elevated border border-dark-border/50 rounded-2xl backdrop-blur-sm">
+              <div className="p-6 border-b border-dark-border/50">
                 <h3 className="text-xl font-semibold text-white flex items-center">
                   <svg className="w-6 h-6 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />

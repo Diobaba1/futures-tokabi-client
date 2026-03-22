@@ -451,7 +451,7 @@ const Trades: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by symbol or order ID..."
-                className="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-900/50 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all"
+                className="w-full pl-12 pr-4 py-3 rounded-xl bg-dark-elevated border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all"
               />
             </div>
 
@@ -464,7 +464,7 @@ const Trades: React.FC = () => {
                   value={startDate}
                   onChange={(e) => { setStartDate(e.target.value); setPlatformPage(1); }}
                   placeholder="From"
-                  className="pl-9 pr-3 py-3 rounded-xl bg-gray-900/50 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all [color-scheme:dark]"
+                  className="pl-9 pr-3 py-3 rounded-xl bg-dark-elevated border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all [color-scheme:dark]"
                 />
               </div>
               <span className="text-gray-500 text-sm">to</span>
@@ -475,7 +475,7 @@ const Trades: React.FC = () => {
                   value={endDate}
                   onChange={(e) => { setEndDate(e.target.value); setPlatformPage(1); }}
                   placeholder="To"
-                  className="pl-9 pr-3 py-3 rounded-xl bg-gray-900/50 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all [color-scheme:dark]"
+                  className="pl-9 pr-3 py-3 rounded-xl bg-dark-elevated border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all [color-scheme:dark]"
                 />
               </div>
               {(startDate || endDate) && (
@@ -496,7 +496,7 @@ const Trades: React.FC = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-3 rounded-xl bg-gray-900/50 border border-white/10 text-white focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all"
+                className="px-4 py-3 rounded-xl bg-dark-elevated border border-white/10 text-white focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all"
               >
                 <option value="">All Status</option>
                 <option value="open">Open</option>
@@ -547,7 +547,7 @@ const Trades: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="rounded-2xl bg-gray-900/50 backdrop-blur-xl border border-white/5 overflow-hidden"
+            className="rounded-2xl bg-dark-elevated backdrop-blur-xl border border-white/5 overflow-hidden"
           >
             <div className="p-5 border-b border-white/5">
               <div className="flex items-center justify-between">
@@ -624,7 +624,7 @@ const StatCard: React.FC<StatCardProps> = ({
 }) => (
   <motion.div
     whileHover={{ y: -2 }}
-    className="p-4 rounded-2xl bg-gray-900/50 backdrop-blur-xl border border-white/5 hover:border-white/10 transition-all"
+    className="p-4 rounded-2xl bg-dark-elevated backdrop-blur-xl border border-white/5 hover:border-white/10 transition-all"
   >
     <div className="flex items-center gap-3">
       <div

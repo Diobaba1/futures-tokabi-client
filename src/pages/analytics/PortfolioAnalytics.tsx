@@ -427,7 +427,7 @@ const PortfolioAnalyticsComponent: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center max-w-md"
         >
-          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gray-800/50 border border-white/5 flex items-center justify-center">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-dark-elevated border border-white/5 flex items-center justify-center">
             <Database className="w-10 h-10 text-gray-600" />
           </div>
           <h3 className="text-xl font-semibold text-white mb-2">No Portfolio Data</h3>
@@ -754,7 +754,7 @@ const PortfolioAnalyticsComponent: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="rounded-2xl bg-gray-900/50 backdrop-blur-xl border border-white/5 overflow-hidden"
+              className="rounded-2xl bg-dark-elevated backdrop-blur-xl border border-white/5 overflow-hidden"
             >
               <div className="p-5 border-b border-white/5">
                 <div className="flex items-center justify-between">
@@ -818,7 +818,7 @@ const PortfolioAnalyticsComponent: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.35 }}
-              className="rounded-2xl bg-gray-900/50 backdrop-blur-xl border border-white/5 overflow-hidden"
+              className="rounded-2xl bg-dark-elevated backdrop-blur-xl border border-white/5 overflow-hidden"
             >
               <div className="p-5 border-b border-white/5">
                 <div className="flex items-center justify-between">
@@ -893,7 +893,7 @@ const PortfolioAnalyticsComponent: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="rounded-2xl bg-gray-900/50 backdrop-blur-xl border border-white/5 overflow-hidden"
+              className="rounded-2xl bg-dark-elevated backdrop-blur-xl border border-white/5 overflow-hidden"
             >
               <div className="p-5 border-b border-white/5">
                 <h3 className="text-lg font-semibold text-white flex items-center gap-2">
@@ -1030,7 +1030,7 @@ const PortfolioAnalyticsComponent: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="rounded-2xl bg-gray-900/50 backdrop-blur-xl border border-white/5 overflow-hidden"
+              className="rounded-2xl bg-dark-elevated backdrop-blur-xl border border-white/5 overflow-hidden"
             >
               <div className="p-5 border-b border-white/5 flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-white flex items-center gap-2">
@@ -1243,7 +1243,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay }}
     whileHover={{ y: -2 }}
-    className={`relative overflow-hidden p-5 rounded-2xl bg-gray-900/50 backdrop-blur-xl border ${borderColor} hover:border-white/20 transition-all group`}
+    className={`relative overflow-hidden p-5 rounded-2xl bg-dark-elevated backdrop-blur-xl border ${borderColor} hover:border-white/20 transition-all group`}
   >
     {/* Hover glow */}
     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />

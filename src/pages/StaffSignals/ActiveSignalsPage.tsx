@@ -68,7 +68,7 @@ const ActiveSignalsPage: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-950">
+    <div className="min-h-screen bg-dark-base">
       {/* Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 pointer-events-none" />
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-900/10 via-transparent to-transparent pointer-events-none" />
@@ -91,7 +91,7 @@ const ActiveSignalsPage: React.FC = () => {
 
         {/* Search & Filters - Hide when subscription required */}
         {!requiresSubscription && (
-          <div className="bg-gray-900/80 backdrop-blur-sm border border-gray-800 rounded-xl p-4 mb-8">
+          <div className="bg-dark-elevated/80 backdrop-blur-sm border border-dark-border rounded-xl p-4 mb-8">
             <div className="flex flex-col sm:flex-row gap-4">
               <form onSubmit={handleSearch} className="flex-1">
                 <div className="relative">
@@ -104,13 +104,13 @@ const ActiveSignalsPage: React.FC = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by symbol (e.g., BTCUSDT)"
-                    className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-3 bg-dark-elevated border border-dark-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors"
                   />
                 </div>
               </form>
 
               <div className="flex items-center gap-3">
-                <div className="flex items-center bg-gray-800 border border-gray-700 rounded-lg p-1">
+                <div className="flex items-center bg-dark-elevated border border-dark-border rounded-lg p-1">
                   <button
                     onClick={() => setPositionFilter("")}
                     className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
@@ -146,7 +146,7 @@ const ActiveSignalsPage: React.FC = () => {
                 <button
                   onClick={handleRefresh}
                   disabled={isLoading}
-                  className="p-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-400 hover:text-white hover:border-cyan-500/50 transition-all"
+                  className="p-3 bg-dark-elevated border border-dark-border rounded-lg text-gray-400 hover:text-white hover:border-cyan-500/50 transition-all"
                 >
                   <RefreshCw
                     size={18}
@@ -182,15 +182,15 @@ const ActiveSignalsPage: React.FC = () => {
 
               {/* Features */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 max-w-2xl mx-auto">
-                <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
+                <div className="bg-dark-elevated/50 border border-dark-border/50 rounded-xl p-4">
                   <Zap size={24} className="text-cyan-400 mx-auto mb-2" />
                   <p className="text-sm text-gray-300 font-medium">Real-time Alerts</p>
                 </div>
-                <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
+                <div className="bg-dark-elevated/50 border border-dark-border/50 rounded-xl p-4">
                   <Target size={24} className="text-green-400 mx-auto mb-2" />
                   <p className="text-sm text-gray-300 font-medium">Entry & Exit Points</p>
                 </div>
-                <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
+                <div className="bg-dark-elevated/50 border border-dark-border/50 rounded-xl p-4">
                   <Sparkles size={24} className="text-purple-400 mx-auto mb-2" />
                   <p className="text-sm text-gray-300 font-medium">Expert Analysis</p>
                 </div>
@@ -227,19 +227,19 @@ const ActiveSignalsPage: React.FC = () => {
                 {[...Array(4)].map((_, i) => (
                   <div
                     key={i}
-                    className="bg-gray-900/80 border border-gray-800 rounded-2xl p-6 animate-pulse"
+                    className="bg-dark-elevated/80 border border-dark-border rounded-2xl p-6 animate-pulse"
                   >
-                    <div className="h-6 w-32 bg-gray-800 rounded mb-4" />
+                    <div className="h-6 w-32 bg-dark-elevated rounded mb-4" />
                     <div className="space-y-3">
-                      <div className="h-16 bg-gray-800 rounded-xl" />
-                      <div className="h-16 bg-gray-800 rounded-xl" />
+                      <div className="h-16 bg-dark-elevated rounded-xl" />
+                      <div className="h-16 bg-dark-elevated rounded-xl" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : filteredSignals.length === 0 ? (
-              <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-16 text-center">
-                <div className="w-20 h-20 bg-gray-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="bg-dark-elevated/80 border border-dark-border rounded-2xl p-16 text-center">
+                <div className="w-20 h-20 bg-dark-elevated/50 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Zap size={40} className="text-gray-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-400 mb-2">
@@ -258,7 +258,7 @@ const ActiveSignalsPage: React.FC = () => {
                 </div>
 
                 {activePagination.total > 0 && (
-                  <div className="mt-6 bg-gray-900/80 backdrop-blur-sm border border-gray-800 rounded-xl">
+                  <div className="mt-6 bg-dark-elevated/80 backdrop-blur-sm border border-dark-border rounded-xl">
                     <Pagination
                       page={activePagination.page}
                       pageSize={activePagination.pageSize}
@@ -332,7 +332,7 @@ const SignalDisplayCard: React.FC<{ signal: StaffSignalResponse }> = ({
 
   return (
     <div
-      className={`bg-gray-900/80 backdrop-blur-sm border rounded-2xl p-6 transition-all duration-300 hover:shadow-lg ${
+      className={`bg-dark-elevated/80 backdrop-blur-sm border rounded-2xl p-6 transition-all duration-300 hover:shadow-lg ${
         isBuy
           ? "border-green-500/20 hover:border-green-500/40 hover:shadow-green-500/5"
           : "border-red-500/20 hover:border-red-500/40 hover:shadow-red-500/5"
@@ -386,7 +386,7 @@ const SignalDisplayCard: React.FC<{ signal: StaffSignalResponse }> = ({
 
       {/* Price Info */}
       <div className="grid grid-cols-2 gap-3 mb-5">
-        <div className="bg-gray-800/50 rounded-xl p-4">
+        <div className="bg-dark-elevated/50 rounded-xl p-4">
           <p className="text-xs text-gray-500 mb-1">Entry Price</p>
           <p className="text-lg font-bold text-white">
             ${formatPrice(signal.entry_price)}
@@ -436,7 +436,7 @@ const SignalDisplayCard: React.FC<{ signal: StaffSignalResponse }> = ({
               className={`flex items-center justify-between p-3 rounded-lg ${
                 tp.hit
                   ? "bg-green-500/10 border border-green-500/30"
-                  : "bg-gray-800/50 border border-gray-700/50"
+                  : "bg-dark-elevated/50 border border-dark-border/50"
               }`}
             >
               <span
@@ -460,7 +460,7 @@ const SignalDisplayCard: React.FC<{ signal: StaffSignalResponse }> = ({
 
       {/* Risk/Reward */}
       {signal.risk_reward_ratio && (
-        <div className="pt-4 border-t border-gray-800 flex items-center justify-between">
+        <div className="pt-4 border-t border-dark-border flex items-center justify-between">
           <span className="text-xs text-gray-500">Risk : Reward</span>
           <span className="text-sm font-bold text-cyan-400">
             1 : {signal.risk_reward_ratio}
@@ -470,7 +470,7 @@ const SignalDisplayCard: React.FC<{ signal: StaffSignalResponse }> = ({
 
       {/* Notes */}
       {signal.notes && (
-        <div className="mt-4 pt-4 border-t border-gray-800">
+        <div className="mt-4 pt-4 border-t border-dark-border">
           <p className="text-xs text-gray-500 leading-relaxed">{signal.notes}</p>
         </div>
       )}

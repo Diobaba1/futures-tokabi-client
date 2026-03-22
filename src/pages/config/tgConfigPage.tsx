@@ -205,7 +205,7 @@ const TgConfigPage: React.FC = () => {
             onClick={() => navigate('/dashboard')}
             className="flex items-center gap-3 text-gray-400 hover:text-cyan-800 transition-all duration-300 group"
           >
-            <div className="w-10 h-10 bg-gray-800/50 rounded-xl flex items-center justify-center group-hover:bg-cyan-800/10 border border-gray-700 group-hover:border-cyan-800/30 transition-all">
+            <div className="w-10 h-10 bg-dark-elevated rounded-xl flex items-center justify-center group-hover:bg-cyan-800/10 border border-dark-border group-hover:border-cyan-800/30 transition-all">
               <ArrowLeft className="w-5 h-5 group-hover:scale-110 transition-transform" />
             </div>
             <span className="font-medium">Back to Dashboard</span>
@@ -285,7 +285,7 @@ const TgConfigPage: React.FC = () => {
                       value={formData.chat_id}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-4 bg-gray-900/50 border-2 border-cyan-800/20 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:border-cyan-800/50 focus:ring-4 focus:ring-cyan-800/10 disabled:bg-gray-800/50 disabled:text-gray-500 transition-all duration-300"
+                      className="w-full px-4 py-4 bg-dark-elevated border-2 border-cyan-800/20 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:border-cyan-800/50 focus:ring-4 focus:ring-cyan-800/10 disabled:bg-dark-elevated disabled:text-gray-500 transition-all duration-300"
                       placeholder="1234567890"
                       disabled={loading}
                     />
@@ -312,7 +312,7 @@ const TgConfigPage: React.FC = () => {
                       value={formData.bot_token}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-4 pr-12 bg-gray-900/50 border-2 border-cyan-800/20 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:border-cyan-800/50 focus:ring-4 focus:ring-cyan-800/10 disabled:bg-gray-800/50 disabled:text-gray-500 transition-all duration-300 font-mono text-sm"
+                      className="w-full px-4 py-4 pr-12 bg-dark-elevated border-2 border-cyan-800/20 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:border-cyan-800/50 focus:ring-4 focus:ring-cyan-800/10 disabled:bg-dark-elevated disabled:text-gray-500 transition-all duration-300 font-mono text-sm"
                       placeholder="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz"
                       disabled={loading}
                     />
@@ -519,7 +519,7 @@ const TgConfigPage: React.FC = () => {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setDeleteConfirm(false)}
-                className="flex-1 px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl transition-all duration-300 font-medium border border-gray-600 hover:border-gray-500"
+                className="flex-1 px-4 py-3 bg-dark-surface hover:bg-gray-600 text-white rounded-xl transition-all duration-300 font-medium border border-gray-600 hover:border-gray-500"
               >
                 Cancel
               </button>

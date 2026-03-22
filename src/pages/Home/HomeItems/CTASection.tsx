@@ -16,7 +16,7 @@ const CTASection: React.FC = () => {
   };
 
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-950 relative overflow-hidden">
+    <section className="py-24 px-4 sm:px-6 lg:px-8 bg-dark-base relative overflow-hidden">
       {/* Background Video */}
       <div className="absolute inset-0">
         <video
@@ -81,7 +81,7 @@ const CTASection: React.FC = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="inline-flex items-center px-5 py-2.5 rounded-full bg-gray-800/60 border border-gray-700/50 text-gray-300 text-sm font-light tracking-wider mb-8 backdrop-blur-sm"
+            className="inline-flex items-center px-5 py-2.5 rounded-full bg-dark-elevated/60 border border-gray-700/50 text-gray-300 text-sm font-light tracking-wider mb-8 backdrop-blur-sm"
           >
             <motion.div 
               animate={{ scale: [1, 1.1, 1] }}
@@ -161,7 +161,7 @@ const CTASection: React.FC = () => {
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="relative px-10 py-4 bg-gray-800/60 border border-gray-600/50 rounded-xl font-medium text-white hover:border-gray-500/50 transition-all duration-300 backdrop-blur-sm overflow-hidden"
+                className="relative px-10 py-4 bg-dark-elevated/60 border border-gray-600/50 rounded-xl font-medium text-white hover:border-gray-500/50 transition-all duration-300 backdrop-blur-sm overflow-hidden"
               >
                 <span className="relative z-10 flex items-center gap-2 text-sm tracking-wide">
                   <Play className="w-4 h-4 text-cyan-400" />
@@ -207,7 +207,7 @@ const CTASection: React.FC = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 1 + index * 0.1 }}
                   whileHover={{ y: -2 }}
-                  className="flex flex-col items-center text-center p-6 bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700/30 hover:border-gray-600/50 transition-all duration-300"
+                  className="flex flex-col items-center text-center p-6 bg-dark-elevated/30 backdrop-blur-sm rounded-xl border border-gray-700/30 hover:border-gray-600/50 transition-all duration-300"
                 >
                   <motion.div 
                     className="w-12 h-12 mb-4 rounded-lg bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 flex items-center justify-center"
@@ -247,7 +247,7 @@ const CTASection: React.FC = () => {
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, delay: 1.4 + index * 0.1 }}
                   whileHover={{ scale: 1.02 }}
-                  className="flex items-center gap-2 px-3 py-2 bg-gray-800/20 rounded-lg border border-gray-700/20 backdrop-blur-sm"
+                  className="flex items-center gap-2 px-3 py-2 bg-dark-elevated/20 rounded-lg border border-gray-700/20 backdrop-blur-sm"
                 >
                   <span className="text-cyan-400 text-xs">{item.icon}</span>
                   <div className="text-right">
@@ -279,7 +279,7 @@ const CTASection: React.FC = () => {
         <motion.div
           initial={{ opacity: 1 }}
           animate={{ opacity: videoLoaded ? 0 : 1 }}
-          className="absolute inset-0 bg-gray-950 flex items-center justify-center"
+          className="absolute inset-0 bg-dark-base flex items-center justify-center"
         >
           <motion.div
             animate={{ rotate: 360 }}

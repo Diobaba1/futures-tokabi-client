@@ -104,7 +104,7 @@ const CancelModal: React.FC<CancelModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 border border-gray-700 rounded-2xl p-6 max-w-md w-full">
+      <div className="bg-dark-elevated border border-dark-border rounded-2xl p-6 max-w-md w-full">
         <h3 className="text-xl font-bold text-white mb-4">
           Cancel Subscription
         </h3>
@@ -249,7 +249,7 @@ const SubscriptionPage: React.FC = () => {
         </div>
 
         {/* Main Card */}
-        <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 mb-6">
+        <div className="bg-dark-elevated backdrop-blur-sm border border-dark-border rounded-2xl p-6 mb-6">
           {/* Plan Info */}
           <div className="flex items-start justify-between mb-6">
             <div>
@@ -372,7 +372,7 @@ const SubscriptionPage: React.FC = () => {
 
         {/* Features Card */}
         {subscription.plan?.features?.features_list && (
-          <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6">
+          <div className="bg-dark-elevated backdrop-blur-sm border border-dark-border rounded-2xl p-6">
             <h3 className="text-lg font-semibold text-white mb-4">
               Plan Features
             </h3>

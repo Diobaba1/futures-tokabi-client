@@ -171,7 +171,7 @@ const LiveTradingPage: React.FC = () => {
   };
 
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return <ChevronDown size={14} className="text-slate-600" />;
+    if (sortField !== field) return <ChevronDown size={14} className="text-gray-600" />;
     return sortDir === 'asc' ? (
       <ChevronUp size={14} className="text-cyan-400" />
     ) : (
@@ -180,7 +180,7 @@ const LiveTradingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-dark-base">
       {/* Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pointer-events-none" />
 
@@ -209,13 +209,13 @@ const LiveTradingPage: React.FC = () => {
               <Activity className="text-cyan-400" size={24} />
               Live Positions
             </h1>
-            <p className="text-slate-500 mt-1 text-sm">Monitor and manage your active trades in real-time</p>
+            <p className="text-gray-500 mt-1 text-sm">Monitor and manage your active trades in real-time</p>
           </div>
 
           <button
             onClick={() => loadData(true)}
             disabled={refreshing}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-xl text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white transition-all disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-dark-elevated border border-dark-border rounded-xl text-sm text-gray-300 hover:bg-dark-surface/50 hover:text-white transition-all disabled:opacity-50"
           >
             <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
             Refresh
@@ -224,25 +224,25 @@ const LiveTradingPage: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-slate-800 p-4">
+          <div className="bg-dark-elevated backdrop-blur-sm rounded-2xl border border-dark-border p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-cyan-500/10 rounded-xl">
                 <Activity size={20} className="text-cyan-400" />
               </div>
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wider">Active Positions</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wider">Active Positions</p>
                 <p className="text-2xl font-bold text-white mt-0.5">{data.total_positions}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-slate-800 p-4">
+          <div className="bg-dark-elevated backdrop-blur-sm rounded-2xl border border-dark-border p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-500/10 rounded-xl">
                 <DollarSign size={20} className="text-blue-400" />
               </div>
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wider">Total Exposure</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wider">Total Exposure</p>
                 <p className="text-2xl font-bold text-white mt-0.5">
                   ${data.total_exposure_usdt.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                 </p>
@@ -250,13 +250,13 @@ const LiveTradingPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-slate-800 p-4">
+          <div className="bg-dark-elevated backdrop-blur-sm rounded-2xl border border-dark-border p-4">
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-xl ${data.total_unrealized_pnl >= 0 ? 'bg-emerald-500/10' : 'bg-red-500/10'}`}>
                 <BarChart3 size={20} className={data.total_unrealized_pnl >= 0 ? 'text-emerald-400' : 'text-red-400'} />
               </div>
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wider">Unrealized PnL</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wider">Unrealized PnL</p>
                 <p className={`text-2xl font-bold mt-0.5 ${
                   data.total_unrealized_pnl >= 0 ? 'text-emerald-400' : 'text-red-400'
                 }`}>
@@ -275,7 +275,7 @@ const LiveTradingPage: React.FC = () => {
               className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
                 !symbolFilter
                   ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                  : 'bg-slate-800/50 text-slate-400 border border-slate-700 hover:border-slate-600'
+                  : 'bg-dark-elevated text-gray-400 border border-dark-border hover:border-dark-border'
               }`}
             >
               All
@@ -287,7 +287,7 @@ const LiveTradingPage: React.FC = () => {
                 className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
                   symbolFilter === sym
                     ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                    : 'bg-slate-800/50 text-slate-400 border border-slate-700 hover:border-slate-600'
+                    : 'bg-dark-elevated text-gray-400 border border-dark-border hover:border-dark-border'
                 }`}
               >
                 {sym}
@@ -299,19 +299,19 @@ const LiveTradingPage: React.FC = () => {
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
             <input
               type="text"
               placeholder="Search by symbol or execution ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-900/50 border border-slate-800 rounded-xl text-sm placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500/30 text-white"
+              className="w-full pl-10 pr-4 py-2.5 bg-dark-elevated border border-dark-border rounded-xl text-sm placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500/30 text-white"
             />
           </div>
           <select
             value={exchangeFilter}
             onChange={(e) => setExchangeFilter(e.target.value)}
-            className="px-4 py-2.5 bg-slate-900/50 border border-slate-800 rounded-xl text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
+            className="px-4 py-2.5 bg-dark-elevated border border-dark-border rounded-xl text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
           >
             <option value="">All Exchanges</option>
             <option value="binance">Binance</option>
@@ -323,36 +323,36 @@ const LiveTradingPage: React.FC = () => {
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 size={32} className="animate-spin text-cyan-400" />
-            <span className="ml-3 text-slate-500">Loading positions...</span>
+            <span className="ml-3 text-gray-500">Loading positions...</span>
           </div>
         ) : filteredPositions.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-500">
+          <div className="flex flex-col items-center justify-center py-20 text-gray-500">
             <Shield size={48} className="mb-4 text-slate-700" />
-            <p className="text-lg font-medium text-slate-400">No active positions</p>
-            <p className="text-sm mt-1 text-slate-600">You don't have any open trades right now</p>
+            <p className="text-lg font-medium text-gray-400">No active positions</p>
+            <p className="text-sm mt-1 text-gray-600">You don't have any open trades right now</p>
           </div>
         ) : (
-          <div className="bg-slate-900/50 backdrop-blur-xl rounded-2xl border border-slate-800 overflow-hidden">
+          <div className="bg-dark-elevated backdrop-blur-xl rounded-2xl border border-dark-border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-800 bg-slate-800/30">
+                  <tr className="border-b border-dark-border bg-dark-elevated/30">
                     <th
-                      className="text-left px-4 py-3 text-slate-500 font-medium cursor-pointer select-none"
+                      className="text-left px-4 py-3 text-gray-500 font-medium cursor-pointer select-none"
                       onClick={() => handleSort('symbol')}
                     >
                       <div className="flex items-center gap-1">
                         Symbol <SortIcon field="symbol" />
                       </div>
                     </th>
-                    <th className="text-left px-4 py-3 text-slate-500 font-medium">Exchange</th>
-                    <th className="text-left px-4 py-3 text-slate-500 font-medium">Side</th>
-                    <th className="text-right px-4 py-3 text-slate-500 font-medium">Entry</th>
-                    <th className="text-right px-4 py-3 text-slate-500 font-medium">Current</th>
-                    <th className="text-right px-4 py-3 text-slate-500 font-medium">Qty</th>
-                    <th className="text-center px-4 py-3 text-slate-500 font-medium">Lev</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-medium">Exchange</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-medium">Side</th>
+                    <th className="text-right px-4 py-3 text-gray-500 font-medium">Entry</th>
+                    <th className="text-right px-4 py-3 text-gray-500 font-medium">Current</th>
+                    <th className="text-right px-4 py-3 text-gray-500 font-medium">Qty</th>
+                    <th className="text-center px-4 py-3 text-gray-500 font-medium">Lev</th>
                     <th
-                      className="text-right px-4 py-3 text-slate-500 font-medium cursor-pointer select-none"
+                      className="text-right px-4 py-3 text-gray-500 font-medium cursor-pointer select-none"
                       onClick={() => handleSort('position_size_usdt')}
                     >
                       <div className="flex items-center justify-end gap-1">
@@ -360,24 +360,24 @@ const LiveTradingPage: React.FC = () => {
                       </div>
                     </th>
                     <th
-                      className="text-right px-4 py-3 text-slate-500 font-medium cursor-pointer select-none"
+                      className="text-right px-4 py-3 text-gray-500 font-medium cursor-pointer select-none"
                       onClick={() => handleSort('unrealized_pnl')}
                     >
                       <div className="flex items-center justify-end gap-1">
                         PnL <SortIcon field="unrealized_pnl" />
                       </div>
                     </th>
-                    <th className="text-right px-4 py-3 text-slate-500 font-medium">SL</th>
-                    <th className="text-center px-4 py-3 text-slate-500 font-medium">TPs</th>
+                    <th className="text-right px-4 py-3 text-gray-500 font-medium">SL</th>
+                    <th className="text-center px-4 py-3 text-gray-500 font-medium">TPs</th>
                     <th
-                      className="text-right px-4 py-3 text-slate-500 font-medium cursor-pointer select-none"
+                      className="text-right px-4 py-3 text-gray-500 font-medium cursor-pointer select-none"
                       onClick={() => handleSort('created_at')}
                     >
                       <div className="flex items-center justify-end gap-1">
                         Age <SortIcon field="created_at" />
                       </div>
                     </th>
-                    <th className="text-center px-4 py-3 text-slate-500 font-medium">Action</th>
+                    <th className="text-center px-4 py-3 text-gray-500 font-medium">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -389,7 +389,7 @@ const LiveTradingPage: React.FC = () => {
                     return (
                       <tr
                         key={pos.execution_id}
-                        className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors"
+                        className="border-b border-dark-border/50 hover:bg-dark-elevated/30 transition-colors"
                       >
                         {/* Symbol */}
                         <td className="px-4 py-3">
@@ -425,7 +425,7 @@ const LiveTradingPage: React.FC = () => {
                         </td>
 
                         {/* Entry Price */}
-                        <td className="px-4 py-3 text-right text-slate-300 font-mono text-xs">
+                        <td className="px-4 py-3 text-right text-gray-300 font-mono text-xs">
                           {pos.entry_price != null ? `$${pos.entry_price.toLocaleString()}` : '—'}
                         </td>
 
@@ -434,12 +434,12 @@ const LiveTradingPage: React.FC = () => {
                           {pos.current_price != null ? (
                             <span className="text-white">${pos.current_price.toLocaleString()}</span>
                           ) : (
-                            <span className="text-slate-600">—</span>
+                            <span className="text-gray-600">—</span>
                           )}
                         </td>
 
                         {/* Quantity */}
-                        <td className="px-4 py-3 text-right text-slate-300 font-mono text-xs">
+                        <td className="px-4 py-3 text-right text-gray-300 font-mono text-xs">
                           {pos.remaining_quantity ?? pos.quantity ?? '—'}
                         </td>
 
@@ -449,7 +449,7 @@ const LiveTradingPage: React.FC = () => {
                         </td>
 
                         {/* Size */}
-                        <td className="px-4 py-3 text-right text-slate-300 font-mono text-xs">
+                        <td className="px-4 py-3 text-right text-gray-300 font-mono text-xs">
                           {pos.position_size_usdt != null
                             ? `$${pos.position_size_usdt.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
                             : '—'}
@@ -492,7 +492,7 @@ const LiveTradingPage: React.FC = () => {
                         {/* TPs */}
                         <td className="px-4 py-3 text-center">
                           {pos.take_profit_orders && pos.take_profit_orders.length > 0 ? (
-                            <span className="text-xs text-slate-300">
+                            <span className="text-xs text-gray-300">
                               {pos.take_profit_orders.length}
                             </span>
                           ) : (
@@ -502,7 +502,7 @@ const LiveTradingPage: React.FC = () => {
 
                         {/* Age */}
                         <td className="px-4 py-3 text-right">
-                          <span className="flex items-center justify-end gap-1 text-xs text-slate-500">
+                          <span className="flex items-center justify-end gap-1 text-xs text-gray-500">
                             <Clock size={10} />
                             {formatAge(pos.executed_at || pos.created_at)}
                           </span>
@@ -526,22 +526,22 @@ const LiveTradingPage: React.FC = () => {
 
             {/* Pagination */}
             {data.total_pages > 1 && (
-              <div className="flex items-center justify-between px-4 py-3 border-t border-slate-800">
-                <p className="text-xs text-slate-500">
+              <div className="flex items-center justify-between px-4 py-3 border-t border-dark-border">
+                <p className="text-xs text-gray-500">
                   Page {data.page} of {data.total_pages} ({data.total} positions)
                 </p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setPage(Math.max(1, page - 1))}
                     disabled={!data.has_prev}
-                    className="px-3 py-1.5 text-xs bg-slate-800 text-slate-300 rounded-lg disabled:opacity-30 hover:bg-slate-700 transition-all"
+                    className="px-3 py-1.5 text-xs bg-dark-elevated text-gray-300 rounded-lg disabled:opacity-30 hover:bg-dark-surface transition-all"
                   >
                     Previous
                   </button>
                   <button
                     onClick={() => setPage(page + 1)}
                     disabled={!data.has_next}
-                    className="px-3 py-1.5 text-xs bg-slate-800 text-slate-300 rounded-lg disabled:opacity-30 hover:bg-slate-700 transition-all"
+                    className="px-3 py-1.5 text-xs bg-dark-elevated text-gray-300 rounded-lg disabled:opacity-30 hover:bg-dark-surface transition-all"
                   >
                     Next
                   </button>
@@ -560,14 +560,14 @@ const LiveTradingPage: React.FC = () => {
       {/* Close Position Confirmation Dialog */}
       {closeTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden">
+          <div className="bg-dark-elevated border border-dark-border rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden">
             {/* Header */}
             <div className="px-6 py-4 bg-red-500/10 border-b border-red-500/20">
               <div className="flex items-center gap-3">
                 <AlertTriangle className="text-red-400" size={24} />
                 <div>
                   <h3 className="text-lg font-bold text-white">Close Position</h3>
-                  <p className="text-sm text-slate-400">This will close the position on the exchange</p>
+                  <p className="text-sm text-gray-400">This will close the position on the exchange</p>
                 </div>
               </div>
             </div>
@@ -576,43 +576,43 @@ const LiveTradingPage: React.FC = () => {
             <div className="px-6 py-4 space-y-3">
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <span className="text-slate-500">Symbol</span>
+                  <span className="text-gray-500">Symbol</span>
                   <p className="text-white font-medium">{closeTarget.symbol}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500">Side</span>
+                  <span className="text-gray-500">Side</span>
                   <p className={closeTarget.side?.toUpperCase().includes('BUY') || closeTarget.side?.toUpperCase() === 'LONG' ? 'text-emerald-400 font-medium' : 'text-red-400 font-medium'}>
                     {closeTarget.side?.toUpperCase().includes('BUY') || closeTarget.side?.toUpperCase() === 'LONG' ? 'LONG' : 'SHORT'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-500">Exchange</span>
+                  <span className="text-gray-500">Exchange</span>
                   <p className="text-white">{closeTarget.exchange_type}{closeTarget.is_testnet ? ' (Testnet)' : ''}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500">Leverage</span>
+                  <span className="text-gray-500">Leverage</span>
                   <p className="text-cyan-400 font-medium">{closeTarget.leverage}x</p>
                 </div>
                 <div>
-                  <span className="text-slate-500">Entry Price</span>
+                  <span className="text-gray-500">Entry Price</span>
                   <p className="text-white font-mono">${closeTarget.entry_price?.toLocaleString() ?? '—'}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500">Current Price</span>
+                  <span className="text-gray-500">Current Price</span>
                   <p className="text-white font-mono">${closeTarget.current_price?.toLocaleString() ?? '—'}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500">Quantity</span>
+                  <span className="text-gray-500">Quantity</span>
                   <p className="text-white font-mono">{closeTarget.remaining_quantity ?? closeTarget.quantity ?? '—'}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500">Position Size</span>
+                  <span className="text-gray-500">Position Size</span>
                   <p className="text-white font-mono">
                     ${closeTarget.position_size_usdt?.toLocaleString(undefined, { maximumFractionDigits: 0 }) ?? '—'}
                   </p>
                 </div>
                 <div className="col-span-2">
-                  <span className="text-slate-500">Unrealized PnL</span>
+                  <span className="text-gray-500">Unrealized PnL</span>
                   <p
                     className={`font-mono font-medium ${
                       (closeTarget.unrealized_pnl ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400'
@@ -637,11 +637,11 @@ const LiveTradingPage: React.FC = () => {
             </div>
 
             {/* Actions */}
-            <div className="px-6 py-4 border-t border-slate-800 flex gap-3 justify-end">
+            <div className="px-6 py-4 border-t border-dark-border flex gap-3 justify-end">
               <button
                 onClick={() => setCloseTarget(null)}
                 disabled={closing}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-medium transition-all"
+                className="px-4 py-2 bg-dark-elevated hover:bg-dark-surface text-gray-300 rounded-xl text-sm font-medium transition-all"
               >
                 Cancel
               </button>
